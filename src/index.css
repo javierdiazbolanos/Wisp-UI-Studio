@@ -1,0 +1,28 @@
+@import "tailwindcss";
+
+html, body, #root {
+  height: 100%;
+  width: 100%;
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+}
+
+/* Monaco Custom Line / Block Highlight */
+.monaco-highlight-line {
+  background: rgba(168, 85, 247, 0.22) !important;
+  border-left: 3px solid #A855F7 !important;
+}
+
+.monaco-highlight-block-line {
+  background: rgba(168, 85, 247, 0.28) !important;
+  border-left: 3px solid #C084FC !important;
+}
+
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
