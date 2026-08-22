@@ -1,6 +1,35 @@
 /**
- * Material 3 Expressive Design System Tokens & Dynamic Color Engine
+ * Google Material 3 Expressive Design System Tokens & Dynamic Color Engine
+ * Powered by official @material/material-color-utilities
  */
+
+import {
+  argbFromHex,
+  hexFromArgb,
+  Hct,
+  MaterialDynamicColors,
+  SchemeExpressive,
+  SchemeVibrant,
+  SchemeFruitSalad,
+  SchemeRainbow,
+  SchemeTonalSpot,
+  SchemeFidelity,
+  SchemeContent,
+  SchemeNeutral,
+  SchemeMonochrome,
+  DynamicScheme,
+} from "@material/material-color-utilities";
+
+export type M3SchemeVariant =
+  | "expressive"
+  | "vibrant"
+  | "fruit_salad"
+  | "rainbow"
+  | "tonal_spot"
+  | "fidelity"
+  | "content"
+  | "neutral"
+  | "monochrome";
 
 export interface M3ColorScheme {
   primary: string;
@@ -41,413 +70,293 @@ export interface M3ColorScheme {
   outlineVariant: string;
   shadow: string;
   scrim: string;
+  surfaceTint: string;
   inverseSurface: string;
   inverseOnSurface: string;
   inversePrimary: string;
+
+  // Fixed & Expressive Accent Tokens
+  primaryFixed: string;
+  primaryFixedDim: string;
+  onPrimaryFixed: string;
+  secondaryFixed: string;
+  secondaryFixedDim: string;
+  onSecondaryFixed: string;
+  tertiaryFixed: string;
+  tertiaryFixedDim: string;
+  onTertiaryFixed: string;
 }
 
 export interface M3Preset {
   id: string;
   name: string;
   seedHex: string;
+  variant: M3SchemeVariant;
+  description: string;
   light: M3ColorScheme;
   dark: M3ColorScheme;
 }
 
+/**
+ * Material 3 Expressive Motion & Animation Tokens
+ */
+export const M3_MOTION = {
+  // Spring Transitions
+  emphasized: {
+    type: "spring",
+    stiffness: 300,
+    damping: 24,
+    mass: 0.8,
+  },
+  expressiveBounce: {
+    type: "spring",
+    stiffness: 280,
+    damping: 16,
+    mass: 0.9,
+  },
+  spatial: {
+    type: "spring",
+    stiffness: 260,
+    damping: 22,
+  },
+  smooth: {
+    type: "spring",
+    stiffness: 220,
+    damping: 28,
+  },
+  gentle: {
+    type: "spring",
+    stiffness: 180,
+    damping: 22,
+  },
+
+  // Easing Curves (CSS standard & expressive)
+  easingEmphasized: "cubic-bezier(0.2, 0.0, 0, 1.0)",
+  easingExpressive: "cubic-bezier(0.3, 0.0, 0.1, 1.0)",
+  easingStandardDecelerate: "cubic-bezier(0.0, 0.0, 0.2, 1.0)",
+  easingStandardAccelerate: "cubic-bezier(0.3, 0.0, 1.0, 1.0)",
+
+  // Standard Durations (ms)
+  durationShort: 0.15,
+  durationMedium: 0.28,
+  durationLong: 0.45,
+  durationExtraLong: 0.6,
+};
+
+/**
+ * Material 3 Expressive Shape Tokens
+ */
+export const M3_SHAPES = {
+  none: "0px",
+  extraSmall: "4px", // rounded
+  small: "8px", // rounded-lg
+  medium: "12px", // rounded-xl
+  large: "16px", // rounded-2xl
+  extraLarge: "28px", // rounded-3xl / custom
+  extraLargePlus: "32px",
+  full: "9999px", // rounded-full (Pill)
+};
+
+/**
+ * Instantiates the dynamic scheme using Google's official @material/material-color-utilities
+ */
+function createDynamicScheme(
+  sourceHct: Hct,
+  isDark: boolean,
+  variant: M3SchemeVariant,
+  contrastLevel: number = 0.0
+): DynamicScheme {
+  switch (variant) {
+    case "expressive":
+      return new SchemeExpressive(sourceHct, isDark, contrastLevel);
+    case "vibrant":
+      return new SchemeVibrant(sourceHct, isDark, contrastLevel);
+    case "fruit_salad":
+      return new SchemeFruitSalad(sourceHct, isDark, contrastLevel);
+    case "rainbow":
+      return new SchemeRainbow(sourceHct, isDark, contrastLevel);
+    case "fidelity":
+      return new SchemeFidelity(sourceHct, isDark, contrastLevel);
+    case "content":
+      return new SchemeContent(sourceHct, isDark, contrastLevel);
+    case "neutral":
+      return new SchemeNeutral(sourceHct, isDark, contrastLevel);
+    case "monochrome":
+      return new SchemeMonochrome(sourceHct, isDark, contrastLevel);
+    case "tonal_spot":
+    default:
+      return new SchemeTonalSpot(sourceHct, isDark, contrastLevel);
+  }
+}
+
+/**
+ * Extracts a complete M3ColorScheme from a DynamicScheme instance
+ */
+function extractSchemeTokens(scheme: DynamicScheme): M3ColorScheme {
+  const getHex = (dynamicColor: any, fallback: string = "#000000"): string => {
+    try {
+      if (!dynamicColor) return fallback;
+      const argb = dynamicColor.getArgb(scheme);
+      return hexFromArgb(argb);
+    } catch {
+      return fallback;
+    }
+  };
+
+  return {
+    primary: getHex(MaterialDynamicColors.primary, "#6750A4"),
+    onPrimary: getHex(MaterialDynamicColors.onPrimary, "#FFFFFF"),
+    primaryContainer: getHex(MaterialDynamicColors.primaryContainer, "#EADDFF"),
+    onPrimaryContainer: getHex(MaterialDynamicColors.onPrimaryContainer, "#21005D"),
+
+    secondary: getHex(MaterialDynamicColors.secondary, "#625B71"),
+    onSecondary: getHex(MaterialDynamicColors.onSecondary, "#FFFFFF"),
+    secondaryContainer: getHex(MaterialDynamicColors.secondaryContainer, "#E8DEF8"),
+    onSecondaryContainer: getHex(MaterialDynamicColors.onSecondaryContainer, "#1D192B"),
+
+    tertiary: getHex(MaterialDynamicColors.tertiary, "#7D5260"),
+    onTertiary: getHex(MaterialDynamicColors.onTertiary, "#FFFFFF"),
+    tertiaryContainer: getHex(MaterialDynamicColors.tertiaryContainer, "#FFD8E4"),
+    onTertiaryContainer: getHex(MaterialDynamicColors.onTertiaryContainer, "#31111D"),
+
+    error: getHex(MaterialDynamicColors.error, "#BA1A1A"),
+    onError: getHex(MaterialDynamicColors.onError, "#FFFFFF"),
+    errorContainer: getHex(MaterialDynamicColors.errorContainer, "#FFDAD6"),
+    onErrorContainer: getHex(MaterialDynamicColors.onErrorContainer, "#410002"),
+
+    background: getHex(MaterialDynamicColors.background, "#FEF7FF"),
+    onBackground: getHex(MaterialDynamicColors.onBackground, "#1D1B20"),
+
+    surface: getHex(MaterialDynamicColors.surface, "#FEF7FF"),
+    surfaceDim: getHex(MaterialDynamicColors.surfaceDim, "#DED8E1"),
+    surfaceBright: getHex(MaterialDynamicColors.surfaceBright, "#FEF7FF"),
+    surfaceContainerLowest: getHex(MaterialDynamicColors.surfaceContainerLowest, "#FFFFFF"),
+    surfaceContainerLow: getHex(MaterialDynamicColors.surfaceContainerLow, "#F7F2FA"),
+    surfaceContainer: getHex(MaterialDynamicColors.surfaceContainer, "#F3EDF7"),
+    surfaceContainerHigh: getHex(MaterialDynamicColors.surfaceContainerHigh, "#ECE6F0"),
+    surfaceContainerHighest: getHex(MaterialDynamicColors.surfaceContainerHighest, "#E6E0E9"),
+    onSurface: getHex(MaterialDynamicColors.onSurface, "#1D1B20"),
+    onSurfaceVariant: getHex(MaterialDynamicColors.onSurfaceVariant, "#49454F"),
+
+    outline: getHex(MaterialDynamicColors.outline, "#79747E"),
+    outlineVariant: getHex(MaterialDynamicColors.outlineVariant, "#CAC4D0"),
+    shadow: getHex(MaterialDynamicColors.shadow, "#000000"),
+    scrim: getHex(MaterialDynamicColors.scrim, "#000000"),
+    surfaceTint: getHex(MaterialDynamicColors.surfaceTint, "#6750A4"),
+    inverseSurface: getHex(MaterialDynamicColors.inverseSurface, "#313033"),
+    inverseOnSurface: getHex(MaterialDynamicColors.inverseOnSurface, "#F4EFF4"),
+    inversePrimary: getHex(MaterialDynamicColors.inversePrimary, "#D0BCFF"),
+
+    primaryFixed: getHex(MaterialDynamicColors.primaryFixed, "#EADDFF"),
+    primaryFixedDim: getHex(MaterialDynamicColors.primaryFixedDim, "#D0BCFF"),
+    onPrimaryFixed: getHex(MaterialDynamicColors.onPrimaryFixed, "#21005D"),
+    secondaryFixed: getHex(MaterialDynamicColors.secondaryFixed, "#E8DEF8"),
+    secondaryFixedDim: getHex(MaterialDynamicColors.secondaryFixedDim, "#CCC2DC"),
+    onSecondaryFixed: getHex(MaterialDynamicColors.onSecondaryFixed, "#1D192B"),
+    tertiaryFixed: getHex(MaterialDynamicColors.tertiaryFixed, "#FFD8E4"),
+    tertiaryFixedDim: getHex(MaterialDynamicColors.tertiaryFixedDim, "#EFB8C8"),
+    onTertiaryFixed: getHex(MaterialDynamicColors.onTertiaryFixed, "#31111D"),
+  };
+}
+
+/**
+ * Generates an official Material 3 color scheme dynamically from any seed hex color
+ */
+export function generateM3Scheme(
+  seedHex: string,
+  isDark: boolean,
+  variant: M3SchemeVariant = "expressive",
+  contrastLevel: number = 0.0
+): M3ColorScheme {
+  try {
+    const cleanHex = seedHex.startsWith("#") ? seedHex : `#${seedHex}`;
+    const argb = argbFromHex(cleanHex);
+    const sourceHct = Hct.fromInt(argb);
+    const dynamicScheme = createDynamicScheme(sourceHct, isDark, variant, contrastLevel);
+    return extractSchemeTokens(dynamicScheme);
+  } catch (err) {
+    console.error("Error generating M3 scheme with @material/material-color-utilities:", err);
+    // Return baseline fallback
+    return M3_PRESETS.indigo[isDark ? "dark" : "light"];
+  }
+}
+
+/**
+ * Pre-configured curated presets demonstrating M3 Expressive color harmonies
+ */
+export function createPreset(
+  id: string,
+  name: string,
+  seedHex: string,
+  variant: M3SchemeVariant,
+  description: string
+): M3Preset {
+  return {
+    id,
+    name,
+    seedHex,
+    variant,
+    description,
+    light: generateM3Scheme(seedHex, false, variant, 0.0),
+    dark: generateM3Scheme(seedHex, true, variant, 0.0),
+  };
+}
+
 export const M3_PRESETS: Record<string, M3Preset> = {
-  indigo: {
-    id: "indigo",
-    name: "Material Baseline (Indigo / Purple)",
-    seedHex: "#6750A4",
-    light: {
-      primary: "#6750A4",
-      onPrimary: "#FFFFFF",
-      primaryContainer: "#EADDFF",
-      onPrimaryContainer: "#21005D",
-      secondary: "#625B71",
-      onSecondary: "#FFFFFF",
-      secondaryContainer: "#E8DEF8",
-      onSecondaryContainer: "#1D192B",
-      tertiary: "#7D5260",
-      onTertiary: "#FFFFFF",
-      tertiaryContainer: "#FFD8E4",
-      onTertiaryContainer: "#31111D",
-      error: "#BA1A1A",
-      onError: "#FFFFFF",
-      errorContainer: "#FFDAD6",
-      onErrorContainer: "#410002",
-      background: "#FEF7FF",
-      onBackground: "#1D1B20",
-      surface: "#FEF7FF",
-      surfaceDim: "#DED8E1",
-      surfaceBright: "#FEF7FF",
-      surfaceContainerLowest: "#FFFFFF",
-      surfaceContainerLow: "#F7F2FA",
-      surfaceContainer: "#F3EDF7",
-      surfaceContainerHigh: "#ECE6F0",
-      surfaceContainerHighest: "#E6E0E9",
-      onSurface: "#1D1B20",
-      onSurfaceVariant: "#49454F",
-      outline: "#79747E",
-      outlineVariant: "#CAC4D0",
-      shadow: "#000000",
-      scrim: "#000000",
-      inverseSurface: "#313033",
-      inverseOnSurface: "#F4EFF4",
-      inversePrimary: "#D0BCFF",
-    },
-    dark: {
-      primary: "#D0BCFF",
-      onPrimary: "#381E72",
-      primaryContainer: "#4F378B",
-      onPrimaryContainer: "#EADDFF",
-      secondary: "#CCC2DC",
-      onSecondary: "#332D41",
-      secondaryContainer: "#4A4458",
-      onSecondaryContainer: "#E8DEF8",
-      tertiary: "#EFB8C8",
-      onTertiary: "#492532",
-      tertiaryContainer: "#633B48",
-      onTertiaryContainer: "#FFD8E4",
-      error: "#FFB4AB",
-      onError: "#690005",
-      errorContainer: "#93000A",
-      onErrorContainer: "#FFDAD6",
-      background: "#141218",
-      onBackground: "#E6E0E9",
-      surface: "#141218",
-      surfaceDim: "#141218",
-      surfaceBright: "#3B383E",
-      surfaceContainerLowest: "#0F0D13",
-      surfaceContainerLow: "#1D1B20",
-      surfaceContainer: "#211F26",
-      surfaceContainerHigh: "#2B2930",
-      surfaceContainerHighest: "#36343B",
-      onSurface: "#E6E0E9",
-      onSurfaceVariant: "#CAC4D0",
-      outline: "#938F99",
-      outlineVariant: "#49454F",
-      shadow: "#000000",
-      scrim: "#000000",
-      inverseSurface: "#E6E0E9",
-      inverseOnSurface: "#313033",
-      inversePrimary: "#6750A4",
-    },
-  },
-  emerald: {
-    id: "emerald",
-    name: "Emerald Forest",
-    seedHex: "#006C4C",
-    light: {
-      primary: "#006C4C",
-      onPrimary: "#FFFFFF",
-      primaryContainer: "#89F8C6",
-      onPrimaryContainer: "#002114",
-      secondary: "#4C6356",
-      onSecondary: "#FFFFFF",
-      secondaryContainer: "#CEE9D7",
-      onSecondaryContainer: "#092015",
-      tertiary: "#3E6374",
-      onTertiary: "#FFFFFF",
-      tertiaryContainer: "#C2E8FD",
-      onTertiaryContainer: "#001F2A",
-      error: "#BA1A1A",
-      onError: "#FFFFFF",
-      errorContainer: "#FFDAD6",
-      onErrorContainer: "#410002",
-      background: "#FBFDF8",
-      onBackground: "#191C1A",
-      surface: "#FBFDF8",
-      surfaceDim: "#D8DBD4",
-      surfaceBright: "#FBFDF8",
-      surfaceContainerLowest: "#FFFFFF",
-      surfaceContainerLow: "#F2F5EF",
-      surfaceContainer: "#ECEFE9",
-      surfaceContainerHigh: "#E7E9E3",
-      surfaceContainerHighest: "#E1E4DE",
-      onSurface: "#191C1A",
-      onSurfaceVariant: "#404943",
-      outline: "#707973",
-      outlineVariant: "#BFC9C1",
-      shadow: "#000000",
-      scrim: "#000000",
-      inverseSurface: "#2E312E",
-      inverseOnSurface: "#EFF2EC",
-      inversePrimary: "#6CDBAB",
-    },
-    dark: {
-      primary: "#6CDBAB",
-      onPrimary: "#003825",
-      primaryContainer: "#005138",
-      onPrimaryContainer: "#89F8C6",
-      secondary: "#B3CCBC",
-      onSecondary: "#1F352A",
-      secondaryContainer: "#354C3F",
-      onSecondaryContainer: "#CEE9D7",
-      tertiary: "#A6CCE0",
-      onTertiary: "#073544",
-      tertiaryContainer: "#254C5C",
-      onTertiaryContainer: "#C2E8FD",
-      error: "#FFB4AB",
-      onError: "#690005",
-      errorContainer: "#93000A",
-      onErrorContainer: "#FFDAD6",
-      background: "#101412",
-      onBackground: "#E1E4DE",
-      surface: "#101412",
-      surfaceDim: "#101412",
-      surfaceBright: "#363A37",
-      surfaceContainerLowest: "#0B0F0D",
-      surfaceContainerLow: "#191C1A",
-      surfaceContainer: "#1D201E",
-      surfaceContainerHigh: "#272B28",
-      surfaceContainerHighest: "#323633",
-      onSurface: "#E1E4DE",
-      onSurfaceVariant: "#BFC9C1",
-      outline: "#8A938C",
-      outlineVariant: "#404943",
-      shadow: "#000000",
-      scrim: "#000000",
-      inverseSurface: "#E1E4DE",
-      inverseOnSurface: "#2E312E",
-      inversePrimary: "#006C4C",
-    },
-  },
-  ocean: {
-    id: "ocean",
-    name: "Ocean Azure",
-    seedHex: "#00639B",
-    light: {
-      primary: "#00639B",
-      onPrimary: "#FFFFFF",
-      primaryContainer: "#CEE5FF",
-      onPrimaryContainer: "#001D33",
-      secondary: "#51606F",
-      onSecondary: "#FFFFFF",
-      secondaryContainer: "#D5E4F6",
-      onSecondaryContainer: "#0E1D2A",
-      tertiary: "#68587A",
-      onTertiary: "#FFFFFF",
-      tertiaryContainer: "#EFDBFF",
-      onTertiaryContainer: "#231533",
-      error: "#BA1A1A",
-      onError: "#FFFFFF",
-      errorContainer: "#FFDAD6",
-      onErrorContainer: "#410002",
-      background: "#FCFCFF",
-      onBackground: "#1A1C1E",
-      surface: "#FCFCFF",
-      surfaceDim: "#D9DADC",
-      surfaceBright: "#FCFCFF",
-      surfaceContainerLowest: "#FFFFFF",
-      surfaceContainerLow: "#F3F3F6",
-      surfaceContainer: "#EDEEF0",
-      surfaceContainerHigh: "#E7E8EB",
-      surfaceContainerHighest: "#E2E2E5",
-      onSurface: "#1A1C1E",
-      onSurfaceVariant: "#42474E",
-      outline: "#72777F",
-      outlineVariant: "#C2C7CF",
-      shadow: "#000000",
-      scrim: "#000000",
-      inverseSurface: "#2F3033",
-      inverseOnSurface: "#F0F0F3",
-      inversePrimary: "#97CBFF",
-    },
-    dark: {
-      primary: "#97CBFF",
-      onPrimary: "#003353",
-      primaryContainer: "#004B76",
-      onPrimaryContainer: "#CEE5FF",
-      secondary: "#B9C8DA",
-      onSecondary: "#233240",
-      secondaryContainer: "#3A4857",
-      onSecondaryContainer: "#D5E4F6",
-      tertiary: "#D3BFE6",
-      onTertiary: "#392A49",
-      tertiaryContainer: "#504061",
-      onTertiaryContainer: "#EFDBFF",
-      error: "#FFB4AB",
-      onError: "#690005",
-      errorContainer: "#93000A",
-      onErrorContainer: "#FFDAD6",
-      background: "#111417",
-      onBackground: "#E2E2E5",
-      surface: "#111417",
-      surfaceDim: "#111417",
-      surfaceBright: "#37393C",
-      surfaceContainerLowest: "#0C0F11",
-      surfaceContainerLow: "#1A1C1E",
-      surfaceContainer: "#1E2023",
-      surfaceContainerHigh: "#282A2D",
-      surfaceContainerHighest: "#333538",
-      onSurface: "#E2E2E5",
-      onSurfaceVariant: "#C2C7CF",
-      outline: "#8C9199",
-      outlineVariant: "#42474E",
-      shadow: "#000000",
-      scrim: "#000000",
-      inverseSurface: "#E2E2E5",
-      inverseOnSurface: "#2F3033",
-      inversePrimary: "#00639B",
-    },
-  },
-  amber: {
-    id: "amber",
-    name: "Warm Amber",
-    seedHex: "#8B5000",
-    light: {
-      primary: "#8B5000",
-      onPrimary: "#FFFFFF",
-      primaryContainer: "#FFDDB3",
-      onPrimaryContainer: "#2C1600",
-      secondary: "#705B40",
-      onSecondary: "#FFFFFF",
-      secondaryContainer: "#FCDEBC",
-      onSecondaryContainer: "#271905",
-      tertiary: "#52643E",
-      onTertiary: "#FFFFFF",
-      tertiaryContainer: "#D5EABA",
-      onTertiaryContainer: "#111F03",
-      error: "#BA1A1A",
-      onError: "#FFFFFF",
-      errorContainer: "#FFDAD6",
-      onErrorContainer: "#410002",
-      background: "#FFF8F4",
-      onBackground: "#211A13",
-      surface: "#FFF8F4",
-      surfaceDim: "#E4D8CE",
-      surfaceBright: "#FFF8F4",
-      surfaceContainerLowest: "#FFFFFF",
-      surfaceContainerLow: "#FDF2E8",
-      surfaceContainer: "#F7ECE2",
-      surfaceContainerHigh: "#F2E6DC",
-      surfaceContainerHighest: "#ECE0D7",
-      onSurface: "#211A13",
-      onSurfaceVariant: "#504539",
-      outline: "#837568",
-      outlineVariant: "#D5C4B4",
-      shadow: "#000000",
-      scrim: "#000000",
-      inverseSurface: "#362F27",
-      inverseOnSurface: "#FAEEE4",
-      inversePrimary: "#FFB950",
-    },
-    dark: {
-      primary: "#FFB950",
-      onPrimary: "#4A2800",
-      primaryContainer: "#693C00",
-      onPrimaryContainer: "#FFDDB3",
-      secondary: "#DFBF9C",
-      onSecondary: "#3E2D16",
-      secondaryContainer: "#56432B",
-      onSecondaryContainer: "#FCDEBC",
-      tertiary: "#B9CDA0",
-      onTertiary: "#253514",
-      tertiaryContainer: "#3B4C28",
-      onTertiaryContainer: "#D5EABA",
-      error: "#FFB4AB",
-      onError: "#690005",
-      errorContainer: "#93000A",
-      onErrorContainer: "#FFDAD6",
-      background: "#18120C",
-      onBackground: "#ECE0D7",
-      surface: "#18120C",
-      surfaceDim: "#18120C",
-      surfaceBright: "#403830",
-      surfaceContainerLowest: "#120D07",
-      surfaceContainerLow: "#211A13",
-      surfaceContainer: "#251E17",
-      surfaceContainerHigh: "#302821",
-      surfaceContainerHighest: "#3B332B",
-      onSurface: "#ECE0D7",
-      onSurfaceVariant: "#D5C4B4",
-      outline: "#9D8E80",
-      outlineVariant: "#504539",
-      shadow: "#000000",
-      scrim: "#000000",
-      inverseSurface: "#ECE0D7",
-      inverseOnSurface: "#362F27",
-      inversePrimary: "#8B5000",
-    },
-  },
-  coral: {
-    id: "coral",
-    name: "Radiant Coral",
-    seedHex: "#A33E3E",
-    light: {
-      primary: "#A33E3E",
-      onPrimary: "#FFFFFF",
-      primaryContainer: "#FFDAD7",
-      onPrimaryContainer: "#410006",
-      secondary: "#775654",
-      onSecondary: "#FFFFFF",
-      secondaryContainer: "#FFDAD7",
-      onSecondaryContainer: "#2C1514",
-      tertiary: "#725B2E",
-      onTertiary: "#FFFFFF",
-      tertiaryContainer: "#FEDEA6",
-      onTertiaryContainer: "#261900",
-      error: "#BA1A1A",
-      onError: "#FFFFFF",
-      errorContainer: "#FFDAD6",
-      onErrorContainer: "#410002",
-      background: "#FFF8F7",
-      onBackground: "#231919",
-      surface: "#FFF8F7",
-      surfaceDim: "#E6D6D5",
-      surfaceBright: "#FFF8F7",
-      surfaceContainerLowest: "#FFFFFF",
-      surfaceContainerLow: "#FFF0EF",
-      surfaceContainer: "#FAEAEA",
-      surfaceContainerHigh: "#F4E4E4",
-      surfaceContainerHighest: "#EEDFDE",
-      onSurface: "#231919",
-      onSurfaceVariant: "#534342",
-      outline: "#857372",
-      outlineVariant: "#D8C2C1",
-      shadow: "#000000",
-      scrim: "#000000",
-      inverseSurface: "#382E2E",
-      inverseOnSurface: "#FFEDEB",
-      inversePrimary: "#FFB3B0",
-    },
-    dark: {
-      primary: "#FFB3B0",
-      onPrimary: "#640F15",
-      primaryContainer: "#842729",
-      onPrimaryContainer: "#FFDAD7",
-      secondary: "#E7BDBA",
-      onSecondary: "#442928",
-      secondaryContainer: "#5D3F3D",
-      onSecondaryContainer: "#FFDAD7",
-      tertiary: "#E1C28C",
-      onTertiary: "#402D05",
-      tertiaryContainer: "#584319",
-      onTertiaryContainer: "#FEDEA6",
-      error: "#FFB4AB",
-      onError: "#690005",
-      errorContainer: "#93000A",
-      onErrorContainer: "#FFDAD6",
-      background: "#1A1111",
-      onBackground: "#EEDFDE",
-      surface: "#1A1111",
-      surfaceDim: "#1A1111",
-      surfaceBright: "#423736",
-      surfaceContainerLowest: "#140C0C",
-      surfaceContainerLow: "#231919",
-      surfaceContainer: "#271D1D",
-      surfaceContainerHigh: "#322827",
-      surfaceContainerHighest: "#3E3232",
-      onSurface: "#EEDFDE",
-      onSurfaceVariant: "#D8C2C1",
-      outline: "#A08C8B",
-      outlineVariant: "#534342",
-      shadow: "#000000",
-      scrim: "#000000",
-      inverseSurface: "#EEDFDE",
-      inverseOnSurface: "#382E2E",
-      inversePrimary: "#A33E3E",
-    },
-  },
+  indigo: createPreset(
+    "indigo",
+    "Material Baseline (Tonal Spot)",
+    "#6750A4",
+    "tonal_spot",
+    "Official Google Material 3 Baseline palette based on the Tonal Spot color model with Primary #6750A4 and Primary Container #EADDFF."
+  ),
+  expressive_iris: createPreset(
+    "expressive_iris",
+    "Expressive Iris (M3 Expressive)",
+    "#6750A4",
+    "expressive",
+    "Playful and vibrant design with chromatic decoupling of complementary hues following the official M3 Expressive algorithm."
+  ),
+  vibrant_sunset: createPreset(
+    "vibrant_sunset",
+    "Vibrant Sunset (M3 Vibrant)",
+    "#F4511E",
+    "vibrant",
+    "Maximized chroma and saturation engineered for energetic, high-impact visual interfaces."
+  ),
+  fruit_botanical: createPreset(
+    "fruit_botanical",
+    "Fruit Salad Botanical",
+    "#006C4C",
+    "fruit_salad",
+    "Fresh, organic palette inspired by botanical tones and lush fruit hues with rich tonal harmonies."
+  ),
+  ocean_azure: createPreset(
+    "ocean_azure",
+    "Ocean Azure (M3 Rainbow)",
+    "#00639B",
+    "rainbow",
+    "Fluid spectrum of oceanic hues with superior contrast ratios and accessibility compliance."
+  ),
+  warm_amber: createPreset(
+    "warm_amber",
+    "Warm Amber Expressive",
+    "#8B5000",
+    "expressive",
+    "Warm and welcoming honey and amber tones paired with expressive secondary and tertiary accents."
+  ),
+  radiant_coral: createPreset(
+    "radiant_coral",
+    "Radiant Coral (M3 Expressive)",
+    "#A33E3E",
+    "expressive",
+    "Energetic, striking accents tailored for event platforms, entertainment, and e-commerce."
+  ),
+  monochrome: createPreset(
+    "monochrome",
+    "Monochrome Minimal",
+    "#49454F",
+    "monochrome",
+    "Pure minimalist tonal scale designed for maximum clarity and luminance-driven readability."
+  ),
 };

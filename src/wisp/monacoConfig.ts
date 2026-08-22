@@ -25,14 +25,19 @@ export function registerWispLanguage(monacoInstance: Monaco) {
     tokenPostfix: ".wisp",
 
     keywords: [
-      "screen", "wizard", "dialog", "sheet",
-      "button", "textfield", "textarea", "card", "text",
+      "screen", "wizard", "dialog", "sheet", "modal", "toast", "component", "include", "use",
+      "drawer", "navigationdrawer", "appdrawer", "navdrawer", "draweritem",
+      "sidesheet", "bottomsheet", "navigationrail", "apprail", "navrail", "rail", "railitem", "rail-item", "destination",
+      "loading", "spinner", "circularprogress", "linearprogress",
+      "tooltip", "richtooltip", "carousel",
+      "iconbutton", "timepicker", "menu", "dropdown", "dropdownmenu", "menuitem", "section", "list",
+      "button", "textfield", "textarea", "searchbar", "search", "card", "text",
       "select", "option", "autocomplete", "datepicker", "radio",
       "switch", "checkbox", "slider",
       "chip", "segmentedbutton", "listitem", "avatar", "badge",
       "icon", "image", "progress", "metric", "stat", "alert",
-      "divider", "spacer", "row", "column", "grid", "split",
-      "tabs", "table", "appbar", "bottomnav", "navitem", "fab",
+      "divider", "spacer", "row", "column", "grid", "split", "sidebar", "container",
+      "tabs", "tab", "panel", "table", "appbar", "bottomnav", "navitem", "fab",
       "accordion", "snackbar", "breadcrumbs", "rating",
       "step", "data", "left", "right"
     ],

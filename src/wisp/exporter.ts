@@ -1,4 +1,6 @@
 import { WispDocument, ScreenNode, WispNode } from "./types";
+export { exportToJetpackCompose } from "./composeExporter";
+export { exportToFlutterM3 } from "./flutterExporter";
 
 /**
  * Escapes HTML entities.
@@ -89,7 +91,7 @@ export default function AppPrototype() {
 `;
 
   for (const screen of doc.screens) {
-    if (screen.type === "dialog" || screen.type === "modal" || screen.type === "sheet") {
+    if (screen.type === "dialog" || screen.type === "modal" || screen.type === "sheet" || screen.type === "component") {
       continue;
     }
 
@@ -241,6 +243,23 @@ ${indent}  <input
 ${indent}    type="${node.props.type || "text"}" 
 ${indent}    placeholder="${node.props.placeholder || ""}"
 ${indent}    className="w-full px-4 py-2.5 rounded-2xl border border-neutral-300 focus:outline-none focus:ring-2 focus:ring-purple-600 bg-white text-sm"
+${indent}    value={formData['${name}'] || ''}
+${indent}    onChange={e => handleInputChange('${name}', e.target.value)}
+${indent}  />
+${indent}</div>\n`;
+        break;
+      }
+
+      case "searchbar":
+      case "search": {
+        const name = node.props.name || node.id || "query";
+        const placeholder = node.props.placeholder || "Buscar...";
+        res += `${indent}<div className="relative flex items-center w-full">
+${indent}  <Search className="w-4 h-4 absolute left-3.5 text-neutral-400 pointer-events-none" />
+${indent}  <input 
+${indent}    type="text" 
+${indent}    placeholder="${placeholder}"
+${indent}    className="w-full pl-10 pr-4 py-2.5 rounded-full border border-neutral-300 focus:outline-none focus:ring-2 focus:ring-purple-600 bg-white text-sm"
 ${indent}    value={formData['${name}'] || ''}
 ${indent}    onChange={e => handleInputChange('${name}', e.target.value)}
 ${indent}  />
@@ -423,8 +442,7 @@ ${indent}</div>\n`;
         break;
       }
 
-      case "autocomplete":
-      case "searchbar": {
+      case "autocomplete": {
         const autoName = node.props.name || "autocomplete";
         const autoLabel = node.props.label || autoName;
         const autoChildOptions = (node.children || [])
@@ -752,9 +770,193 @@ ${indent}</div>\n`;
         break;
       }
 
+      case "appbar":
+      case "topappbar":
+      case "navbar":
+      case "topbar":
+      case "header": {
+        const title = node.props.title || node.props.label || node.props.value || (typeof node.props.name === "string" ? node.props.name : "") || "App Bar";
+        const subtitle = node.props.subtitle;
+        const icon = node.props.icon ? sanitizeIconName(node.props.icon) : (node.props.goto ? "arrow-left" : "");
+        const goto = node.props.goto;
+        const action = node.props.action;
+        const isElevated = node.props.elevated === true || node.props.variant === "elevated";
+
+        res += `${indent}<div className="w-full rounded-2xl md:rounded-3xl border border-neutral-200 bg-white px-4 py-3 md:px-5 md:py-3.5 flex flex-wrap items-center justify-between gap-3 ${isElevated ? "shadow-md" : "shadow-xs"}">
+${indent}  <div className="flex items-center gap-3">
+${icon ? `${indent}    <button type="button" ${goto ? `onClick={() => handleNavigateAction('${goto}')} ` : ""}className="p-2 rounded-full hover:bg-neutral-100 transition-colors text-neutral-700">
+${indent}      <i data-lucide="${icon}" className="w-5 h-5" />
+${indent}    </button>\n` : ""}${indent}    <div>
+${indent}      <h2 className="text-base sm:text-lg font-bold text-neutral-900 tracking-tight">${title}</h2>
+${subtitle ? `${indent}      <p className="text-xs text-neutral-500">${subtitle}</p>\n` : ""}${indent}    </div>
+${indent}  </div>
+${indent}  <div className="flex items-center gap-2">
+${node.children.length > 0 ? renderNodesToReact(node.children, indentLevel + 2) : ""}${action ? `${indent}    <button type="button" className="px-3.5 py-1.5 rounded-full text-xs font-bold bg-purple-700 text-white shadow-xs uppercase tracking-wider">${action}</button>\n` : ""}${indent}  </div>
+${indent}</div>\n`;
+        break;
+      }
+
+      case "bottomnav":
+      case "bottombar":
+      case "navigationbar": {
+        res += `${indent}<nav className="w-full rounded-2xl md:rounded-3xl border border-neutral-200 bg-white p-2 flex items-center justify-around gap-1 shadow-sm">
+${node.children.length > 0 ? renderNodesToReact(node.children, indentLevel + 1) : `${indent}  <button className="flex-1 py-1.5 px-2 flex flex-col items-center gap-1 text-purple-700 font-bold text-xs"><i data-lucide="home" className="w-4 h-4" /><span>Inicio</span></button>\n${indent}  <button className="flex-1 py-1.5 px-2 flex flex-col items-center gap-1 text-neutral-500 text-xs"><i data-lucide="search" className="w-4 h-4" /><span>Buscar</span></button>\n${indent}  <button className="flex-1 py-1.5 px-2 flex flex-col items-center gap-1 text-neutral-500 text-xs"><i data-lucide="user" className="w-4 h-4" /><span>Perfil</span></button>\n`}${indent}</nav>\n`;
+        break;
+      }
+
+      case "navitem": {
+        const label = node.props.label || node.props.title || node.props.value || "Item";
+        const icon = node.props.icon ? sanitizeIconName(node.props.icon) : "circle";
+        const isActive = node.props.active === true || node.props.active === "true";
+        const goto = node.props.goto;
+
+        res += `${indent}<button type="button" ${goto ? `onClick={() => handleNavigateAction('${goto}')} ` : ""}className="flex-1 py-1.5 px-2 flex flex-col items-center justify-center gap-1 rounded-xl transition-all ${isActive ? "text-purple-700 font-bold" : "text-neutral-500 hover:text-neutral-900"}">
+${indent}  <div className="px-4 py-1 rounded-full ${isActive ? "bg-purple-100 text-purple-800" : ""}">
+${indent}    <i data-lucide="${icon}" className="w-4 h-4" />
+${indent}  </div>
+${indent}  <span className="text-xs truncate">${label}</span>
+${indent}</button>\n`;
+        break;
+      }
+
       case "spacer": {
         const height = Number(node.props.height) || 16;
         res += `${indent}<div style={{ height: '${height}px' }} />\n`;
+        break;
+      }
+
+      case "loading":
+      case "spinner":
+      case "circularprogress":
+      case "linearprogress": {
+        const val = node.props.value;
+        const msg = node.props.message || node.props.label || "";
+        res += `${indent}<div className="flex flex-col items-center justify-center p-4 gap-2">
+${indent}  <div className="w-8 h-8 rounded-full border-4 border-purple-200 border-t-purple-700 animate-spin" />
+${msg ? `${indent}  <span className="text-xs font-semibold text-neutral-600">${msg}</span>\n` : ""}${indent}</div>\n`;
+        break;
+      }
+
+      case "navigationrail":
+      case "apprail":
+      case "navrail":
+      case "rail": {
+        const title = node.props.title || "";
+        res += `${indent}<aside className="w-20 border-r border-neutral-200 bg-white p-3 flex flex-col items-center gap-4 rounded-2xl">
+${title ? `${indent}  <span className="text-[10px] font-bold uppercase text-purple-700">${title}</span>\n` : ""}${node.children.length > 0 ? renderNodesToReact(node.children, indentLevel + 1) : ""}${indent}</aside>\n`;
+        break;
+      }
+
+      case "drawer":
+      case "navigationdrawer":
+      case "appdrawer":
+      case "navdrawer": {
+        const title = node.props.title || "Navegación";
+        res += `${indent}<nav className="w-72 rounded-3xl border border-neutral-200 bg-white p-4 shadow-sm space-y-2">
+${indent}  <h3 className="text-sm font-bold text-neutral-900 px-3 py-2">${title}</h3>
+${node.children.length > 0 ? renderNodesToReact(node.children, indentLevel + 1) : ""}${indent}</nav>\n`;
+        break;
+      }
+
+      case "draweritem": {
+        const label = node.props.label || "Item";
+        const icon = node.props.icon ? sanitizeIconName(node.props.icon) : "circle";
+        const isActive = node.props.active === true || node.props.active === "true";
+        res += `${indent}<button className="w-full flex items-center gap-3 px-3.5 py-2.5 rounded-full text-xs font-semibold ${isActive ? "bg-purple-100 text-purple-900" : "text-neutral-600 hover:bg-neutral-50"}">
+${indent}  <i data-lucide="${icon}" className="w-4 h-4" />
+${indent}  <span>${label}</span>
+${indent}</button>\n`;
+        break;
+      }
+
+      case "sidesheet":
+      case "side-sheet": {
+        const title = node.props.title || "Detalles";
+        res += `${indent}<aside className="w-80 rounded-3xl border border-neutral-200 bg-white p-5 shadow-sm space-y-4">
+${indent}  <h3 className="text-sm font-bold text-neutral-900 border-b pb-2">${title}</h3>
+${node.children.length > 0 ? renderNodesToReact(node.children, indentLevel + 1) : ""}${indent}</aside>\n`;
+        break;
+      }
+
+      case "bottomsheet": {
+        const title = node.props.title || "";
+        res += `${indent}<div className="w-full rounded-t-3xl border border-neutral-200 bg-white p-5 shadow-lg space-y-4">
+${indent}  <div className="w-12 h-1 rounded-full bg-neutral-300 mx-auto" />
+${title ? `${indent}  <h3 className="text-base font-bold text-neutral-900">${title}</h3>\n` : ""}${node.children.length > 0 ? renderNodesToReact(node.children, indentLevel + 1) : ""}${indent}</div>\n`;
+        break;
+      }
+
+      case "tooltip":
+      case "richtooltip":
+      case "rich-tooltip": {
+        const text = node.props.text || node.props.message || node.props.value || "Información";
+        res += `${indent}<div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-neutral-100 border text-xs text-neutral-700">
+${indent}  <span>${text}</span>
+${indent}</div>\n`;
+        break;
+      }
+
+      case "carousel": {
+        res += `${indent}<div className="w-full rounded-3xl border border-neutral-200 bg-white p-4 space-y-3">
+${node.children.length > 0 ? renderNodesToReact(node.children, indentLevel + 1) : ""}${indent}</div>\n`;
+        break;
+      }
+
+      case "iconbutton":
+      case "icon-button": {
+        const icon = node.props.icon || "star";
+        res += `${indent}<button className="p-2.5 rounded-full hover:bg-neutral-100 transition-all text-neutral-700">
+${indent}  <i data-lucide="${sanitizeIconName(icon)}" className="w-5 h-5" />
+${indent}</button>\n`;
+        break;
+      }
+
+      case "timepicker":
+      case "time-picker": {
+        const name = node.props.name || "time";
+        const label = node.props.label || name;
+        res += `${indent}<div className="space-y-1.5">
+${indent}  <label className="text-xs font-semibold text-neutral-600 uppercase">${label}</label>
+${indent}  <input type="time" className="px-4 py-2 rounded-2xl border border-neutral-300 bg-white font-bold" />
+${indent}</div>\n`;
+        break;
+      }
+
+      case "menu":
+      case "dropdown":
+      case "dropdownmenu": {
+        const label = node.props.label || "Opciones";
+        res += `${indent}<div className="relative inline-block">
+${indent}  <button className="px-3.5 py-2 rounded-2xl border bg-white text-xs font-semibold flex items-center gap-2">${label}</button>
+${node.children.length > 0 ? `${indent}  <div className="mt-1 rounded-2xl border bg-white p-1 shadow-lg">\n${renderNodesToReact(node.children, indentLevel + 2)}${indent}  </div>\n` : ""}${indent}</div>\n`;
+        break;
+      }
+
+      case "menuitem": {
+        const label = node.props.label || "Acción";
+        res += `${indent}<button className="w-full px-3 py-2 rounded-xl text-xs font-semibold hover:bg-neutral-100 text-left">${label}</button>\n`;
+        break;
+      }
+
+      case "section": {
+        const title = node.props.title || "Sección";
+        res += `${indent}<div className="pt-3 pb-1 text-[10px] font-bold uppercase text-purple-700 tracking-wider">${title}</div>\n`;
+        break;
+      }
+
+      case "list": {
+        res += `${indent}<div className="w-full rounded-2xl border border-neutral-200 divide-y divide-neutral-100 bg-white overflow-hidden">
+${node.children.length > 0 ? renderNodesToReact(node.children, indentLevel + 1) : ""}${indent}</div>\n`;
+        break;
+      }
+
+      case "component":
+      case "include":
+      case "use": {
+        if (node.children && node.children.length > 0) {
+          res += `${indent}{/* Reusable Component: @${node.props.name || node.props.id || "component"} */}\n`;
+          res += renderNodesToReact(node.children, indentLevel);
+        }
         break;
       }
 
@@ -782,27 +984,27 @@ function renderNodesToHTML(nodes: WispNode[], indentLevel = 4): string {
         const variant = node.props.variant || "body";
         const val = escapeHtml(node.props.value || "");
         let tag = "p";
-        let cls = "text-neutral-700 text-base leading-relaxed";
+        let cls = "text-neutral-700 dark:text-neutral-300 text-base leading-relaxed";
 
         if (variant === "display") {
           tag = "h1";
-          cls = "text-3xl md:text-4xl font-extrabold text-neutral-900 tracking-tight font-sans";
+          cls = "text-3xl md:text-4xl font-extrabold text-neutral-900 dark:text-white tracking-tight font-sans";
         } else if (variant === "headline") {
           tag = "h2";
-          cls = "text-2xl md:text-3xl font-bold text-neutral-900 tracking-tight font-sans";
+          cls = "text-2xl md:text-3xl font-bold text-neutral-900 dark:text-white tracking-tight font-sans";
         } else if (variant === "title") {
           tag = "h3";
-          cls = "text-lg md:text-xl font-semibold text-neutral-800";
+          cls = "text-lg md:text-xl font-semibold text-neutral-900 dark:text-white";
         } else if (variant === "label") {
           tag = "p";
-          cls = "text-xs font-semibold text-neutral-500 uppercase tracking-wider";
+          cls = "text-xs font-semibold text-neutral-500 dark:text-neutral-400 uppercase tracking-wider";
         } else if (variant === "caption") {
           tag = "p";
-          cls = "text-xs text-neutral-500";
+          cls = "text-xs text-neutral-500 dark:text-neutral-400";
         }
 
-        if (node.props.color === "primary") cls += " text-purple-700";
-        else if (node.props.color === "error") cls += " text-red-600";
+        if (node.props.color === "primary") cls += " text-purple-700 dark:text-purple-400";
+        else if (node.props.color === "error") cls += " text-red-600 dark:text-red-400";
 
         html += `${indent}<${tag} class="${cls}">${val}</${tag}>\n`;
         break;
@@ -810,7 +1012,7 @@ function renderNodesToHTML(nodes: WispNode[], indentLevel = 4): string {
 
       case "button": {
         const variant = node.props.variant || "filled";
-        const label = escapeHtml(node.props.label || "Botón");
+        const label = escapeHtml(node.props.label || "Button");
         const icon = node.props.icon ? sanitizeIconName(node.props.icon) : null;
         const goto = node.props.goto ? `data-goto="${escapeHtml(node.props.goto)}"` : "";
         const disabled = node.props.disabled ? "disabled" : "";
@@ -819,13 +1021,13 @@ function renderNodesToHTML(nodes: WispNode[], indentLevel = 4): string {
         if (variant === "filled") {
           cls += " bg-purple-700 hover:bg-purple-800 text-white shadow-purple-900/10";
         } else if (variant === "tonal") {
-          cls += " bg-purple-100 hover:bg-purple-200 text-purple-900";
+          cls += " bg-purple-100 dark:bg-purple-950/60 hover:bg-purple-200 dark:hover:bg-purple-900/60 text-purple-900 dark:text-purple-200";
         } else if (variant === "outlined") {
-          cls += " border border-purple-700 text-purple-700 hover:bg-purple-50 bg-transparent";
+          cls += " border border-purple-700 dark:border-purple-400 text-purple-700 dark:text-purple-400 hover:bg-purple-50 dark:hover:bg-purple-950/40 bg-transparent";
         } else if (variant === "text") {
-          cls += " text-purple-700 hover:bg-purple-50 bg-transparent shadow-none px-4";
+          cls += " text-purple-700 dark:text-purple-400 hover:bg-purple-50 dark:hover:bg-purple-950/40 bg-transparent shadow-none px-4";
         } else if (variant === "elevated") {
-          cls += " bg-white hover:bg-neutral-50 text-purple-700 shadow-md border border-neutral-100";
+          cls += " bg-white dark:bg-[#1E1B24] hover:bg-neutral-50 dark:hover:bg-neutral-800 text-purple-700 dark:text-purple-400 shadow-md border border-neutral-100 dark:border-neutral-800";
         }
 
         if (disabled) {
@@ -847,11 +1049,11 @@ ${indent}</button>\n`;
         const helper = node.props.helper || node.props.helperText ? escapeHtml(node.props.helper || node.props.helperText) : null;
 
         html += `${indent}<div class="space-y-1.5 w-full">
-${indent}  <label class="block text-xs font-semibold text-neutral-700 uppercase tracking-wide">${label}${node.props.required ? ' <span class="text-red-500">*</span>' : ""}</label>
+${indent}  <label class="block text-xs font-semibold text-neutral-700 dark:text-neutral-300 uppercase tracking-wide">${label}${node.props.required ? ' <span class="text-red-500">*</span>' : ""}</label>
 ${indent}  <div class="relative flex items-center">
-${icon ? `${indent}    <div class="absolute left-3.5 pointer-events-none text-neutral-400"><i data-lucide="${icon}" class="w-4 h-4"></i></div>\n` : ""}${indent}    <input type="${type}" name="${name}" placeholder="${placeholder}" class="w-full px-4 py-2.5 rounded-2xl text-sm transition-all outline-none border border-neutral-300 focus:border-purple-600 focus:ring-2 focus:ring-purple-600/20 bg-white ${icon ? "pl-10" : ""}" />
+${icon ? `${indent}    <div class="absolute left-3.5 pointer-events-none text-neutral-400"><i data-lucide="${icon}" class="w-4 h-4"></i></div>\n` : ""}${indent}    <input type="${type}" name="${name}" placeholder="${placeholder}" class="w-full px-4 py-2.5 rounded-2xl text-sm transition-all outline-none border border-neutral-300 dark:border-neutral-700 focus:border-purple-600 focus:ring-2 focus:ring-purple-600/20 bg-white dark:bg-[#1E1B24] text-neutral-900 dark:text-white ${icon ? "pl-10" : ""}" />
 ${indent}  </div>
-${helper ? `${indent}  <p class="text-[11px] text-neutral-500">${helper}</p>\n` : ""}${indent}</div>\n`;
+${helper ? `${indent}  <p class="text-[11px] text-neutral-500 dark:text-neutral-400">${helper}</p>\n` : ""}${indent}</div>\n`;
         break;
       }
 
@@ -862,8 +1064,8 @@ ${helper ? `${indent}  <p class="text-[11px] text-neutral-500">${helper}</p>\n` 
         const rows = Number(node.props.rows) || 3;
 
         html += `${indent}<div class="space-y-1.5 w-full">
-${indent}  <label class="block text-xs font-semibold text-neutral-700 uppercase tracking-wide">${label}</label>
-${indent}  <textarea name="${name}" rows="${rows}" placeholder="${placeholder}" class="w-full px-4 py-2.5 rounded-2xl text-sm transition-all outline-none border border-neutral-300 focus:border-purple-600 focus:ring-2 focus:ring-purple-600/20 bg-white resize-y"></textarea>
+${indent}  <label class="block text-xs font-semibold text-neutral-700 dark:text-neutral-300 uppercase tracking-wide">${label}</label>
+${indent}  <textarea name="${name}" rows="${rows}" placeholder="${placeholder}" class="w-full px-4 py-2.5 rounded-2xl text-sm transition-all outline-none border border-neutral-300 dark:border-neutral-700 focus:border-purple-600 focus:ring-2 focus:ring-purple-600/20 bg-white dark:bg-[#1E1B24] text-neutral-900 dark:text-white resize-y"></textarea>
 ${indent}</div>\n`;
         break;
       }
@@ -876,12 +1078,12 @@ ${indent}</div>\n`;
           .map(c => String(c.props.value || c.props.label || c.props.name || ""));
         const options: string[] = childOptions.length > 0
           ? childOptions
-          : (Array.isArray(node.props.options) ? node.props.options : ["Opción 1", "Opción 2", "Opción 3"]);
+          : (Array.isArray(node.props.options) ? node.props.options : ["Option 1", "Option 2", "Option 3"]);
 
         html += `${indent}<div class="space-y-1.5 w-full">
-${indent}  <label class="block text-xs font-semibold text-neutral-700 uppercase tracking-wide">${label}</label>
+${indent}  <label class="block text-xs font-semibold text-neutral-700 dark:text-neutral-300 uppercase tracking-wide">${label}</label>
 ${indent}  <div class="relative">
-${indent}    <select name="${name}" class="w-full px-4 py-2.5 rounded-2xl text-sm transition-all outline-none border border-neutral-300 bg-white appearance-none cursor-pointer pr-10 focus:border-purple-600 focus:ring-2 focus:ring-purple-600/20">
+${indent}    <select name="${name}" class="w-full px-4 py-2.5 rounded-2xl text-sm transition-all outline-none border border-neutral-300 dark:border-neutral-700 bg-white dark:bg-[#1E1B24] text-neutral-900 dark:text-white appearance-none cursor-pointer pr-10 focus:border-purple-600 focus:ring-2 focus:ring-purple-600/20">
 ${options.map(opt => `${indent}      <option value="${escapeHtml(opt)}">${escapeHtml(opt)}</option>`).join("\n")}
 ${indent}    </select>
 ${indent}    <i data-lucide="chevron-down" class="w-4 h-4 absolute right-3.5 top-1/2 -translate-y-1/2 pointer-events-none text-neutral-400"></i>
@@ -899,13 +1101,13 @@ ${indent}</div>\n`;
           .map(c => String(c.props.value || c.props.label || c.props.name || ""));
         const options: string[] = childOptions.length > 0
           ? childOptions
-          : (Array.isArray(node.props.options) ? node.props.options : ["Opción 1", "Opción 2", "Opción 3"]);
+          : (Array.isArray(node.props.options) ? node.props.options : ["Option 1", "Option 2", "Option 3"]);
 
         html += `${indent}<div class="space-y-1.5 w-full">
-${indent}  <label class="block text-xs font-semibold text-neutral-700 uppercase tracking-wide">${label}</label>
+${indent}  <label class="block text-xs font-semibold text-neutral-700 dark:text-neutral-300 uppercase tracking-wide">${label}</label>
 ${indent}  <div class="relative flex items-center">
 ${indent}    <div class="absolute left-3.5 pointer-events-none text-neutral-400"><i data-lucide="search" class="w-4 h-4"></i></div>
-${indent}    <input type="text" list="list_${name}" name="${name}" placeholder="${escapeHtml(node.props.placeholder || "Escribe para filtrar...")}" class="w-full pl-10 pr-4 py-2.5 rounded-2xl text-sm transition-all outline-none border border-neutral-300 focus:border-purple-600 focus:ring-2 focus:ring-purple-600/20 bg-white" />
+${indent}    <input type="text" list="list_${name}" name="${name}" placeholder="${escapeHtml(node.props.placeholder || "Type to filter...")}" class="w-full pl-10 pr-4 py-2.5 rounded-2xl text-sm transition-all outline-none border border-neutral-300 dark:border-neutral-700 focus:border-purple-600 focus:ring-2 focus:ring-purple-600/20 bg-white dark:bg-[#1E1B24] text-neutral-900 dark:text-white" />
 ${indent}    <datalist id="list_${name}">
 ${options.map(opt => `${indent}      <option value="${escapeHtml(opt)}"></option>`).join("\n")}
 ${indent}    </datalist>
@@ -919,8 +1121,8 @@ ${indent}</div>\n`;
         const label = escapeHtml(node.props.label || name);
 
         html += `${indent}<div class="space-y-1.5 w-full">
-${indent}  <label class="block text-xs font-semibold text-neutral-700 uppercase tracking-wide">${label}</label>
-${indent}  <input type="date" name="${name}" class="w-full px-4 py-2.5 rounded-2xl text-sm transition-all outline-none border border-neutral-300 focus:border-purple-600 focus:ring-2 focus:ring-purple-600/20 bg-white cursor-pointer" />
+${indent}  <label class="block text-xs font-semibold text-neutral-700 dark:text-neutral-300 uppercase tracking-wide">${label}</label>
+${indent}  <input type="date" name="${name}" class="w-full px-4 py-2.5 rounded-2xl text-sm transition-all outline-none border border-neutral-300 dark:border-neutral-700 focus:border-purple-600 focus:ring-2 focus:ring-purple-600/20 bg-white dark:bg-[#1E1B24] text-neutral-900 dark:text-white cursor-pointer" />
 ${indent}</div>\n`;
         break;
       }
@@ -932,7 +1134,7 @@ ${indent}</div>\n`;
 
         html += `${indent}<label class="flex items-center gap-2.5 py-1.5 cursor-pointer select-none">
 ${indent}  <input type="radio" name="${name}" value="${val}" ${node.props.checked ? "checked" : ""} class="w-4 h-4 accent-purple-700" />
-${indent}  <span class="text-sm text-neutral-800">${label}</span>
+${indent}  <span class="text-sm text-neutral-800 dark:text-neutral-200">${label}</span>
 ${indent}</label>\n`;
         break;
       }
@@ -941,14 +1143,14 @@ ${indent}</label>\n`;
         const name = escapeHtml(node.props.name || node.id);
         const options: string[] = Array.isArray(node.props.options)
           ? node.props.options
-          : ["Opción A", "Opción B", "Opción C"];
+          : ["Option A", "Option B", "Option C"];
         const selected = node.props.selected || options[0];
 
-        html += `${indent}<div class="inline-flex p-1 rounded-full border border-neutral-200 bg-neutral-100/80 overflow-hidden w-auto" data-segmented="${name}">
+        html += `${indent}<div class="inline-flex p-1 rounded-full border border-neutral-200 dark:border-neutral-700 bg-neutral-100/80 dark:bg-neutral-800/80 overflow-hidden w-auto" data-segmented="${name}">
 ${options
   .map(
     (opt, idx) => `  <button type="button" class="px-4 py-1.5 text-xs font-medium rounded-full transition-all flex items-center gap-1.5 cursor-pointer ${
-      opt === selected ? "bg-purple-100 text-purple-900 shadow-xs font-semibold active-segment" : "text-neutral-600 hover:bg-neutral-200/60"
+      opt === selected ? "bg-purple-100 dark:bg-purple-950/80 text-purple-900 dark:text-purple-200 shadow-xs font-semibold active-segment" : "text-neutral-600 dark:text-neutral-400 hover:bg-neutral-200/60 dark:hover:bg-neutral-700/60"
     }" onclick="selectSegmented(this)">
     <span>${escapeHtml(opt)}</span>
   </button>`
@@ -964,7 +1166,7 @@ ${indent}</div>\n`;
         const isSelected = node.props.selected === true;
 
         html += `${indent}<button type="button" class="chip-item inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-medium transition-all border cursor-pointer select-none ${
-          isSelected ? "bg-purple-100 border-purple-300 text-purple-900" : "bg-white border-neutral-200 text-neutral-600 hover:bg-neutral-50"
+          isSelected ? "bg-purple-100 dark:bg-purple-950/80 border-purple-300 dark:border-purple-700 text-purple-900 dark:text-purple-200" : "bg-white dark:bg-[#1E1B24] border-neutral-200 dark:border-neutral-700 text-neutral-600 dark:text-neutral-300 hover:bg-neutral-50 dark:hover:bg-neutral-800"
         }" onclick="toggleChip(this)">
 ${icon ? `${indent}  <i data-lucide="${icon}" class="w-3.5 h-3.5"></i>\n` : ""}${indent}  <span>${label}</span>
 ${indent}</button>\n`;
@@ -977,7 +1179,7 @@ ${indent}</button>\n`;
         const isChecked = node.props.checked === true;
 
         html += `${indent}<label class="flex items-center justify-between py-1.5 cursor-pointer select-none w-full">
-${indent}  <span class="text-sm font-medium text-neutral-800">${label}</span>
+${indent}  <span class="text-sm font-medium text-neutral-800 dark:text-neutral-200">${label}</span>
 ${indent}  <input type="checkbox" name="${name}" ${isChecked ? "checked" : ""} class="w-5 h-5 accent-purple-700 cursor-pointer rounded" />
 ${indent}</label>\n`;
         break;
@@ -990,7 +1192,7 @@ ${indent}</label>\n`;
 
         html += `${indent}<label class="flex items-start gap-2.5 py-1.5 cursor-pointer select-none">
 ${indent}  <input type="checkbox" name="${name}" ${isChecked ? "checked" : ""} class="w-4 h-4 accent-purple-700 mt-0.5 rounded cursor-pointer" />
-${indent}  <span class="text-sm leading-snug text-neutral-800">${label}</span>
+${indent}  <span class="text-sm leading-snug text-neutral-800 dark:text-neutral-200">${label}</span>
 ${indent}</label>\n`;
         break;
       }
@@ -1004,23 +1206,23 @@ ${indent}</label>\n`;
 
         html += `${indent}<div class="space-y-2 w-full">
 ${indent}  <div class="flex items-center justify-between">
-${indent}    <label class="text-xs font-semibold uppercase text-neutral-600">${label}</label>
-${indent}    <span class="text-xs font-bold px-2 py-0.5 rounded-full bg-purple-100 text-purple-900 slider-val">${val}</span>
+${indent}    <label class="text-xs font-semibold uppercase text-neutral-600 dark:text-neutral-400">${label}</label>
+${indent}    <span class="text-xs font-bold px-2 py-0.5 rounded-full bg-purple-100 dark:bg-purple-950/80 text-purple-900 dark:text-purple-200 slider-val">${val}</span>
 ${indent}  </div>
-${indent}  <input type="range" name="${name}" min="${min}" max="${max}" value="${val}" class="w-full accent-purple-700 cursor-pointer h-2 bg-neutral-200 rounded-lg" oninput="this.parentElement.querySelector('.slider-val').textContent = this.value" />
+${indent}  <input type="range" name="${name}" min="${min}" max="${max}" value="${val}" class="w-full accent-purple-700 cursor-pointer h-2 bg-neutral-200 dark:bg-neutral-700 rounded-lg" oninput="this.parentElement.querySelector('.slider-val').textContent = this.value" />
 ${indent}</div>\n`;
         break;
       }
 
       case "card": {
         const variant = node.props.variant || "elevated";
-        let cardCls = "bg-white rounded-3xl p-5 md:p-6 border transition-all space-y-4";
+        let cardCls = "bg-white dark:bg-[#1E1B24] rounded-3xl p-5 md:p-6 border transition-all space-y-4";
         if (variant === "elevated") {
-          cardCls += " border-neutral-100 shadow-[0_2px_8px_rgba(0,0,0,0.06),0_1px_2px_rgba(0,0,0,0.04)]";
+          cardCls += " border-neutral-100 dark:border-neutral-800 shadow-[0_2px_8px_rgba(0,0,0,0.06),0_1px_2px_rgba(0,0,0,0.04)]";
         } else if (variant === "filled") {
-          cardCls += " bg-neutral-50/80 border-transparent shadow-none";
+          cardCls += " bg-neutral-50/80 dark:bg-neutral-800/60 border-transparent shadow-none";
         } else if (variant === "outlined") {
-          cardCls += " border-neutral-200 shadow-none";
+          cardCls += " border-neutral-200 dark:border-neutral-800 shadow-none";
         }
 
         html += `${indent}<div class="${cardCls}">\n`;
@@ -1090,7 +1292,7 @@ ${indent}</div>\n`;
       case "sidebar": {
         const width = node.props.width || 280;
         const widthStyle = typeof width === "number" ? `${width}px` : width;
-        html += `${indent}<div class="rounded-3xl p-4 border border-neutral-200 bg-white space-y-3 shrink-0" style="width: ${widthStyle};">\n`;
+        html += `${indent}<div class="rounded-3xl p-4 border border-neutral-200 dark:border-neutral-800 bg-white dark:bg-[#1E1B24] space-y-3 shrink-0" style="width: ${widthStyle};">\n`;
         html += renderNodesToHTML(node.children, indentLevel + 1);
         html += `${indent}</div>\n`;
         break;
@@ -1103,21 +1305,21 @@ ${indent}</div>\n`;
         const badge = node.props.badge ? escapeHtml(node.props.badge) : null;
         const goto = node.props.goto ? `data-goto="${escapeHtml(node.props.goto)}"` : "";
 
-        html += `${indent}<div class="flex items-center justify-between p-3.5 rounded-2xl transition-all border border-transparent hover:border-neutral-200 hover:bg-neutral-50 cursor-pointer" ${goto}>
+        html += `${indent}<div class="flex items-center justify-between p-3.5 rounded-2xl transition-all border border-transparent hover:border-neutral-200 dark:hover:border-neutral-700 hover:bg-neutral-50 dark:hover:bg-neutral-800/60 cursor-pointer" ${goto}>
 ${indent}  <div class="flex items-center gap-3.5">
-${icon ? `${indent}    <div class="w-9 h-9 rounded-xl flex items-center justify-center shrink-0 bg-purple-100 text-purple-900"><i data-lucide="${icon}" class="w-5 h-5"></i></div>\n` : ""}${indent}    <div>
-${indent}      <p class="text-sm font-semibold text-neutral-900">${label}</p>
-${subtitle ? `${indent}      <p class="text-xs text-neutral-500 mt-0.5">${subtitle}</p>\n` : ""}${indent}    </div>
+${icon ? `${indent}    <div class="w-9 h-9 rounded-xl flex items-center justify-center shrink-0 bg-purple-100 dark:bg-purple-950/80 text-purple-900 dark:text-purple-200"><i data-lucide="${icon}" class="w-5 h-5"></i></div>\n` : ""}${indent}    <div>
+${indent}      <p class="text-sm font-semibold text-neutral-900 dark:text-white">${label}</p>
+${subtitle ? `${indent}      <p class="text-xs text-neutral-500 dark:text-neutral-400 mt-0.5">${subtitle}</p>\n` : ""}${indent}    </div>
 ${indent}  </div>
 ${indent}  <div class="flex items-center gap-2">
-${badge ? `${indent}    <span class="text-xs font-semibold px-2.5 py-0.5 rounded-full bg-purple-100 text-purple-900">${badge}</span>\n` : ""}${indent}    <i data-lucide="chevron-right" class="w-4 h-4 text-neutral-400"></i>
+${badge ? `${indent}    <span class="text-xs font-semibold px-2.5 py-0.5 rounded-full bg-purple-100 dark:bg-purple-950/80 text-purple-900 dark:text-purple-200">${badge}</span>\n` : ""}${indent}    <i data-lucide="chevron-right" class="w-4 h-4 text-neutral-400"></i>
 ${indent}  </div>
 ${indent}</div>\n`;
         break;
       }
 
       case "avatar": {
-        const name = escapeHtml(node.props.name || "Usuario");
+        const name = escapeHtml(node.props.name || "User");
         const initials = name
           .split(" ")
           .map((n: string) => n[0])
@@ -1125,33 +1327,33 @@ ${indent}</div>\n`;
           .substring(0, 2)
           .toUpperCase();
 
-        html += `${indent}<div class="w-10 h-10 rounded-full font-bold text-sm flex items-center justify-center shadow-sm select-none shrink-0 bg-purple-100 text-purple-900">${initials}</div>\n`;
+        html += `${indent}<div class="w-10 h-10 rounded-full font-bold text-sm flex items-center justify-center shadow-sm select-none shrink-0 bg-purple-100 dark:bg-purple-950/80 text-purple-900 dark:text-purple-200">${initials}</div>\n`;
         break;
       }
 
       case "badge": {
-        const text = escapeHtml(node.props.text || node.props.value || "Nuevo");
-        html += `${indent}<span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold uppercase tracking-wider bg-purple-100 text-purple-900">${text}</span>\n`;
+        const text = escapeHtml(node.props.text || node.props.value || "New");
+        html += `${indent}<span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold uppercase tracking-wider bg-purple-100 dark:bg-purple-950/80 text-purple-900 dark:text-purple-200">${text}</span>\n`;
         break;
       }
 
       case "icon": {
         const iconName = sanitizeIconName(node.props.name || "star");
-        html += `${indent}<div class="text-purple-700 inline-flex items-center justify-center"><i data-lucide="${iconName}" class="w-6 h-6"></i></div>\n`;
+        html += `${indent}<div class="text-purple-700 dark:text-purple-400 inline-flex items-center justify-center"><i data-lucide="${iconName}" class="w-6 h-6"></i></div>\n`;
         break;
       }
 
       case "image": {
         const src = escapeHtml(node.props.src || "https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=800&auto=format&fit=crop&q=80");
-        html += `${indent}<img src="${src}" alt="Preview" class="w-full h-48 object-cover rounded-2xl shadow-sm border border-neutral-200" />\n`;
+        html += `${indent}<img src="${src}" alt="Preview" class="w-full h-48 object-cover rounded-2xl shadow-sm border border-neutral-200 dark:border-neutral-800" />\n`;
         break;
       }
 
       case "progress": {
         const val = Math.min(100, Math.max(0, Number(node.props.value) || 50));
         html += `${indent}<div class="w-full space-y-1">
-${indent}  <div class="h-2 rounded-full overflow-hidden w-full bg-neutral-200">
-${indent}    <div class="h-full bg-purple-700 rounded-full transition-all duration-300" style="width: ${val}%;"></div>
+${indent}  <div class="h-2 rounded-full overflow-hidden w-full bg-neutral-200 dark:bg-neutral-700">
+${indent}    <div class="h-full bg-purple-700 dark:bg-purple-500 rounded-full transition-all duration-300" style="width: ${val}%;"></div>
 ${indent}  </div>
 ${indent}</div>\n`;
         break;
@@ -1159,17 +1361,17 @@ ${indent}</div>\n`;
 
       case "metric":
       case "stat": {
-        const label = escapeHtml(node.props.label || "Métrica");
+        const label = escapeHtml(node.props.label || "Metric");
         const val = escapeHtml(node.props.value || "0");
         const delta = node.props.delta ? escapeHtml(node.props.delta) : null;
         const icon = node.props.icon ? sanitizeIconName(node.props.icon) : null;
 
-        html += `${indent}<div class="p-5 rounded-3xl border border-neutral-200/80 bg-white space-y-2 transition-all">
+        html += `${indent}<div class="p-5 rounded-3xl border border-neutral-200/80 dark:border-neutral-800 bg-white dark:bg-[#1E1B24] space-y-2 transition-all">
 ${indent}  <div class="flex items-center justify-between">
-${indent}    <span class="text-xs font-semibold uppercase tracking-wider text-neutral-500">${label}</span>
-${icon ? `${indent}    <div class="w-8 h-8 rounded-xl flex items-center justify-center bg-purple-100 text-purple-900"><i data-lucide="${icon}" class="w-4 h-4"></i></div>\n` : ""}${indent}  </div>
-${indent}  <p class="text-2xl md:text-3xl font-extrabold text-neutral-900">${val}</p>
-${delta ? `${indent}  <span class="inline-flex items-center text-xs font-semibold px-2 py-0.5 rounded-full ${delta.startsWith("+") ? "bg-emerald-100 text-emerald-800" : "bg-red-100 text-red-800"}">${delta}</span>\n` : ""}${indent}</div>\n`;
+${indent}    <span class="text-xs font-semibold uppercase tracking-wider text-neutral-500 dark:text-neutral-400">${label}</span>
+${icon ? `${indent}    <div class="w-8 h-8 rounded-xl flex items-center justify-center bg-purple-100 dark:bg-purple-950/80 text-purple-900 dark:text-purple-200"><i data-lucide="${icon}" class="w-4 h-4"></i></div>\n` : ""}${indent}  </div>
+${indent}  <p class="text-2xl md:text-3xl font-extrabold text-neutral-900 dark:text-white">${val}</p>
+${delta ? `${indent}  <span class="inline-flex items-center text-xs font-semibold px-2 py-0.5 rounded-full ${delta.startsWith("+") ? "bg-emerald-100 dark:bg-emerald-950/60 text-emerald-800 dark:text-emerald-300" : "bg-red-100 dark:bg-red-950/60 text-red-800 dark:text-red-300"}">${delta}</span>\n` : ""}${indent}</div>\n`;
         break;
       }
 
@@ -1178,17 +1380,17 @@ ${delta ? `${indent}  <span class="inline-flex items-center text-xs font-semibol
         const msg = escapeHtml(node.props.value || "");
         const type = node.props.type || "info";
 
-        let alertBg = "bg-blue-50 text-blue-900 border-blue-100";
+        let alertBg = "bg-purple-50 dark:bg-purple-950/40 text-purple-900 dark:text-purple-200 border-purple-100 dark:border-purple-800";
         let iconName = "info";
 
         if (type === "success") {
-          alertBg = "bg-emerald-50 text-emerald-900 border-emerald-100";
+          alertBg = "bg-emerald-50 dark:bg-emerald-950/40 text-emerald-900 dark:text-emerald-200 border-emerald-100 dark:border-emerald-800";
           iconName = "check-circle-2";
         } else if (type === "warning") {
-          alertBg = "bg-amber-50 text-amber-900 border-amber-100";
+          alertBg = "bg-amber-50 dark:bg-amber-950/40 text-amber-900 dark:text-amber-200 border-amber-100 dark:border-amber-800";
           iconName = "alert-triangle";
         } else if (type === "error") {
-          alertBg = "bg-red-50 text-red-900 border-red-100";
+          alertBg = "bg-red-50 dark:bg-red-950/40 text-red-900 dark:text-red-200 border-red-100 dark:border-red-800";
           iconName = "alert-circle";
         }
 
@@ -1206,16 +1408,16 @@ ${indent}</div>\n`;
         let items: string[] = [];
         if (Array.isArray(node.props.items)) items = node.props.items;
         else if (Array.isArray(node.props.tabs)) items = node.props.tabs;
-        else if (tabPanels.length > 0) items = tabPanels.map(p => p.props.title || p.props.label || p.props.value || "Pestaña");
-        else items = ["Pestaña 1", "Pestaña 2", "Pestaña 3"];
+        else if (tabPanels.length > 0) items = tabPanels.map(p => p.props.title || p.props.label || p.props.value || "Tab");
+        else items = ["Tab 1", "Tab 2", "Tab 3"];
 
         html += `${indent}<div class="w-full space-y-4 tabs-container">
-${indent}  <div class="border-b border-neutral-200">
+${indent}  <div class="border-b border-neutral-200 dark:border-neutral-800">
 ${indent}    <div class="flex gap-2">
 ${items
   .map(
-    (tab, idx) => `${indent}      <button type="button" class="px-4 py-2.5 text-sm font-semibold transition-all cursor-pointer border-b-2 ${
-      idx === 0 ? "border-purple-700 text-purple-700 font-bold" : "border-transparent text-neutral-500 hover:text-neutral-800"
+    (tab, idx) => `${indent}      <button type="button" class="tab-btn px-4 py-2.5 text-sm font-semibold transition-all cursor-pointer border-b-2 ${
+      idx === 0 ? "border-purple-700 dark:border-purple-400 text-purple-700 dark:text-purple-400 font-bold" : "border-transparent text-neutral-500 dark:text-neutral-400 hover:text-neutral-800 dark:hover:text-neutral-200"
     }" onclick="switchTab(this, ${idx})">${escapeHtml(tab)}</button>`
   )
   .join("\n")}
@@ -1245,7 +1447,7 @@ ${renderNodesToHTML(panel.children, indentLevel + 2)}${indent}  </div>\n`;
         const rawCols = node.props.columns || node.props.headers || node.props.cols;
         if (Array.isArray(rawCols)) headers = rawCols.map(String);
         else if (typeof rawCols === "string") headers = rawCols.split(",").map(s => s.trim().replace(/^["']|["']$/g, ""));
-        else headers = ["ID", "Nombre", "Estado", "Acciones"];
+        else headers = ["ID", "Name", "Status", "Actions"];
 
         let rows: any[][] = [];
         if (node.children && node.children.length > 0) {
@@ -1267,30 +1469,31 @@ ${renderNodesToHTML(panel.children, indentLevel + 2)}${indent}  </div>\n`;
         }
         if (rows.length === 0) {
           rows = [
-            ["#101", "Servicio Auth Gateway", "Activo", "Configurar"],
-            ["#102", "Worker de Notificaciones", "Activo", "Configurar"],
+            ["#101", "Auth Gateway Service", "Active", "Configure"],
+            ["#102", "Notification Worker", "Active", "Configure"],
+            ["#103", "Javier Díaz Bolaños", "Active", "Manage"],
           ];
         }
 
         const title = node.props.title || node.props.label;
-        html += `${indent}<div class="overflow-x-auto rounded-2xl border border-neutral-200 bg-white shadow-xs">
-${title ? `${indent}  <div class="p-4 border-b border-neutral-200 font-bold text-neutral-900">${escapeHtml(title)}</div>\n` : ""}${indent}  <table class="w-full text-left text-sm">
-${indent}    <thead class="bg-neutral-50 text-neutral-600">
+        html += `${indent}<div class="overflow-x-auto rounded-2xl border border-neutral-200 dark:border-neutral-800 bg-white dark:bg-[#1E1B24] shadow-xs">
+${title ? `${indent}  <div class="p-4 border-b border-neutral-200 dark:border-neutral-800 font-bold text-neutral-900 dark:text-white">${escapeHtml(title)}</div>\n` : ""}${indent}  <table class="w-full text-left text-sm">
+${indent}    <thead class="bg-neutral-50 dark:bg-neutral-800/60 text-neutral-600 dark:text-neutral-300">
 ${indent}      <tr>
 ${headers.map(h => `${indent}        <th class="p-3 font-semibold text-xs uppercase tracking-wider">${escapeHtml(h)}</th>`).join("\n")}
 ${indent}      </tr>
 ${indent}    </thead>
-${indent}    <tbody class="divide-y divide-neutral-200">
+${indent}    <tbody class="divide-y divide-neutral-200 dark:divide-neutral-800">
 ${rows
   .map(
-    row => `${indent}      <tr class="hover:bg-neutral-50 transition-colors">
+    row => `${indent}      <tr class="hover:bg-neutral-50 dark:hover:bg-neutral-800/40 transition-colors">
 ${headers
   .map((_, cIdx) => {
     const cell = row[cIdx] !== undefined ? String(row[cIdx]) : "";
-    const isStatus = ["activo", "active", "completado", "success", "ok"].includes(cell.toLowerCase());
-    return `${indent}        <td class="p-3 text-neutral-800">${
+    const isStatus = ["activo", "active", "completado", "completed", "success", "ok"].includes(cell.toLowerCase());
+    return `${indent}        <td class="p-3 text-neutral-800 dark:text-neutral-200">${
       isStatus
-        ? `<span class="text-xs font-semibold px-2.5 py-0.5 rounded-full bg-emerald-100 text-emerald-800">${escapeHtml(
+        ? `<span class="text-xs font-semibold px-2.5 py-0.5 rounded-full bg-emerald-100 dark:bg-emerald-950/60 text-emerald-800 dark:text-emerald-300">${escapeHtml(
             cell
           )}</span>`
         : escapeHtml(cell)
@@ -1398,6 +1601,211 @@ ${indent}</div>\n`;
         break;
       }
 
+      case "loading":
+      case "spinner":
+      case "progressindicator":
+      case "circularprogress": {
+        const rawVal = node.props.value;
+        const isDeterminate = rawVal !== undefined && !isNaN(Number(rawVal));
+        const val = isDeterminate ? Math.min(100, Math.max(0, Number(rawVal))) : 0;
+        const msg = escapeHtml(node.props.message || node.props.label || node.props.title || "");
+        const variant = node.props.variant || (node.type === "circularprogress" ? "circular" : "circular");
+
+        if (variant === "linear") {
+          html += `${indent}<div class="w-full space-y-1.5 py-1">\n`;
+          if (msg) html += `${indent}  <div class="flex items-center justify-between text-xs font-semibold text-neutral-800 dark:text-neutral-200"><span>${msg}</span>${isDeterminate ? `<span class="font-mono text-[11px]">${val}%</span>` : ""}</div>\n`;
+          html += `${indent}  <div class="w-full bg-neutral-200 dark:bg-neutral-800 rounded-full h-2 overflow-hidden">\n`;
+          if (isDeterminate) {
+            html += `${indent}    <div class="bg-purple-700 h-full rounded-full transition-all duration-300" style="width: ${val}%;"></div>\n`;
+          } else {
+            html += `${indent}    <div class="bg-purple-700 h-full rounded-full animate-pulse w-2/3"></div>\n`;
+          }
+          html += `${indent}  </div>\n`;
+          html += `${indent}</div>\n`;
+        } else {
+          html += `${indent}<div class="flex flex-col items-center justify-center gap-2 p-3 text-center w-full">\n`;
+          html += `${indent}  <div class="relative w-10 h-10 flex items-center justify-center">\n`;
+          html += `${indent}    <svg class="animate-spin w-10 h-10 text-purple-700" viewBox="0 0 24 24" fill="none">\n`;
+          html += `${indent}      <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="3"></circle>\n`;
+          html += `${indent}      <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>\n`;
+          html += `${indent}    </svg>\n`;
+          html += `${indent}  </div>\n`;
+          if (msg) html += `${indent}  <p class="text-xs font-semibold text-neutral-700 dark:text-neutral-300">${msg}</p>\n`;
+          html += `${indent}</div>\n`;
+        }
+        break;
+      }
+
+      case "tooltip": {
+        const text = escapeHtml(node.props.text || node.props.message || node.props.value || "Información de ayuda");
+        html += `${indent}<div class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold border border-purple-200 bg-purple-50 dark:bg-purple-950/60 dark:border-purple-800 text-purple-900 dark:text-purple-300">\n`;
+        html += `${indent}  <i data-lucide="help-circle" class="w-3.5 h-3.5 text-purple-700 dark:text-purple-400"></i>\n`;
+        html += `${indent}  <span>${text}</span>\n`;
+        html += `${indent}</div>\n`;
+        break;
+      }
+
+      case "richtooltip":
+      case "rich-tooltip": {
+        const title = escapeHtml(node.props.title || node.props.label || "Información");
+        const text = escapeHtml(node.props.text || node.props.message || node.props.value || "");
+        const action = node.props.action ? escapeHtml(node.props.action) : null;
+        const goto = (node.props.actionGoto || node.props.action_goto || node.props.goto) ? `data-goto="${escapeHtml(node.props.actionGoto || node.props.action_goto || node.props.goto)}"` : "";
+        html += `${indent}<div class="max-w-xs rounded-2xl border border-purple-200 dark:border-purple-800 bg-purple-50/70 dark:bg-purple-950/50 p-4 shadow-md space-y-2">\n`;
+        html += `${indent}  <div class="flex items-center gap-2">\n`;
+        html += `${indent}    <i data-lucide="sparkles" class="w-4 h-4 text-purple-700 dark:text-purple-400"></i>\n`;
+        html += `${indent}    <h4 class="text-xs font-bold text-neutral-900 dark:text-white">${title}</h4>\n`;
+        html += `${indent}  </div>\n`;
+        if (text) html += `${indent}  <p class="text-xs text-neutral-700 dark:text-neutral-300 leading-relaxed">${text}</p>\n`;
+        if (action) {
+          html += `${indent}  <div class="pt-1 flex justify-end">\n`;
+          html += `${indent}    <button type="button" ${goto} class="px-3 py-1 rounded-full text-xs font-bold text-purple-700 dark:text-purple-300 hover:bg-purple-100 dark:hover:bg-purple-900/40 cursor-pointer">${action}</button>\n`;
+          html += `${indent}  </div>\n`;
+        }
+        html += `${indent}</div>\n`;
+        break;
+      }
+
+      case "iconbutton":
+      case "icon-button": {
+        const icon = sanitizeIconName(node.props.icon || node.props.name || "star");
+        const goto = node.props.goto ? `data-goto="${escapeHtml(node.props.goto)}"` : "";
+        const variant = node.props.variant || "standard";
+        let cls = "w-10 h-10 rounded-full inline-flex items-center justify-center transition-all cursor-pointer ";
+        if (variant === "filled") cls += "bg-purple-700 hover:bg-purple-800 text-white shadow-sm";
+        else if (variant === "tonal") cls += "bg-purple-100 dark:bg-purple-950/60 hover:bg-purple-200 dark:hover:bg-purple-900/60 text-purple-900 dark:text-purple-200";
+        else if (variant === "outlined") cls += "border border-neutral-300 dark:border-neutral-700 text-neutral-800 dark:text-neutral-200 hover:bg-neutral-100 dark:hover:bg-neutral-800";
+        else cls += "text-neutral-700 dark:text-neutral-300 hover:bg-neutral-100 dark:hover:bg-neutral-800";
+
+        html += `${indent}<button type="button" ${goto} class="${cls}">\n`;
+        html += `${indent}  <i data-lucide="${icon}" class="w-5 h-5"></i>\n`;
+        html += `${indent}</button>\n`;
+        break;
+      }
+
+      case "navigationrail":
+      case "apprail":
+      case "navrail":
+      case "rail": {
+        const title = escapeHtml(node.props.title || node.props.label || "");
+        html += `${indent}<div class="w-full md:w-20 lg:w-24 rounded-3xl border border-neutral-200 dark:border-neutral-800 bg-white dark:bg-[#1E1B24] p-3 flex flex-col items-center gap-3 shadow-xs shrink-0">\n`;
+        if (title) html += `${indent}  <span class="text-[10px] font-bold uppercase tracking-wider text-purple-700 dark:text-purple-400">${title}</span>\n`;
+        if (node.children && node.children.length > 0) {
+          html += renderNodesToHTML(node.children, indentLevel + 1);
+        }
+        html += `${indent}</div>\n`;
+        break;
+      }
+
+      case "navitem":
+      case "railitem":
+      case "rail-item":
+      case "destination": {
+        const label = escapeHtml(node.props.label || node.props.title || node.props.value || "Nav");
+        const icon = sanitizeIconName(node.props.icon || "circle");
+        const isActive = node.props.active === true || node.props.active === "true" || node.props.selected === true;
+        const goto = node.props.goto ? `data-goto="${escapeHtml(node.props.goto)}"` : "";
+        const badge = node.props.badge ? escapeHtml(node.props.badge) : null;
+
+        html += `${indent}<button type="button" ${goto} class="w-full py-2 px-1 flex flex-col items-center justify-center gap-1 rounded-2xl transition-all cursor-pointer group text-neutral-700 dark:text-neutral-300">\n`;
+        html += `${indent}  <div class="px-3.5 py-1 rounded-full flex items-center justify-center ${isActive ? "bg-purple-100 dark:bg-purple-950/80 text-purple-900 dark:text-purple-200 font-bold" : "group-hover:bg-neutral-100 dark:group-hover:bg-neutral-800"}">\n`;
+        html += `${indent}    <i data-lucide="${icon}" class="w-4 h-4"></i>\n`;
+        html += `${indent}  </div>\n`;
+        html += `${indent}  <span class="text-[10px] font-medium truncate max-w-full">${label}</span>\n`;
+        if (badge) html += `${indent}  <span class="text-[9px] font-bold px-1.5 py-0.2 rounded-full bg-purple-700 text-white">${badge}</span>\n`;
+        html += `${indent}</button>\n`;
+        break;
+      }
+
+      case "bottomnav":
+      case "bottombar":
+      case "navigationbar": {
+        html += `${indent}<nav class="w-full rounded-2xl border border-neutral-200 dark:border-neutral-800 bg-white dark:bg-[#1E1B24] p-2 flex items-center justify-around gap-1 shadow-sm">\n`;
+        if (node.children && node.children.length > 0) {
+          html += renderNodesToHTML(node.children, indentLevel + 1);
+        }
+        html += `${indent}</nav>\n`;
+        break;
+      }
+
+      case "appbar":
+      case "topappbar":
+      case "navbar":
+      case "topbar":
+      case "header": {
+        const title = escapeHtml(node.props.title || node.props.label || node.props.value || "");
+        const icon = sanitizeIconName(node.props.icon || (node.props.goto ? "arrow-left" : "menu"));
+        const goto = node.props.goto ? `data-goto="${escapeHtml(node.props.goto)}"` : "";
+        const action = node.props.action ? escapeHtml(node.props.action) : null;
+        const actionGoto = (node.props.actionGoto || node.props.action_goto) ? `data-goto="${escapeHtml(node.props.actionGoto || node.props.action_goto)}"` : "";
+
+        html += `${indent}<header class="w-full rounded-2xl border border-neutral-200 dark:border-neutral-800 bg-white dark:bg-[#1E1B24] px-4 py-3 flex items-center justify-between gap-3 shadow-xs">\n`;
+        html += `${indent}  <div class="flex items-center gap-3">\n`;
+        html += `${indent}    <button type="button" ${goto} class="p-1.5 rounded-full hover:bg-neutral-100 dark:hover:bg-neutral-800 text-neutral-700 dark:text-neutral-300 cursor-pointer"><i data-lucide="${icon}" class="w-5 h-5"></i></button>\n`;
+        if (title) html += `${indent}    <h2 class="text-base font-bold text-neutral-900 dark:text-white">${title}</h2>\n`;
+        html += `${indent}  </div>\n`;
+        if (action) {
+          html += `${indent}  <button type="button" ${actionGoto} class="px-3.5 py-1.5 rounded-full text-xs font-bold bg-purple-700 text-white cursor-pointer">${action}</button>\n`;
+        }
+        html += `${indent}</header>\n`;
+        break;
+      }
+
+      case "list": {
+        html += `${indent}<div class="w-full rounded-2xl border border-neutral-200 dark:border-neutral-800 bg-white dark:bg-[#1E1B24] divide-y divide-neutral-100 dark:divide-neutral-800 overflow-hidden shadow-2xs">\n`;
+        if (node.children && node.children.length > 0) {
+          html += renderNodesToHTML(node.children, indentLevel + 1);
+        }
+        html += `${indent}</div>\n`;
+        break;
+      }
+
+      case "drawer":
+      case "navigationdrawer":
+      case "appdrawer":
+      case "navdrawer": {
+        const title = escapeHtml(node.props.title || node.props.label || "Main Navigation");
+        html += `${indent}<nav class="w-full max-w-xs rounded-3xl border border-neutral-200 dark:border-neutral-800 bg-white dark:bg-[#1E1B24] p-4 shadow-sm space-y-3">\n`;
+        html += `${indent}  <div class="px-3 py-2 font-bold text-sm text-neutral-900 dark:text-white border-b border-neutral-100 dark:border-neutral-800">${title}</div>\n`;
+        if (node.children && node.children.length > 0) {
+          html += renderNodesToHTML(node.children, indentLevel + 1);
+        }
+        html += `${indent}</nav>\n`;
+        break;
+      }
+
+      case "draweritem": {
+        const label = escapeHtml(node.props.label || node.props.title || node.props.value || "Item");
+        const icon = node.props.icon ? sanitizeIconName(node.props.icon) : null;
+        const goto = node.props.goto ? `data-goto="${escapeHtml(node.props.goto)}"` : "";
+        const isActive = node.props.active === true || node.props.active === "true";
+        const badge = node.props.badge ? escapeHtml(node.props.badge) : null;
+
+        html += `${indent}<button type="button" ${goto} class="w-full flex items-center justify-between px-3.5 py-2.5 rounded-full text-xs font-semibold transition-all cursor-pointer select-none ${isActive ? "bg-purple-100 dark:bg-purple-950/80 text-purple-900 dark:text-purple-200" : "text-neutral-700 dark:text-neutral-300 hover:bg-neutral-100 dark:hover:bg-neutral-800"}">\n`;
+        html += `${indent}  <div class="flex items-center gap-3 min-w-0">\n`;
+        if (icon) html += `${indent}    <i data-lucide="${icon}" class="w-4 h-4 shrink-0"></i>\n`;
+        html += `${indent}    <span class="truncate">${label}</span>\n`;
+        html += `${indent}  </div>\n`;
+        if (badge) html += `${indent}  <span class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-purple-700 text-white">${badge}</span>\n`;
+        html += `${indent}</button>\n`;
+        break;
+      }
+
+      case "sidesheet":
+      case "side-sheet":
+      case "bottomsheet": {
+        const title = escapeHtml(node.props.title || node.props.label || "Details");
+        html += `${indent}<div class="w-full rounded-3xl border border-neutral-200 dark:border-neutral-800 bg-white dark:bg-[#1E1B24] p-5 shadow-sm space-y-4">\n`;
+        html += `${indent}  <div class="flex items-center justify-between pb-2 border-b border-neutral-100 dark:border-neutral-800">\n`;
+        html += `${indent}    <h3 class="text-sm font-bold text-neutral-900 dark:text-white">${title}</h3>\n`;
+        html += `${indent}  </div>\n`;
+        if (node.children && node.children.length > 0) {
+          html += renderNodesToHTML(node.children, indentLevel + 1);
+        }
+        html += `${indent}</div>\n`;
+        break;
+      }
+
       default:
         if (node.children && node.children.length > 0) {
           html += renderNodesToHTML(node.children, indentLevel);
@@ -1423,11 +1831,11 @@ export function exportToHTML(doc: WispDocument): string {
   );
 
   return `<!DOCTYPE html>
-<html lang="es" class="h-full">
+<html lang="en" class="h-full">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Prototipo Wisp Material 3</title>
+  <title>Wisp Material 3 Prototype</title>
   <!-- Google Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -1451,6 +1859,11 @@ export function exportToHTML(doc: WispDocument): string {
   <!-- Lucide Icons -->
   <script src="https://unpkg.com/lucide@latest"></script>
 
+  <!-- Beer CSS & Material Design 3 Ecosystem (CDN Universal) -->
+  <link href="https://cdn.jsdelivr.net/npm/beercss@3.9.1/dist/cdn/beer.min.css" rel="stylesheet" />
+  <script type="module" src="https://cdn.jsdelivr.net/npm/beercss@3.9.1/dist/cdn/beer.min.js"></script>
+  <script type="module" src="https://cdn.jsdelivr.net/npm/material-dynamic-colors@1.1.2/dist/cdn/material-dynamic-colors.min.js"></script>
+
   <style>
     body {
       font-family: 'Plus Jakarta Sans', sans-serif;
@@ -1472,6 +1885,38 @@ export function exportToHTML(doc: WispDocument): string {
     }
     .modal-overlay.active {
       display: flex;
+    }
+    /* M3 Expressive Interactive Transitions & Click States */
+    button, input[type="button"], select, a {
+      transition: all 0.2s cubic-bezier(0.2, 0, 0, 1);
+    }
+    button:active {
+      transform: scale(0.96);
+    }
+
+    /* M3 Expressive Ripple Wave Animation */
+    @keyframes m3-ripple-expand {
+      0% {
+        transform: scale(0);
+        opacity: 0.35;
+      }
+      60% {
+        opacity: 0.22;
+      }
+      100% {
+        transform: scale(2.8);
+        opacity: 0;
+      }
+    }
+
+    .m3-ripple-effect {
+      position: absolute;
+      border-radius: 50%;
+      pointer-events: none;
+      background-color: currentColor;
+      transform: scale(0);
+      animation: m3-ripple-expand 0.65s cubic-bezier(0.2, 0, 0, 1) forwards;
+      z-index: 10;
     }
   </style>
 </head>
@@ -1505,7 +1950,7 @@ export function exportToHTML(doc: WispDocument): string {
         </div>
 
         <!-- Dark Mode Toggle -->
-        <button type="button" onclick="toggleDarkMode()" class="p-2 rounded-xl bg-neutral-100 dark:bg-neutral-800 hover:bg-neutral-200 dark:hover:bg-neutral-700 transition-colors cursor-pointer text-neutral-700 dark:text-neutral-300" title="Alternar tema claro/oscuro">
+        <button type="button" onclick="toggleDarkMode()" class="p-2 rounded-xl bg-neutral-100 dark:bg-neutral-800 hover:bg-neutral-200 dark:hover:bg-neutral-700 transition-colors cursor-pointer text-neutral-700 dark:text-neutral-300" title="Toggle dark/light theme">
           <i data-lucide="moon" class="w-4 h-4 dark:hidden"></i>
           <i data-lucide="sun" class="w-4 h-4 hidden dark:block"></i>
         </button>
@@ -1529,7 +1974,7 @@ export function exportToHTML(doc: WispDocument): string {
           <div class="flex items-center justify-between">
             <div>
               <span class="text-xs uppercase tracking-wider font-semibold text-purple-700 dark:text-purple-400 bg-purple-50 dark:bg-purple-950/60 px-2.5 py-1 rounded-full">
-                Wizard • <span class="wizard-step-label">Paso 1 de ${totalSteps}</span>
+                Wizard • <span class="wizard-step-label">Step 1 of ${totalSteps}</span>
               </span>
               <h2 class="text-2xl font-bold text-neutral-900 dark:text-white mt-1">${escapeHtml(screen.name)}</h2>
             </div>
@@ -1593,8 +2038,8 @@ ${renderNodesToHTML(screen.children, 4)}
       .map(
         m => `
     <div id="modal-${escapeHtml(m.name)}" class="modal-overlay fixed inset-0 z-50 items-center justify-center p-4 bg-black/50 backdrop-blur-xs">
-      <div class="w-full max-w-lg bg-white dark:bg-[#1E1B24] rounded-3xl p-6 md:p-8 shadow-2xl border border-neutral-200 dark:border-neutral-800 relative">
-        <button type="button" onclick="closeModal('${escapeHtml(m.name)}')" class="absolute top-4 right-4 p-1.5 rounded-full hover:bg-neutral-100 dark:hover:bg-neutral-800 text-neutral-500 cursor-pointer">
+      <div class="w-full max-w-lg bg-white dark:bg-[#1E1B24] rounded-3xl p-6 md:p-8 shadow-2xl border border-neutral-200 dark:border-neutral-800 relative text-neutral-900 dark:text-neutral-100">
+        <button type="button" onclick="closeModal('${escapeHtml(m.name)}')" class="absolute top-4 right-4 p-1.5 rounded-full hover:bg-neutral-100 dark:hover:bg-neutral-800 text-neutral-500 hover:text-neutral-900 dark:hover:text-white cursor-pointer transition-colors">
           <i data-lucide="x" class="w-5 h-5"></i>
         </button>
         <div class="space-y-4">
@@ -1663,7 +2108,7 @@ ${renderNodesToHTML(m.children, 5)}
       // Update step label
       const totalSteps = parseInt(screenEl.querySelector('[data-wizard-stepper]')?.dataset.totalSteps || '3', 10);
       const label = screenEl.querySelector('.wizard-step-label');
-      if (label) label.textContent = 'Paso ' + stepNum + ' de ' + totalSteps;
+      if (label) label.textContent = 'Step ' + stepNum + ' of ' + totalSteps;
 
       // Update buttons
       const buttons = screenEl.querySelectorAll('.step-btn');
@@ -1734,29 +2179,41 @@ ${renderNodesToHTML(m.children, 5)}
       const container = button.closest('[data-segmented]');
       if (!container) return;
       container.querySelectorAll('button').forEach(btn => {
-        btn.className = 'px-4 py-1.5 text-xs font-medium rounded-full transition-all flex items-center gap-1.5 cursor-pointer text-neutral-600 hover:bg-neutral-200/60';
+        btn.className = 'px-4 py-1.5 text-xs font-medium rounded-full transition-all flex items-center gap-1.5 cursor-pointer text-neutral-600 dark:text-neutral-400 hover:bg-neutral-200/60 dark:hover:bg-neutral-700/60';
       });
-      button.className = 'px-4 py-1.5 text-xs font-medium rounded-full transition-all flex items-center gap-1.5 cursor-pointer bg-purple-100 text-purple-900 shadow-xs font-semibold active-segment';
+      button.className = 'px-4 py-1.5 text-xs font-medium rounded-full transition-all flex items-center gap-1.5 cursor-pointer bg-purple-100 dark:bg-purple-950/80 text-purple-900 dark:text-purple-200 shadow-xs font-semibold active-segment';
     }
 
     // Chip toggle
     function toggleChip(chip) {
-      const isSelected = chip.classList.contains('bg-purple-100');
+      const isSelected = chip.classList.contains('bg-purple-100') || chip.classList.contains('dark:bg-purple-950/80');
       if (isSelected) {
-        chip.className = 'chip-item inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-medium transition-all border cursor-pointer select-none bg-white border-neutral-200 text-neutral-600 hover:bg-neutral-50';
+        chip.className = 'chip-item inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-medium transition-all border cursor-pointer select-none bg-white dark:bg-[#1E1B24] border-neutral-200 dark:border-neutral-700 text-neutral-600 dark:text-neutral-300 hover:bg-neutral-50 dark:hover:bg-neutral-800';
       } else {
-        chip.className = 'chip-item inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-medium transition-all border cursor-pointer select-none bg-purple-100 border-purple-300 text-purple-900';
+        chip.className = 'chip-item inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-medium transition-all border cursor-pointer select-none bg-purple-100 dark:bg-purple-950/80 border-purple-300 dark:border-purple-700 text-purple-900 dark:text-purple-200';
       }
     }
 
     // Tab switching
-    function switchTab(tabBtn) {
+    function switchTab(tabBtn, tabIndex) {
       const container = tabBtn.closest('.tabs-container');
       if (!container) return;
-      container.querySelectorAll('button').forEach(btn => {
-        btn.className = 'px-4 py-2.5 text-sm font-semibold transition-all cursor-pointer border-b-2 border-transparent text-neutral-500 hover:text-neutral-800';
+      container.querySelectorAll('.tab-btn').forEach((btn, idx) => {
+        if (idx === tabIndex) {
+          btn.className = 'tab-btn px-4 py-2.5 text-sm font-semibold transition-all cursor-pointer border-b-2 border-purple-700 dark:border-purple-400 text-purple-700 dark:text-purple-400 font-bold';
+        } else {
+          btn.className = 'tab-btn px-4 py-2.5 text-sm font-semibold transition-all cursor-pointer border-b-2 border-transparent text-neutral-500 dark:text-neutral-400 hover:text-neutral-800 dark:hover:text-neutral-200';
+        }
       });
-      tabBtn.className = 'px-4 py-2.5 text-sm font-semibold transition-all cursor-pointer border-b-2 border-purple-700 text-purple-700 font-bold';
+      const panels = container.querySelectorAll('.tab-panel');
+      panels.forEach((p, idx) => {
+        if (idx === tabIndex) {
+          p.classList.remove('hidden');
+        } else {
+          p.classList.add('hidden');
+        }
+      });
+      lucide.createIcons();
     }
 
     // Dark Mode Toggle
@@ -1764,6 +2221,36 @@ ${renderNodesToHTML(m.children, 5)}
       document.documentElement.classList.toggle('dark');
       lucide.createIcons();
     }
+
+    // Material 3 Expressive Ripple Wave Handler
+    document.addEventListener('pointerdown', (e) => {
+      const target = e.target.closest('button, [role="button"], a, .tab-btn, .chip-item, [data-goto]');
+      if (!target) return;
+
+      const rect = target.getBoundingClientRect();
+      const x = e.clientX - rect.left;
+      const y = e.clientY - rect.top;
+      const diameter = Math.max(rect.width, rect.height) * 2.2;
+
+      const ripple = document.createElement('span');
+      ripple.className = 'm3-ripple-effect';
+      ripple.style.width = diameter + 'px';
+      ripple.style.height = diameter + 'px';
+      ripple.style.left = (x - diameter / 2) + 'px';
+      ripple.style.top = (y - diameter / 2) + 'px';
+
+      const computedPos = window.getComputedStyle(target).position;
+      if (computedPos === 'static') {
+        target.style.position = 'relative';
+      }
+      target.style.overflow = 'hidden';
+
+      target.appendChild(ripple);
+
+      setTimeout(() => {
+        ripple.remove();
+      }, 650);
+    });
 
     // Close modal on Escape
     document.addEventListener('keydown', (e) => {

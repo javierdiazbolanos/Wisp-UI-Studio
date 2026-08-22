@@ -1,6 +1,6 @@
 {
   "name": "Wisp UI Studio",
-  "description": "Herramienta de prototipado rápido basada en el DSL Wisp con renderizado fiel a Google Material 3 Expressive.",
+  "description": "Declarative UI prototyping studio powered by Wisp DSL and pixel-perfect Google Material Design 3.",
   "requestFramePermissions": [],
   "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
 }

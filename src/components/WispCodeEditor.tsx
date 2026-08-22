@@ -40,6 +40,7 @@ export interface WispCodeEditorProps {
   onOpenDocs?: () => void;
   isMaximized?: boolean;
   onToggleMaximize?: () => void;
+  previewIsDark?: boolean;
 }
 
 // Helper to dedent raw snippet to 0-based relative indent
@@ -99,6 +100,7 @@ export const WispCodeEditor: React.FC<WispCodeEditorProps> = ({
   onOpenDocs,
   isMaximized = false,
   onToggleMaximize,
+  previewIsDark = false,
 }) => {
   const monacoEditorRef = useRef<any>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
@@ -428,7 +430,7 @@ export const WispCodeEditor: React.FC<WispCodeEditorProps> = ({
                   ? "bg-amber-600 text-white shadow-xs font-semibold"
                   : "text-neutral-400 hover:text-neutral-200"
               }`}
-              title="Tema Oscuro Monokai (Estilo por defecto clásico de VS Code / Sublime)"
+              title="Monokai Dark Theme (Classic VS Code / Sublime style)"
             >
               <Palette className="w-3 h-3 text-amber-300" />
               <span>Monokai</span>
@@ -442,10 +444,10 @@ export const WispCodeEditor: React.FC<WispCodeEditorProps> = ({
                   ? "bg-purple-600 text-white shadow-xs font-semibold"
                   : "text-neutral-400 hover:text-neutral-600 dark:hover:text-neutral-200"
               }`}
-              title="Tema Claro (Light VS Code con alto contraste)"
+              title="Light Theme (High-contrast clean theme)"
             >
               <Sun className="w-3 h-3 text-amber-500" />
-              <span>Claro</span>
+              <span>Light</span>
             </button>
 
             <button
@@ -456,7 +458,7 @@ export const WispCodeEditor: React.FC<WispCodeEditorProps> = ({
                   ? "bg-purple-600 text-white shadow-xs font-semibold"
                   : "text-neutral-400 hover:text-neutral-200"
               }`}
-              title="Tema Oscuro Material 3"
+              title="Material 3 Dark Theme"
             >
               <Moon className="w-3 h-3 text-purple-300" />
               <span>Material</span>
@@ -477,7 +479,7 @@ export const WispCodeEditor: React.FC<WispCodeEditorProps> = ({
                   ? "bg-purple-600 text-white shadow-xs"
                   : "text-neutral-400 hover:text-neutral-600 dark:hover:text-neutral-200"
               }`}
-              title="Editor Monaco (VS Code): Alineación 100% precisa, autocompletado y sintaxis Wisp"
+              title="Monaco Editor (VS Code engine): Accurate syntax highlighting, completions, and diagnostics"
             >
               <Edit3 className="w-3 h-3" />
               <span>Monaco</span>
@@ -491,10 +493,10 @@ export const WispCodeEditor: React.FC<WispCodeEditorProps> = ({
                   ? "bg-purple-600 text-white shadow-xs"
                   : "text-neutral-400 hover:text-neutral-600 dark:hover:text-neutral-200"
               }`}
-              title="Texto Directo: Editor simple sin extensiones"
+              title="Plain Text: Simple text editor"
             >
               <Terminal className="w-3 h-3" />
-              <span>Texto</span>
+              <span>Text</span>
             </button>
 
             <button
@@ -505,10 +507,10 @@ export const WispCodeEditor: React.FC<WispCodeEditorProps> = ({
                   ? "bg-purple-600 text-white shadow-xs"
                   : "text-neutral-400 hover:text-neutral-600 dark:hover:text-neutral-200"
               }`}
-              title="Modo Solo Lectura"
+              title="Read-only View"
             >
               <Code2 className="w-3 h-3" />
-              <span>Lectura</span>
+              <span>Readonly</span>
             </button>
           </div>
 
@@ -548,11 +550,11 @@ export const WispCodeEditor: React.FC<WispCodeEditorProps> = ({
                 ? "bg-purple-100 hover:bg-purple-200 text-purple-900 border-purple-300"
                 : "bg-purple-950/70 hover:bg-purple-900 text-purple-200 border-purple-700/60"
             }`}
-            title="Abrir panel flotante a la derecha con todos los componentes organizados por categoría y sugerencias contextuales"
+            title="Open floating component palette with categories and contextual suggestions"
           >
             <LayoutGrid className="w-3.5 h-3.5 text-purple-400" />
-            <span className="hidden sm:inline">Paleta (+35)</span>
-            <span className="sm:hidden">Paleta</span>
+            <span className="hidden sm:inline">Palette (+35)</span>
+            <span className="sm:hidden">Palette</span>
             {isPaletteOpen ? (
               <PanelRightClose className="w-3 h-3 opacity-80 ml-0.5" />
             ) : (
@@ -569,10 +571,10 @@ export const WispCodeEditor: React.FC<WispCodeEditorProps> = ({
                 ? "bg-purple-50 hover:bg-purple-100 text-purple-900 border-purple-300"
                 : "bg-purple-950/60 hover:bg-purple-900 text-purple-200 border-purple-800/60"
             }`}
-            title="Abrir catálogo visual con más de 60 íconos Lucide clasificados"
+            title="Open Lucide icon catalog with search"
           >
             <Smile className="w-3.5 h-3.5 text-purple-400" />
-            <span className="hidden md:inline">Íconos</span>
+            <span className="hidden md:inline">Icons</span>
           </button>
 
           {/* Autocomplete IntelliSense manual trigger */}
@@ -580,10 +582,10 @@ export const WispCodeEditor: React.FC<WispCodeEditorProps> = ({
             type="button"
             onClick={triggerAutocomplete}
             className="flex items-center gap-1.5 px-2.5 py-1 rounded-xl bg-purple-950/60 hover:bg-purple-900 text-purple-200 border border-purple-800/60 transition-all cursor-pointer font-medium"
-            title="Abrir autocompletado y documentación de sintaxis contextual (Ctrl+Espacio)"
+            title="Open IntelliSense autocomplete and documentation (Ctrl+Space)"
           >
             <Sparkles className="w-3.5 h-3.5 text-purple-400" />
-            <span className="text-[11px] hidden md:inline">Autocompletar</span>
+            <span className="text-[11px] hidden md:inline">Autocomplete</span>
             <span className="text-[9px] px-1 bg-purple-900/80 rounded border border-purple-700/60 font-mono text-purple-300">
               Ctrl+Space
             </span>
@@ -599,10 +601,10 @@ export const WispCodeEditor: React.FC<WispCodeEditorProps> = ({
                   ? "bg-purple-100 hover:bg-purple-200 text-purple-800 border-purple-300"
                   : "bg-purple-950/60 hover:bg-purple-900 text-purple-200 border-purple-800/60"
               }`}
-              title="Ver Especificación Wisp y Prompt para IA"
+              title="View Wisp DSL Specification & AI Prompting Guide"
             >
               <HelpCircle className="w-3.5 h-3.5 text-purple-500" />
-              <span className="text-[11px]">Guía</span>
+              <span className="text-[11px]">Guide</span>
             </button>
           )}
 
@@ -616,7 +618,7 @@ export const WispCodeEditor: React.FC<WispCodeEditorProps> = ({
                   ? "bg-white hover:bg-neutral-200 text-neutral-700 border-neutral-300"
                   : "bg-neutral-900 hover:bg-neutral-800 text-neutral-300 hover:text-white border-neutral-800"
               }`}
-              title={isMaximized ? "Restaurar vista dividida" : "Maximizar editor"}
+              title={isMaximized ? "Restore split view" : "Maximize editor"}
             >
               {isMaximized ? (
                 <Minimize2 className="w-3.5 h-3.5" />
@@ -635,17 +637,17 @@ export const WispCodeEditor: React.FC<WispCodeEditorProps> = ({
                 ? "bg-white hover:bg-neutral-200 text-neutral-700 border-neutral-300"
                 : "bg-neutral-800 hover:bg-neutral-700 text-neutral-300 hover:text-white border-neutral-700"
             }`}
-            title="Copiar código Wisp"
+            title="Copy Wisp DSL code"
           >
             {copied ? (
               <>
                 <Check className="w-3.5 h-3.5 text-emerald-500" />
-                <span className="text-[11px] text-emerald-500">Copiado</span>
+                <span className="text-[11px] text-emerald-500">Copied</span>
               </>
             ) : (
               <>
                 <Copy className="w-3.5 h-3.5" />
-                <span className="text-[11px]">Copiar</span>
+                <span className="text-[11px]">Copy</span>
               </>
             )}
           </button>
@@ -692,7 +694,7 @@ export const WispCodeEditor: React.FC<WispCodeEditorProps> = ({
                 lineHeight: `${Math.round(fontSize * 1.6)}px`,
                 backgroundColor: editorBg,
               }}
-              placeholder="Escribe tu interfaz en Wisp DSL..."
+              placeholder="Write your interface in Wisp DSL..."
               spellCheck={false}
             />
           </div>
@@ -722,6 +724,7 @@ export const WispCodeEditor: React.FC<WispCodeEditorProps> = ({
             insertSnippet(snippet);
           }}
           isLight={isLight}
+          previewIsDark={previewIsDark}
         />
 
         {/* Floating Quick Tab on right edge when palette is closed */}
@@ -734,12 +737,12 @@ export const WispCodeEditor: React.FC<WispCodeEditorProps> = ({
                 ? "bg-white/95 hover:bg-purple-50 text-purple-900 border-neutral-300 hover:border-purple-400"
                 : "bg-[#1B1A24]/95 hover:bg-[#262338] text-purple-300 border-neutral-700/80 hover:border-purple-500"
             }`}
-            title="Abrir paleta lateral de componentes Wisp (categorías, previews y sugerencias contextuales)"
+            title="Open side component palette (categories, previews, and suggestions)"
           >
             <div className="flex flex-col items-center gap-1.5">
               <Sparkles className="w-3.5 h-3.5 text-purple-400 group-hover:scale-110 transition-transform" />
               <span className="text-[10px] font-bold uppercase tracking-wider [writing-mode:vertical-lr] rotate-180">
-                Componentes
+                Components
               </span>
               <PanelRightOpen className="w-3 h-3 text-neutral-400" />
             </div>
@@ -759,20 +762,20 @@ export const WispCodeEditor: React.FC<WispCodeEditorProps> = ({
           {errorCount === 0 && warningCount === 0 ? (
             <div className="flex items-center gap-1.5 text-emerald-500 font-medium">
               <CheckCircle2 className="w-3.5 h-3.5" />
-              <span>Sintaxis Wisp 100% válida</span>
+              <span>100% valid Wisp syntax</span>
             </div>
           ) : (
             <div className="flex items-center gap-3">
               {errorCount > 0 && (
                 <div className="flex items-center gap-1 text-red-400 font-medium">
                   <AlertCircle className="w-3.5 h-3.5" />
-                  <span>{errorCount} error(es) detectados</span>
+                  <span>{errorCount} error(s) detected</span>
                 </div>
               )}
               {warningCount > 0 && (
                 <div className="flex items-center gap-1 text-amber-400 font-medium">
                   <AlertTriangle className="w-3.5 h-3.5" />
-                  <span>{warningCount} aviso(s)</span>
+                  <span>{warningCount} warning(s)</span>
                 </div>
               )}
             </div>
@@ -780,9 +783,9 @@ export const WispCodeEditor: React.FC<WispCodeEditorProps> = ({
         </div>
 
         <div className="flex items-center gap-2.5 text-[11px] font-mono">
-          <span>Línea {activeCursorLine} de {lines.length}</span>
+          <span>Line {activeCursorLine} of {lines.length}</span>
           <span>•</span>
-          <span className="hidden sm:inline text-purple-400 font-medium">Ctrl+Espacio: Autocompletar</span>
+          <span className="hidden sm:inline text-purple-400 font-medium">Ctrl+Space: Autocomplete</span>
           <span>•</span>
           <span className="capitalize">{monacoTheme.replace("-", " ")}</span>
           <span>•</span>

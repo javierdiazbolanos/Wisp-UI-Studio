@@ -31,6 +31,110 @@ export interface WispCompletionItem {
 // ==========================================
 
 export const TOP_LEVEL_COMPLETIONS: WispCompletionItem[] = [
+  {
+    label: "navigationrail",
+    kind: "keyword",
+    detail: 'navigationrail title="..." fab=plus',
+    insertText: `navigationrail title="App" fab=plus\n  navitem "Inicio" icon=home active\n  navitem "Bandeja" icon=inbox badge="5"\n  navitem "Ajustes" icon=settings`,
+    documentation: "Barra de navegación vertical Material 3 (Rail) para pantallas medianas y grandes, con soporte de FAB e items con indicadores activos y badges.",
+    example: `navigationrail title="Portal" fab=plus\n  navitem "Inicio" icon=home active\n  navitem "Proyectos" icon=folder\n  navitem "Ajustes" icon=settings`,
+  },
+  {
+    label: "drawer",
+    kind: "keyword",
+    detail: 'drawer title="..." subtitle="..." avatar="..."',
+    insertText: `drawer title="Mi Aplicación" subtitle="usuario@empresa.com"\n  draweritem "Panel Principal" icon=layout active\n  draweritem "Clientes" icon=users badge="12"\n  section "Configuración"\n  draweritem "Ajustes" icon=settings`,
+    documentation: "Panel de navegación lateral / Drawer Material 3 con cabecera de perfil, secciones y elementos de menú con píldoras activas.",
+    example: `drawer title="Gestión de Eventos"\n  draweritem "Eventos" icon=calendar active\n  draweritem "Salones" icon=map-pin\n  draweritem "Presupuestos" icon=dollar-sign`,
+  },
+  {
+    label: "sidesheet",
+    kind: "keyword",
+    detail: 'sidesheet title="Detalles & Filtros"',
+    insertText: `sidesheet title="Filtros Avanzados"\n  select categoria label="Categoría" options=["Todas", "Eventos", "Bodas", "Empresariales"]\n  slider precio label="Presupuesto Máximo" min=500 max=20000 value=5000\n  button "Aplicar Filtros" filled`,
+    documentation: "Panel lateral emergente (Side Sheet) de Material 3 para filtros secundarios, edición complementaria o inspección de detalles.",
+    example: `sidesheet title="Filtros"\n  textfield search label="Buscar"\n  button "Filtrar" filled`,
+  },
+  {
+    label: "bottomsheet",
+    kind: "keyword",
+    detail: 'bottomsheet title="Acciones Rápidas"',
+    insertText: `bottomsheet title="Compartir & Exportar"\n  button "Exportar a PDF" filled icon=download\n  button "Enviar por Correo" tonal icon=mail\n  button "Cancelar" text goto=back`,
+    documentation: "Hoja inferior emergente (Bottom Sheet) con tirador táctil de arrastre, título y lista de acciones.",
+    example: `bottomsheet title="Opciones"\n  button "Descargar" filled icon=download`,
+  },
+  {
+    label: "loading",
+    kind: "keyword",
+    detail: 'loading "Mensaje..." [variant=circular|linear] [value=75]',
+    insertText: `loading "Cargando datos del sistema..."`,
+    documentation: "Indicador de progreso y carga Material 3 (circular progress, linear progress, spinner indeterminate o determinate).",
+    example: `loading "Procesando cotización..."\nlinearprogress value=65 message="Subiendo comprobante..."`,
+  },
+  {
+    label: "linearprogress",
+    kind: "keyword",
+    detail: 'linearprogress value=75 [message="..."]',
+    insertText: `linearprogress value=75 message="Progreso de sincronización"`,
+    documentation: "Barra de progreso lineal Material 3 con indicador de porcentaje o modo indeterminado.",
+    example: `linearprogress value=80 message="Completado"`,
+  },
+  {
+    label: "circularprogress",
+    kind: "keyword",
+    detail: 'circularprogress value=75 [message="..."]',
+    insertText: `circularprogress value=75 message="Capacidad utilizada"`,
+    documentation: "Indicador de progreso circular Material 3 con porcentaje central y trazo animado.",
+    example: `circularprogress value=90`,
+  },
+  {
+    label: "tooltip",
+    kind: "keyword",
+    detail: 'tooltip "Mensaje de ayuda"',
+    insertText: `tooltip "Haga clic para sincronizar con la nube"`,
+    documentation: "Píldora o globo flotante de ayuda contextual rápida (Plain Tooltip).",
+    example: `tooltip "Copiar identificador al portapapeles"`,
+  },
+  {
+    label: "richtooltip",
+    kind: "keyword",
+    detail: 'richtooltip title="..." text="..." [action="..."]',
+    insertText: `richtooltip title="Permisos de Edición" text="Los administradores pueden modificar precios y contratos directamente." action="Saber más" action_goto=@Docs`,
+    documentation: "Tarjeta emergente de información enriquecida Material 3 con subtítulo, cuerpo descriptivo y botón de acción opcional.",
+    example: `richtooltip title="Seguridad" text="Autenticación de dos pasos requerida." action="Configurar"`,
+  },
+  {
+    label: "carousel",
+    kind: "keyword",
+    detail: "carousel con múltiples tarjetas / elementos",
+    insertText: `carousel\n  card elevated\n    text "Salón Real" title\n    text "Capacidad para 350 personas con pista de baile." body\n  card elevated\n    text "Terraza Jardín" title\n    text "Espacio al aire libre con vista panorámica." body`,
+    documentation: "Contenedor carrusel horizontal interactivo Material 3 con controles de navegación previa/siguiente y puntos indicadores.",
+    example: `carousel\n  card\n    text "Opción 1" title\n  card\n    text "Opción 2" title`,
+  },
+  {
+    label: "iconbutton",
+    kind: "keyword",
+    detail: 'iconbutton icon=star [variant=filled|tonal|outlined] [tooltip="..."]',
+    insertText: `iconbutton icon=heart variant=tonal tooltip="Marcar como favorito"`,
+    documentation: "Botón de ícono interactivo Material 3 compacto (standard, filled, tonal, outlined) con badge y tooltip.",
+    example: `iconbutton icon=bell variant=filled badge="3"`,
+  },
+  {
+    label: "timepicker",
+    kind: "keyword",
+    detail: 'timepicker id label="..." [value="14:30"]',
+    insertText: `timepicker hora label="Hora del Evento" value="18:00"`,
+    documentation: "Selector de hora interactivo Material 3 con reloj selector, formato y accesos rápidos.",
+    example: `timepicker hora_inicio label="Inicio" value="10:00"`,
+  },
+  {
+    label: "menu",
+    kind: "keyword",
+    detail: 'menu "Opciones" [icon=more-vertical]',
+    insertText: `menu "Acciones" icon=more-vertical\n  menuitem "Editar" icon=edit\n  menuitem "Duplicar" icon=copy\n  menuitem "Eliminar" icon=trash`,
+    documentation: "Menú desplegable contextual Material 3 con lista emergente de acciones, íconos y atajos.",
+    example: `menu "Opciones"\n  menuitem "Ver detalles" icon=eye\n  menuitem "Descargar" icon=download`,
+  },
   // Core Layout Containers (High Priority)
   {
     label: "row",
@@ -157,6 +261,24 @@ export const TOP_LEVEL_COMPLETIONS: WispCompletionItem[] = [
     documentation:
       "Campo de entrada de texto Material 3 con etiqueta flotante animada, ícono y soporte para contraseñas/emails.",
     example: `textfield password label="Contraseña" type=password icon=lock`,
+  },
+  {
+    label: "searchbar",
+    kind: "keyword",
+    detail: 'searchbar id [placeholder="..."] [value="..."]',
+    insertText: `searchbar busqueda placeholder="Buscar usuarios, productos o registros..."`,
+    documentation:
+      "Barra de búsqueda con estilo Material 3, ícono de lupa integrado y botón de borrado rápido.",
+    example: `searchbar query placeholder="Buscar en el sistema..."`,
+  },
+  {
+    label: "search",
+    kind: "keyword",
+    detail: 'search id [placeholder="..."]',
+    insertText: `search query placeholder="Buscar..."`,
+    documentation:
+      "Alias para barra de búsqueda 'searchbar' con ícono de lupa integrado.",
+    example: `search busqueda placeholder="Filtrar datos..."`,
   },
   {
     label: "textarea",
@@ -354,6 +476,22 @@ export const TOP_LEVEL_COMPLETIONS: WispCompletionItem[] = [
     example: `appbar "Ajustes de Cuenta" icon=arrow-left goto=@Dashboard`,
   },
   {
+    label: "topappbar",
+    kind: "keyword",
+    detail: 'topappbar "Título" [icon=menu] [goto=@Home] [action="..."]',
+    insertText: `topappbar "Título de la Barra" icon=menu goto=@Home`,
+    documentation: "Alias estándar de barra superior de aplicación Material 3.",
+    example: `topappbar "Gestión de Pedidos" icon=arrow-left goto=@Dashboard`,
+  },
+  {
+    label: "navbar",
+    kind: "keyword",
+    detail: 'navbar "Título" [icon=menu] [goto=@Home]',
+    insertText: `navbar "Mi Aplicación" icon=menu goto=@Home`,
+    documentation: "Barra de navegación y encabezado superior.",
+    example: `navbar "Mi Empresa" icon=menu\n  button "Salir" text goto=@Login`,
+  },
+  {
     label: "bottomnav",
     kind: "keyword",
     detail: "bottomnav -> navitem ...",
@@ -362,11 +500,29 @@ export const TOP_LEVEL_COMPLETIONS: WispCompletionItem[] = [
     example: `bottomnav\n  navitem "Feed" icon=home goto=@Feed active=true\n  navitem "Mensajes" icon=mail goto=@Inbox`,
   },
   {
+    label: "navigationrail",
+    kind: "keyword",
+    detail: 'navigationrail title="..." fab=plus user="..." [expanded=true|false]',
+    insertText: `navigationrail title="Espacio" fab=plus fabLabel="Nuevo"\n  railitem "Inicio" icon=home active\n    appbar "Panel Principal" icon=home\n    card elevated\n      text "Bienvenido al Panel" title\n  railitem "Analíticas" icon=bar-chart-2 badge="8"\n    appbar "Métricas" icon=bar-chart-2\n  railitem "Ajustes" icon=settings\n    appbar "Ajustes" icon=settings`,
+    documentation:
+      "Barra de navegación vertical Material 3 (Navigation Rail) para desktop y tablet con cambio dinámico de paneles, botón FAB, badges y modo expandible.",
+    example: `navigationrail title="Workspace" fab=plus\n  railitem "Inicio" icon=home active\n    text "Contenido Inicio"\n  railitem "Mensajes" icon=mail badge="4"\n    text "Bandeja de Entrada"`,
+  },
+  {
+    label: "railitem",
+    kind: "keyword",
+    detail: 'railitem "Título" icon=home [active] [badge="..."]',
+    insertText: `railitem "Destino" icon=home active\n  `,
+    documentation:
+      "Destino o panel individual dentro de un contenedor 'navigationrail' con contenido anidado conmutable.",
+    example: `railitem "Resumen" icon=home active\n  appbar "Panel Principal" icon=home`,
+  },
+  {
     label: "navitem",
     kind: "keyword",
     detail: 'navitem "Título" icon=home goto=@Home [active=true]',
     insertText: `navitem "Inicio" icon=home goto=@Home active=true`,
-    documentation: "Pestaña individual dentro de una barra de navegación inferior (bottomnav).",
+    documentation: "Pestaña individual dentro de una barra de navegación inferior (bottomnav) o navigationrail.",
     example: `navitem "Ajustes" icon=settings goto=@Config`,
   },
   {
@@ -476,6 +632,33 @@ export const TOP_LEVEL_COMPLETIONS: WispCompletionItem[] = [
     documentation:
       "Declara un panel inferior deslizable (Bottom Sheet Material 3) ideal para acciones contextuales en móvil.",
     example: `@MenuInferior:sheet\n  listitem "Configuración" icon=settings`,
+  },
+  {
+    label: "@Component:component",
+    kind: "screen",
+    detail: "@Nombre:component (Bloque de UI reutilizable)",
+    insertText: `@SelectorPais:component\n  autocomplete pais label="País de Residencia" placeholder="Selecciona un país..."\n    option "México"\n    option "España"\n    option "Colombia"\n    option "Chile"\n`,
+    documentation:
+      "Declara un bloque o componente modular reutilizable en WDL que puede incrustarse en múltiples pantallas mediante 'component @Nombre'.",
+    example: `@DireccionFiscal:component\n  grid cols=2 gap=12\n    textfield calle label="Calle y Número"\n    textfield cp label="Código Postal"\n\n@Checkout:screen\n  component @DireccionFiscal`,
+  },
+  {
+    label: "component",
+    kind: "keyword",
+    detail: "component @Nombre [prop=valor]",
+    insertText: `component @`,
+    documentation:
+      "Incrusta un componente reutilizable declarado previamente con @Nombre:component en la pantalla actual.",
+    example: `component @DireccionFiscal`,
+  },
+  {
+    label: "include",
+    kind: "keyword",
+    detail: "include @Nombre",
+    insertText: `include @`,
+    documentation:
+      "Alias para incrustar un componente reutilizable declarado con @Nombre:component.",
+    example: `include @SelectorPais`,
   },
   {
     label: "step",
@@ -688,6 +871,40 @@ export const COMPONENT_PROPERTIES: Record<string, WispCompletionItem[]> = {
       detail: "Valor inicial predeterminado",
       insertText: 'value=""',
       documentation: "Contenido de texto pre-cargado en el campo.",
+    },
+  ],
+
+  // SearchBar
+  searchbar: [
+    {
+      label: 'placeholder="..."',
+      kind: "parameter",
+      detail: 'Texto guía tenue de búsqueda (ej. placeholder="Buscar...")',
+      insertText: 'placeholder="Buscar..."',
+      documentation: "Texto de ejemplo visible cuando la barra de búsqueda está vacía.",
+    },
+    {
+      label: 'value="..."',
+      kind: "parameter",
+      detail: 'Valor de búsqueda inicial',
+      insertText: 'value=""',
+      documentation: "Término de búsqueda inicial precargado.",
+    },
+    {
+      label: "icon=...",
+      kind: "parameter",
+      detail: "Ícono Lucide personalizado (predeterminado: search)",
+      insertText: "icon=search",
+      documentation: "Ícono temático situado al inicio de la barra de búsqueda.",
+    },
+  ],
+  search: [
+    {
+      label: 'placeholder="..."',
+      kind: "parameter",
+      detail: 'Texto guía tenue de búsqueda (ej. placeholder="Buscar...")',
+      insertText: 'placeholder="Buscar..."',
+      documentation: "Texto de ejemplo visible cuando la barra de búsqueda está vacía.",
     },
   ],
 
@@ -2239,6 +2456,36 @@ export function getWispCompletions(
       items: filtered.length > 0 ? filtered : toastCompletions,
       replaceRange,
     };
+  }
+
+  // -------------------------------------------------------------
+  // SPECIAL CONTEXT 1.6: Component reference `component @...`, `include @...`, `use @...`
+  // -------------------------------------------------------------
+  if (
+    trimmedLine.startsWith("component") ||
+    trimmedLine.startsWith("include") ||
+    trimmedLine.startsWith("use") ||
+    (leadingSpaces.length > 0 && lowerWord.startsWith("@"))
+  ) {
+    if (lowerWord.startsWith("@") || trimmedLine.endsWith(" ")) {
+      const compCompletions: WispCompletionItem[] = screenNames.map((name) => ({
+        label: `@${name}`,
+        kind: "screen",
+        detail: `Incrustar componente/pantalla @${name}`,
+        insertText: lowerWord.startsWith("@") ? `@${name}` : `@${name}`,
+        documentation: `Inserta e incrusta el contenido del componente @${name} reutilizable aquí.`,
+      }));
+
+      if (compCompletions.length > 0) {
+        const filtered = compCompletions.filter((it) =>
+          it.label.toLowerCase().includes(lowerWord) || it.insertText.toLowerCase().includes(lowerWord)
+        );
+        return {
+          items: filtered.length > 0 ? filtered : compCompletions,
+          replaceRange,
+        };
+      }
+    }
   }
 
   // -------------------------------------------------------------

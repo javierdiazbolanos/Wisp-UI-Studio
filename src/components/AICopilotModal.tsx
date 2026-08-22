@@ -10,11 +10,11 @@ interface AICopilotModalProps {
 }
 
 const QUICK_PROMPTS = [
-  "Crea una pantalla de registro con campos de nombre, correo, contraseña, selector de rol con chips y switch de términos",
-  "Genera un Wizard de 3 pasos para solicitud de crédito bancario con split de documentos y resumen final",
-  "Diseña un panel de analíticas SaaS con métricas de usuarios, ingresos, tabla de suscripciones y botón de nuevo plan",
-  "Crea un formulario médico para registro de alergias, antecedentes clínicos, escala de dolor y selector de especialista",
-  "Haz una pantalla móvil de billetera digital con saldo disponible, contactos frecuentes y lista de transacciones recientes",
+  "Create a registration screen with name, email, password, role selector with chips, and terms switch",
+  "Generate a 3-step Wizard for a loan application with document split view and final summary",
+  "Design a SaaS analytics dashboard with user metrics, revenue KPIs, subscription table, and new plan button",
+  "Create a clinical medical form for allergy registration, medical history, pain scale, and specialist selector",
+  "Build a mobile digital wallet screen with available balance, frequent contacts, and recent transaction list",
 ];
 
 export const AICopilotModal: React.FC<AICopilotModalProps> = ({
@@ -60,17 +60,17 @@ export const AICopilotModal: React.FC<AICopilotModalProps> = ({
       const data = await response.json();
 
       if (!response.ok) {
-        throw new Error(data.error || "Error al conectar con el servicio de IA");
+        throw new Error(data.error || "Error connecting to AI service");
       }
 
       if (data.wispCode) {
         setGeneratedCode(data.wispCode);
       } else {
-        throw new Error("No se recibió código Wisp generado");
+        throw new Error("No generated Wisp code received");
       }
     } catch (err: any) {
       console.error(err);
-      setError(err.message || "Error al generar código Wisp");
+      setError(err.message || "Error generating Wisp code");
     } finally {
       setIsLoading(false);
     }
@@ -87,10 +87,10 @@ export const AICopilotModal: React.FC<AICopilotModalProps> = ({
             </div>
             <div>
               <h3 className="text-lg font-bold text-neutral-900 dark:text-white">
-                Wisp AI Copilot (Gemini 3.7 Flash)
+                Wisp AI Copilot (Gemini 2.5 Flash)
               </h3>
               <p className="text-xs text-neutral-500">
-                Describe en lenguaje natural la pantalla o prototipo que deseas construir.
+                Describe in natural language the screen or interactive flow you want to build.
               </p>
             </div>
           </div>
@@ -113,7 +113,7 @@ export const AICopilotModal: React.FC<AICopilotModalProps> = ({
                 : "text-neutral-500 hover:text-neutral-700"
             }`}
           >
-            Generar Nueva Pantalla
+            Generate New Screen
           </button>
           <button
             type="button"
@@ -124,20 +124,20 @@ export const AICopilotModal: React.FC<AICopilotModalProps> = ({
                 : "text-neutral-500 hover:text-neutral-700"
             }`}
           >
-            Modificar / Enriquecer Código Actual
+            Modify / Enrich Existing Code
           </button>
         </div>
 
         {/* Input prompt */}
         <div className="space-y-2">
           <label className="text-xs font-bold text-neutral-700 dark:text-neutral-300 uppercase tracking-wider">
-            Requerimiento de Pantalla:
+            Screen Requirements & Features:
           </label>
           <textarea
             rows={3}
             value={prompt}
             onChange={(e) => setPrompt(e.target.value)}
-            placeholder="Ejemplo: Crea un wizard de 3 pasos para configuración de pasarela de pagos con endpoints, credenciales, selector de entorno y confirmación..."
+            placeholder="Example: Create a 3-step wizard for payment gateway setup with endpoints, credentials, environment selector, and confirmation..."
             className="w-full p-3.5 text-sm bg-neutral-50 dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700 rounded-2xl outline-none focus:ring-2 focus:ring-purple-600 resize-none text-neutral-900 dark:text-white"
           />
         </div>
@@ -147,7 +147,7 @@ export const AICopilotModal: React.FC<AICopilotModalProps> = ({
           <div className="space-y-2">
             <div className="flex items-center gap-1.5 text-xs text-neutral-500 font-semibold">
               <Lightbulb className="w-3.5 h-3.5 text-amber-500" />
-              <span>Sugerencias rápidas:</span>
+              <span>Quick suggestions:</span>
             </div>
             <div className="flex flex-wrap gap-1.5">
               {QUICK_PROMPTS.map((qp, idx) => (
@@ -175,7 +175,7 @@ export const AICopilotModal: React.FC<AICopilotModalProps> = ({
         {generatedCode && (
           <div className="flex-1 overflow-hidden flex flex-col space-y-2">
             <span className="text-xs font-bold text-neutral-700 dark:text-neutral-300 uppercase tracking-wider">
-              Código Wisp DSL Generado:
+              Generated Wisp DSL Code:
             </span>
             <div className="flex-1 overflow-y-auto p-3.5 bg-neutral-950 text-purple-200 font-mono text-xs rounded-2xl border border-neutral-800 max-h-48 whitespace-pre">
               {generatedCode}
@@ -190,7 +190,7 @@ export const AICopilotModal: React.FC<AICopilotModalProps> = ({
             onClick={onClose}
             className="px-4 py-2 text-xs font-medium text-neutral-600 dark:text-neutral-400 hover:bg-neutral-100 dark:hover:bg-neutral-800 rounded-full cursor-pointer"
           >
-            Cancelar
+            Cancel
           </button>
 
           {!generatedCode ? (
@@ -207,12 +207,12 @@ export const AICopilotModal: React.FC<AICopilotModalProps> = ({
               {isLoading ? (
                 <>
                   <RefreshCw className="w-4 h-4 animate-spin" />
-                  <span>Diseñando con Gemini...</span>
+                  <span>Designing with Gemini...</span>
                 </>
               ) : (
                 <>
                   <Wand2 className="w-4 h-4" />
-                  <span>Generar Wisp DSL</span>
+                  <span>Generate Wisp DSL</span>
                 </>
               )}
             </button>
@@ -223,7 +223,7 @@ export const AICopilotModal: React.FC<AICopilotModalProps> = ({
                 onClick={() => onApplyWisp(generatedCode, "append")}
                 className="px-4 py-2 text-xs font-semibold rounded-full border border-purple-600 text-purple-700 dark:text-purple-300 hover:bg-purple-50 dark:hover:bg-purple-950/40 cursor-pointer"
               >
-                Agregar al final
+                Append to Code
               </button>
               <button
                 type="button"
@@ -231,7 +231,7 @@ export const AICopilotModal: React.FC<AICopilotModalProps> = ({
                 className="px-5 py-2 text-xs font-semibold rounded-full bg-purple-700 hover:bg-purple-800 text-white shadow-md cursor-pointer flex items-center gap-1.5"
               >
                 <Check className="w-4 h-4" />
-                <span>Reemplazar Código</span>
+                <span>Replace Code</span>
               </button>
             </div>
           )}

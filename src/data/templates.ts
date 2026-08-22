@@ -11,312 +11,500 @@ export const WISP_TEMPLATES: WispTemplate[] = [
     id: "m3-expressive-gallery",
     title: "Material 3 Expressive UI • Master Design System",
     category: "Design System",
-    description: "Catálogo exhaustivo de todos los componentes M3 Expressive: botones, campos, controles, tablas tipadas, feedback y layouts.",
+    description: "Exhaustive showcase of every Material 3 Expressive component: Navigation Rail, Drawers, Sheets, Buttons, Typed Tables, Inputs, Feedback, and Surfaces.",
     code: `@theme material3
 
 @M3Gallery:screen
   appbar "Material 3 Expressive Design System" icon=palette
-    button icon=bell text
+    button icon=bell text badge="3"
     button icon=share-2 text
 
-  breadcrumbs items=["Design System", "Material 3", "Component Gallery"] separator=chevron
+  breadcrumbs items=["Design System", "Material 3 Baseline", "Component Showcase"] separator=chevron
 
-  snackbar "Material 3 Expressive Tokens cargados con éxito" action="Explorar" icon=sparkles type=info goto=@M3DialogPreview
+  snackbar "Material 3 Baseline (#6750A4) loaded successfully" action="Explore" icon=sparkles type=info goto=@M3DialogPreview
 
   row spacing=16 justify=between
     column spacing=4
-      text "Catálogo Universal de Componentes M3" display color=primary
-      text "Especificación visual y funcional completa con tipografías fluidas, estados interactivos y tokens M3."
+      text "Google Material Design 3 Master Component Catalog" display color=primary
+      text "Complete visual and functional specification: dynamic HCT tokens, spring physics, fluid typography, and responsive interactive states."
     row spacing=12
-      button "Ver Diálogo Modal" filled icon=layers goto=@M3DialogPreview
-      button "Hoja Inferior" tonal icon=arrow-up-right goto=@M3SheetPreview
+      button "Open Modal Dialog" filled icon=layers goto=@M3DialogPreview
+      button "Bottom Sheet" tonal icon=arrow-up-right goto=@M3SheetPreview
 
   spacer height=8
 
   grid cols=4 gap=16
-    metric label="Tokens M3" value="48 Tokens" delta="100% Cobertura" icon=palette
-    metric label="Componentes" value="28 Widgets" delta="Vibe Ready" icon=box
-    metric label="Accesibilidad" value="WCAG AAA" delta="4.5:1 Contrast" icon=shield-check
-    metric label="Exportación" value="TSX + WDSL" delta="Direct to Dev" icon=code
+    metric label="M3 Tokens" value="48 Tokens" delta="100% HCT Coverage" icon=palette
+    metric label="Components" value="36 Widgets" delta="Baseline + Expressive" icon=box
+    metric label="Accessibility" value="WCAG AAA" delta="4.5:1 Contrast Ratio" icon=shield-check
+    metric label="Architecture" value="TSX + WDSL" delta="Production Ready" icon=code
 
   spacer height=12
 
-  tabs items=["Entradas & Formularios", "Acciones & Botones", "Estructura & Tablas", "Superficies & Alertas"]
-    tab "Entradas & Formularios"
+  tabs items=["Inputs & Forms", "Actions & Buttons", "Structure & Tables", "Surfaces & Feedback", "Navigation & M3 Advanced"]
+    tab "Inputs & Forms"
       split
         left
           card elevated
-            text "Campos de Texto y Búsqueda" title
-            textfield usuario label="Nombre de Usuario" placeholder="javierdiaz" icon=user
-            textfield email label="Correo Corporativo" placeholder="javier@empresa.com" icon=mail
-            textfield password label="Contraseña Segura" placeholder="••••••••••••" icon=lock type=password
-            searchbar query placeholder="Buscar componentes, tokens o guías..."
-            textarea bio label="Biografía Profesional" rows=3 placeholder="Escribe una breve descripción de tu perfil..."
+            text "Text Fields & Search Inputs" title
+            textfield username label="Username" placeholder="alex.morgan" icon=user required=true helper="Enter your unique handle"
+            textfield email label="Work Email" placeholder="alex@company.com" icon=mail required=true
+            textfield password label="Secure Password" placeholder="••••••••••••" icon=lock type=password
+            searchbar query placeholder="Search components, tokens, or guidelines..."
+            textarea bio label="Professional Bio" rows=3 placeholder="Write a short summary about your background and expertise..."
 
         right
           card elevated
-            text "Selectores y Controles Numéricos" title
+            text "Selectors, Sliders & Precision Controls" title
             grid cols=2 gap=12
-              select rol label="Rol en el Sistema" value="Tech Lead"
+              select role label="System Role" value="Tech Lead"
                 option "Tech Lead"
-                option "Senior Frontend"
-                option "Product Designer"
-                option "Fullstack Dev"
-              datepicker fechaIngreso label="Fecha de Inicio" value="2026-08-20"
-            autocomplete pais label="País de Residencia" placeholder="Escribe para filtrar..."
-              option "México"
-              option "España"
+                option "Senior Frontend Engineer"
+                option "Principal Product Designer"
+                option "Fullstack Architect"
+              datepicker startDate label="Start Date" value="2026-08-20"
+            autocomplete country label="Country / Region" placeholder="Type to filter..."
+              option "United States"
+              option "Canada"
               option "Colombia"
-              option "Argentina"
-              option "Chile"
-              option "Perú"
+              option "Germany"
+              option "Japan"
+              option "United Kingdom"
+              option "Venezuela"
+              option "Australia"
+            timepicker syncTime label="Sync Schedule" value="18:30"
             spacer height=4
-            slider nivelExperiencia label="Nivel de Experiencia (Años)" min=1 max=20 value=8
-            text "Satisfacción con el flujo de trabajo Wisp:" label
-            rating csatScore label="Evaluación CSAT" value=5 max=5
+            slider experience label="Years of Experience" min=1 max=20 value=8
+            text "Rate your satisfaction with Wisp DSL:" label
+            rating csatScore label="CSAT Score" value=5 max=5
             row spacing=16
-              switch modoOscuro label="Tema Oscuro Activo" checked=true
-              checkbox terminos label="Acepto Términos M3" checked=true
+              radio tier1 label="Standard Plan" group="billingTier" checked=true
+              radio tier2 label="Enterprise Plan" group="billingTier"
+            row spacing=16
+              switch darkMode label="Dark Theme Active" checked=false
+              checkbox terms label="I agree to M3 Terms of Service" checked=true
 
-    tab "Acciones & Botones"
-      card elevated
-        text "Variantes de Botones Material 3" title
-        text "Jerarquía de énfasis: Filled (primario), Tonal (secundario), Outlined (medio), Elevated (superficie), Text (bajo)." body
-        spacer height=8
-        row spacing=12
-          button "Filled Button" filled icon=check
-          button "Tonal Button" tonal icon=sparkles
-          button "Outlined Button" outlined icon=edit-3
-          button "Elevated Button" elevated icon=arrow-up
-          button "Text Button" text icon=chevron-right
-        spacer height=12
-        text "Botones Segmentados y Chips de Filtro:" label
-        row spacing=12
-          segmentedbutton dispositivo options=["Desktop", "Tablet", "Móvil"] selected="Desktop"
-        spacer height=8
-        row spacing=8
-          chip "Filtro Activo" variant=filter selected=true icon=check
-          chip "Sugerencia Assist" icon=help-circle
-          chip "Alta Prioridad" icon=alert-circle selected=true
-          chip "Cloud Native" icon=cloud
+    tab "Actions & Buttons"
+      split
+        left
+          card elevated
+            text "Material 3 Button Hierarchy" title
+            text "Visual emphasis tiers: Filled (primary), Tonal (secondary), Outlined (medium), Elevated (surface shadow), Text (tertiary)." body
+            spacer height=8
+            row spacing=12
+              button "Filled Button" filled icon=check badge="New"
+              button "Tonal Button" tonal icon=sparkles
+              button "Outlined Button" outlined icon=edit-3
+            row spacing=12
+              button "Elevated Button" elevated icon=arrow-up
+              button "Text Button" text icon=chevron-right
+            spacer height=12
+            text "Interactive Icon Buttons with Tooltips:" label
+            row spacing=12
+              iconbutton icon=heart variant=filled tooltip="Favorite item"
+              iconbutton icon=bookmark variant=tonal tooltip="Bookmark for later"
+              iconbutton icon=share-2 variant=outlined tooltip="Share with team"
+              iconbutton icon=more-vertical variant=standard tooltip="More options"
+            spacer height=8
+            text "Button with Triggered Snackbar:" label
+            row spacing=12
+              button "Trigger Notification" filled icon=send snackbar="Changes synced to cloud successfully" snackbar-action="Undo" snackbar-type=success
 
-    tab "Estructura & Tablas"
+        right
+          card elevated
+            text "Segmented Buttons, Chips & Floating Action" title
+            text "Segmented controls for discrete switching and contextual filter chips:" body
+            spacer height=8
+            segmentedbutton device options=["Desktop", "Tablet", "Mobile"] selected="Desktop"
+            spacer height=12
+            text "Interactive Filter & Assist Chips:" label
+            row spacing=8
+              chip "Active Filter" variant=filter selected=true icon=check
+              chip "Assist Suggestion" icon=help-circle
+              chip "High Priority" icon=alert-circle selected=true
+              chip "Cloud Native" icon=cloud
+            spacer height=12
+            text "Contextual Menu & Floating Action:" label
+            row spacing=12 align=center
+              menu "Quick Actions Menu" icon=more-vertical
+                menuitem "Edit Profile" icon=edit shortcut="Ctrl+E"
+                menuitem "Duplicate Preset" icon=copy shortcut="Ctrl+D"
+                menuitem "Delete Resource" icon=trash goto=@M3DialogPreview
+              tooltip text="Floating action button positioned for primary actions"
+                button "Hover for Tooltip" outlined icon=info
+
+    tab "Structure & Tables"
       card elevated
         row spacing=16 justify=between
-          text "Tabla de Datos Tipados con Búsqueda" title
-          button "Nuevo Miembro" filled icon=plus
-        table title="Directorio de Equipo" columns=["Miembro:avatar", "Correo:text", "Rol:status", "Progreso:progress", "Último Acceso:date", "Sueldo:currency", "Acción:action"] striped=true searchable=true pageSize=3
-          row ["Javier Diaz", "javier@google.com", "Super Admin", "95%", "2026-08-20", "$9,500.00", "Gestionar"]
-          row ["Elena Rostova", "elena@empresa.com", "DevOps Lead", "88%", "2026-08-19", "$8,200.00", "Gestionar"]
-          row ["Carlos Mendez", "carlos@empresa.com", "QA Lead", "72%", "2026-08-18", "$6,800.00", "Gestionar"]
-          row ["Sofia Castro", "sofia@empresa.com", "UX Designer", "100%", "2026-08-20", "$7,400.00", "Gestionar"]
+          column spacing=2
+            text "Typed Data Table with Real-Time Filtering" title
+            text "Supports custom column formatters: avatars, status pills, progress bars, dates, currency, and row actions." body
+          button "New Member" filled icon=plus
+        table title="Engineering Team Directory" columns=["Member:avatar", "Email:text", "Role:status", "Progress:progress", "Last Active:date", "Salary:currency", "Action:action"] striped=true searchable=true pageSize=4
+          row ["Alex Morgan", "alex@google.com", "Super Admin", "95%", "2026-08-20", "$14,500.00", "Manage"]
+          row ["Elena Rostova", "elena@company.com", "DevOps Lead", "88%", "2026-08-19", "$12,800.00", "Manage"]
+          row ["Carlos Mendez", "carlos@company.com", "QA Architect", "72%", "2026-08-18", "$11,200.00", "Manage"]
+          row ["Sofia Castro", "sofia@company.com", "Product Designer", "100%", "2026-08-20", "$13,400.00", "Manage"]
+          row ["Javier Díaz Bolaños", "javier@goldeneventos.com", "Principal Architect", "98%", "2026-08-22", "$16,500.00", "Manage"]
+        divider
+        text "Structured Master List Items:" label
+        list
+          listitem "Master Design Tokens" subtitle="Synchronized with @material/material-color-utilities" icon=palette badge="v3.2" switch=true
+          listitem "Zero-Trust Security Policies" subtitle="Enforcing mTLS and identity certificates" icon=shield-check badge="Active" checkbox=true
 
-    tab "Superficies & Alertas"
+    tab "Surfaces & Feedback"
       grid cols=2 gap=16
         card elevated
-          text "Retroalimentación y Notificaciones" title
-          alert "La sincronización en la nube se ha completado correctamente." type=success title="Operación Exitosa"
-          alert "Recuerda configurar los certificados TLS antes del lanzamiento." type=warning title="Advertencia de Seguridad"
-          alert "Error al autenticar contra el servidor LDAP." type=error title="Fallo de Conexión"
-          alert "Material 3 Expressive utiliza esquemas de color dinámicos HCT." type=info title="Información M3"
+          text "Feedback Alerts & Rich Tooltips" title
+          alert "Cloud database synchronization completed successfully with zero schema conflicts." type=success title="Operation Successful"
+          alert "Review and verify TLS certificates prior to staging deployment." type=warning title="Security Notice"
+          alert "Failed to reach fallback microservices cluster in region us-east4." type=error title="Connection Timeout"
+          alert "Material 3 Expressive dynamically harmonizes secondary and tertiary hues." type=info title="Design System Note"
+          spacer height=8
+          richtooltip title="Material 3 Expressive Guide" text="Learn how HCT color space and dynamic tonal curves elevate your interfaces." action="View Documentation" action_goto=@M3DialogPreview
 
         card outlined
-          text "Acordeones y Agrupadores" title
-          accordion "1. Parámetros de Infraestructura" expanded=true icon=server
-            text "Configuración de clústeres Kubernetes y balanceadores de carga." body
+          text "Collapsible Accordions & Containers" title
+          accordion "1. Infrastructure & Deployment Parameters" expanded=true icon=server
+            text "Configure Kubernetes cluster topologies, load balancers, and ingress routers." body
             row spacing=12
-              switch autoScale label="Auto-escalado HPA" checked=true
-              switch ddosProtect label="Protección DDoS Cloud Armor" checked=true
-          accordion "2. Políticas de Seguridad Zero Trust" expanded=false icon=shield-check
-            text "Autenticación basada en contexto y mTLS estricto." body
+              switch autoScale label="HPA Autoscaling" checked=true
+              switch ddosProtect label="Cloud Armor DDoS Defense" checked=true
+          accordion "2. Zero-Trust Access & Identity Verification" expanded=false icon=shield-check
+            text "Context-aware authentication, granular RBAC policies, and real-time audit logging." body
+          accordion "3. Performance Profiling & Metrics" expanded=false icon=activity
+            text "Continuous tracing with OpenTelemetry and automated regression benchmarks." body
 
-  fab "Crear Widget" icon=plus extended=true goto=@M3DialogPreview
+    tab "Navigation & M3 Advanced"
+      split
+        left
+          navigationrail title="Studio" fab=plus
+            navitem "Overview" icon=home active
+            navitem "Analytics" icon=bar-chart-2 badge="8"
+            navitem "Messages" icon=inbox badge="5"
+            navitem "Settings" icon=settings
+        right
+          column spacing=16
+            card elevated
+              row spacing=12 justify=between align=center
+                column spacing=2
+                  text "Material 3 Progress & Activity Indicators" title
+                  text "Continuous linear tracks, determinate progress with stop indicators, and spinning rings." body
+                menu "Actions" icon=more-vertical
+                  menuitem "Reload Pipeline" icon=refresh-cw
+                  menuitem "Export TSX Code" icon=download
+                  menuitem "Configure Tokens" icon=settings
+              spacer height=4
+              loading "Synchronizing design tokens with cloud backend..."
+              spacer height=4
+              linearprogress value=75 message="Compiling AST AST nodes (75%)"
+              spacer height=4
+              grid cols=2 gap=12
+                circularprogress value=85 message="System Health (85%)"
+                circularprogress value=100 message="Optimizations (100%)"
+            card elevated
+              text "Interactive Card Carousel" title
+              carousel
+                card outlined
+                  text "Grand Emerald Ballroom" title
+                  text "Capacity for 350 guests with high-fidelity acoustics and ambient stage lighting." body
+                card outlined
+                  text "Botanical Terrace Garden" title
+                  text "Open-air scenic lounge with panoramic skyline views and lush landscape architecture." body
+                card outlined
+                  text "Executive Innovation Auditorium" title
+                  text "Equipped with ultra-wide 4K projection and enterprise videoconferencing suites." body
+            row spacing=12
+              button "Open Navigation Drawer" filled icon=menu goto=@M3DrawerPreview
+              button "Open Side Sheet" tonal icon=sidebar goto=@M3SideSheetPreview
+              button "Full Rail Workspace" outlined icon=compass goto=@RailWorkspace
+
+  fab "Create Widget" icon=plus extended=true goto=@M3DialogPreview
+
+@RailWorkspace:screen
+  navigationrail title="Workspace" subtitle="v2.4 Pro" fab=plus fabLabel="Create" fabGoto=@M3DialogPreview user="Carlos Dev" role="Lead Architect"
+    railitem "Overview" icon=home active
+      appbar "Dashboard Overview" icon=layout variant=medium
+        button icon=bell text badge="3" snackbar="3 new notifications"
+        button icon=share-2 text snackbar="Workspace link copied"
+        button "New Project" filled icon=plus goto=@M3DialogPreview
+      grid cols=3 gap=16
+        metric label="Active Projects" value="24" delta="+3 this week" icon=folder
+        metric label="API Latency" value="18ms" delta="Optimal" icon=zap
+        metric label="Sprint Velocity" value="94.2%" delta="+5.1%" icon=trending-up
+      card elevated
+        text "Team Performance & Deliverables" title
+        text "Real-time monitoring synchronized with Material 3 Jetpack Compose and Flutter pipelines." body
+        spacer height=8
+        linearprogress value=82 message="Sprint 42 Completed (82%)"
+      grid cols=2 gap=12
+        card outlined
+          text "Recent Activity" title
+          list
+            listitem "Jetpack Compose M3 Exporter" subtitle="Elevation tokens updated" icon=code
+            listitem "Flutter 3.24 Theme Bridge" subtitle="Tonal palettes harmonized" icon=sparkles
+        card outlined
+          text "Quick Actions" title
+          column spacing=10
+            button "Open M3 Dialog" filled icon=external-link goto=@M3DialogPreview
+            button "View Navigation Drawer" tonal icon=menu goto=@M3DrawerPreview
+            button "Explore Full Gallery" outlined icon=arrow-left goto=@M3Gallery
+
+    railitem "Analytics" icon=bar-chart-2 badge="8"
+      appbar "Growth Metrics & Analytics" icon=bar-chart-2 variant=large
+        button icon=download text snackbar="Report downloaded as CSV"
+        button icon=filter text snackbar="Filters applied"
+      grid cols=2 gap=16
+        card elevated
+          text "Weekly Active Users" title
+          text "Session time distribution across Android, iOS, and Web clients." body
+          spacer height=8
+          linearprogress value=68 message="Target: 100,000 MAU (68%)"
+        card elevated
+          text "Conversion Funnel" title
+          text "Record completion rate reached with Material 3 Expressive components." body
+          spacer height=8
+          circularprogress value=92 message="Retention (92%)"
+      card elevated
+        text "System Health & Servers" title
+        grid cols=3 gap=12
+          stat label="CPU Usage" value="23%" icon=cpu
+          stat label="RAM Memory" value="4.2 GB" icon=database
+          stat label="Availability" value="99.99%" icon=shield-check
+
+    railitem "Messages" icon=inbox badge="5"
+      appbar "Team Inbox" icon=mail variant=center
+        button icon=search text
+        button icon=more-vertical text
+      card elevated
+        text "Recent Messages & Notifications" title
+        list
+          listitem "Carlos Díaz" subtitle="Reviewing NavigationRail expandable support" icon=user badge="New"
+          listitem "CI/CD System" subtitle="Android and Flutter artifact builds passed" icon=check-circle badge="Verified"
+          listitem "Design Systems Team" subtitle="New HCT palettes exported to token JSON" icon=sparkles badge="Tokens"
+      row spacing=12
+        button "Compose Message" filled icon=edit goto=@M3DialogPreview
+        button "Mark All Read" tonal icon=check snackbar="All messages marked as read"
+
+    railitem "Settings" icon=settings
+      appbar "System & Environment Preferences" icon=settings variant=small
+        button "Save Changes" filled icon=save snackbar="Settings saved successfully"
+      card elevated
+        text "Build & Rendering Configuration" title
+        column spacing=14
+          switch autoExport label="Auto-compile Jetpack Compose on code change" checked=true
+          switch syncTheme label="Synchronize dynamic HCT tokens with OS" checked=true
+          switch notifications label="Desktop system notifications" checked=false
+          slider cacheSize label="Cache memory allocation (MB)" min=128 max=2048 value=512
+        divider
+        row spacing=12
+          button "Reset Defaults" outlined icon=rotate-ccw snackbar="Default settings restored"
+          button "Return to M3 Gallery" filled icon=arrow-left goto=@M3Gallery
+
+@M3DrawerPreview:drawer
+  drawer title="Wisp UI Studio" subtitle="developer@wisp.dev"
+    draweritem "Dashboard Hub" icon=layout active
+    draweritem "Venues & Spaces" icon=calendar badge="12"
+    draweritem "Budget & Invoices" icon=dollar-sign
+    section "Preferences & System"
+    draweritem "Theme Settings" icon=settings
+    draweritem "Close Drawer" icon=x goto=close
+
+@M3SideSheetPreview:sidesheet
+  sidesheet title="Advanced Search Filters"
+    text "Adjust real-time criteria to refine the component catalog." body
+    select category label="Event Category" options=["Weddings", "Corporate Galas", "Conferences", "Graduations"]
+    slider budget label="Maximum Budget ($ USD)" min=1000 max=80000 value=25000
+    switch availableOnly label="Show available dates only" checked=true
+    row spacing=12 justify=end
+      button "Close" text goto=close
+      button "Apply Filters" filled goto=close
 
 @M3DialogPreview:dialog
   card elevated
-    text "Diálogo Modal de Confirmación" headline color=primary
-    text "¿Deseas aplicar los cambios del sistema de diseño a todo el proyecto?" body
+    text "Confirm System Changes" headline color=primary
+    text "Are you sure you want to apply these design system tokens across all connected screens?" body
     spacer height=12
-    alert "Esta acción generará un nuevo release en el repositorio de GitHub." type=info
+    alert "This action will publish a new release artifact to your linked GitHub repository." type=info
     spacer height=12
     row spacing=12 justify=end
-      button "Cancelar" text goto=close
-      button "Confirmar y Publicar" filled icon=rocket goto=close
+      button "Cancel" text goto=close
+      button "Confirm & Publish" filled icon=rocket goto=close
 
 @M3SheetPreview:sheet
   card elevated
     row spacing=12 justify=between
-      text "Panel Deslizable Inferior (Sheet)" headline color=primary
+      text "Contextual Bottom Sheet" headline color=primary
       button "" text icon=x goto=close
-    text "Información contextual complementaria o filtros rápidos sin perder el estado de la pantalla." body
+    text "Secondary contextual details and actions presented without losing main screen state." body
     spacer height=12
-    listitem "Documentación Técnica" subtitle="Guía de migración a Material 3" icon=book-open
-    listitem "Descarga de Tokens" subtitle="Exportar formato JSON / TSX" icon=download
+    listitem "Technical Documentation" subtitle="Material 3 Expressive migration guide" icon=book-open
+    listitem "Design Token Downloads" subtitle="Export format JSON / TSX" icon=download
     spacer height=16
-    button "Cerrar Panel" filled goto=close
+    button "Dismiss Sheet" filled goto=close
 `,
   },
   {
     id: "kiro-setup-wizard",
-    title: "Kiro Setup Wizard (Especificación Oficial)",
+    title: "Kiro Cloud Setup Wizard (Official Spec)",
     category: "Wizard",
-    description: "Flujo paso a paso con layout split, inputs de credenciales y navegación entre steps.",
+    description: "Step-by-step multi-screen onboarding flow with split layout, credential inputs, and animated step navigation.",
     code: `@theme material3
 
 @KiroSetup:wizard
   steps: 3
 
-  step "Bienvenida"
+  step "Welcome"
     column spacing=24
       card elevated
-        text "Configura tu entorno Kiro" headline color=primary
-        text "Wisp te permite prototipar flujos completos sin escribir código antes de tiempo. Valida los campos ahora para evitar cambios técnicos futuros."
+        text "Configure Your Kiro Cloud Workspace" headline color=primary
+        text "Wisp enables you to prototype complete interactive flows declaratively. Validate your parameters now to accelerate downstream engineering."
         spacer height=12
         row spacing=12
-          chip "Entorno Cloud" icon=cloud selected=true
-          chip "Alta Disponibilidad" icon=shield selected=true
+          chip "Cloud Native" icon=cloud selected=true
+          chip "High Availability" icon=shield selected=true
           chip "M3 Expressive" icon=palette
         spacer height=16
-        button "Comenzar Configuración" filled icon=arrow-right goto=@KiroSetup(step=2)
+        button "Start Configuration" filled icon=arrow-right goto=@KiroSetup(step=2)
 
-  step "Conexión y Parámetros"
+  step "Connection & Credentials"
     split
       left
         card filled
-          text "Guía de Conexión" title
-          text "Ingresa los endpoints de tus servicios para conectar la pasarela de datos."
+          text "Connection Guide" title
+          text "Provide your cluster endpoints to securely bind the data gateway."
           spacer height=8
-          listitem "1. Endpoint API" subtitle="URL pública HTTPS" icon=globe
-          listitem "2. Autenticación" subtitle="Token de seguridad Bearer" icon=key
-          listitem "3. Timeout" subtitle="Tiempo de espera en ms" icon=clock
+          listitem "1. API Endpoint" subtitle="Public HTTPS Gateway URL" icon=globe
+          listitem "2. Authentication" subtitle="Bearer Security Token" icon=key
+          listitem "3. Timeout" subtitle="Max connection timeout in ms" icon=clock
 
       right
         card elevated
-          text "Credenciales del Servicio" title color=primary
-          textfield endpoint label="URL del servicio" placeholder="https://api.tuempresa.com/v1" icon=globe
-          textfield token label="Token de acceso" placeholder="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..." icon=lock type=password
+          text "Service Credentials" title color=primary
+          textfield endpoint label="Service Gateway URL" placeholder="https://api.yourcompany.com/v1" icon=globe
+          textfield token label="Access Token" placeholder="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..." icon=lock type=password
           row spacing=16
             textfield timeout label="Timeout (ms)" placeholder="5000" type=number
-            select region label="Región Cloud" options=["us-central1 (Iowa)", "southamerica-east1 (São Paulo)", "europe-west1 (Bélgica)"]
-          switch ssl label="Forzar cifrado TLS 1.3" checked=true
+            select region label="Cloud Region" options=["us-central1 (Iowa)", "southamerica-east1 (São Paulo)", "europe-west1 (Belgium)"]
+          switch ssl label="Enforce TLS 1.3 Encryption" checked=true
           spacer height=12
           row spacing=12 justify=between
-            button "Volver" text icon=arrow-left goto=@KiroSetup(step=1)
-            button "Validar y Continuar" filled icon=check goto=@KiroSetup(step=3)
+            button "Back" text icon=arrow-left goto=@KiroSetup(step=1)
+            button "Validate & Proceed" filled icon=check goto=@KiroSetup(step=3)
 
-  step "Finalizado"
+  step "Completed"
     card elevated
-      text "¡Entorno Configurado con Éxito!" headline color=primary
-      text "La conexión con los servicios ha sido verificada. Tu espacio de trabajo está listo para usarse."
+      text "Workspace Configured Successfully!" headline color=primary
+      text "The connection with your upstream microservices has been verified. Your environment is ready for production."
       spacer height=16
-      alert "Todas las credenciales fueron validadas y cifradas en el servidor." type=success title="Listo para Producción"
+      alert "All credentials were encrypted and authenticated against the server cluster." type=success title="Production Ready"
       spacer height=16
       row spacing=12
-        button "Ir al Tablero Principal" filled icon=home goto=@Home
-        button "Revisar Ajustes" outlined icon=settings goto=@KiroSetup(step=2)
+        button "Go to Main Dashboard" filled icon=home goto=@Home
+        button "Review Settings" outlined icon=settings goto=@KiroSetup(step=2)
 
 @Home:screen
   card elevated
     row spacing=16 justify=between
       column spacing=4
-        text "Bienvenido a Kiro Console" headline
-        text "Resumen general de tus servicios y recursos activos"
-      avatar name="Javier Diaz" size=lg
+        text "Welcome to Kiro Console" headline
+        text "Real-time overview of active cloud clusters and services"
+      avatar name="Alex Morgan" size=lg
     divider
     grid cols=3 gap=16
-      metric label="Servicios Activos" value="12/12" delta="+100% OK" icon=check-circle
-      metric label="Peticiones / seg" value="4,820 req/s" delta="+14.2%" icon=trending-up
-      metric label="Latencia Promedio" value="38 ms" delta="-12 ms" icon=zap
+      metric label="Active Services" value="12/12" delta="+100% Operational" icon=check-circle
+      metric label="Requests / sec" value="4,820 req/s" delta="+14.2%" icon=trending-up
+      metric label="Average Latency" value="38 ms" delta="-12 ms vs target" icon=zap
     spacer height=16
     row spacing=12
-      button "Configurar Nuevo Servicio" filled icon=plus goto=@KiroSetup
-      button "Ver Auditoría" tonal icon=file-text
+      button "Configure New Cluster" filled icon=plus goto=@KiroSetup
+      button "Audit Logs" tonal icon=file-text
 `,
   },
   {
     id: "saas-analytics-dashboard",
     title: "SaaS Analytics & Operations Hub",
     category: "Dashboard",
-    description: "Dashboard analítico con métricas clave, filtros por segmento, tabla de despliegues y diálogo de acción.",
+    description: "Executive analytics dashboard featuring KPI metrics, segment filter chips, deployment tables, and modal actions.",
     code: `@theme material3
 
 @Dashboard:screen
   row spacing=16 justify=between
     column spacing=4
-      text "Centro de Operaciones y Métricas" display color=primary
-      text "Supervisión en tiempo real de transacciones, APIs y salud de infraestructura"
+      text "Operations & Infrastructure Analytics" display color=primary
+      text "Real-time observability of transactions, microservices, and system health"
     row spacing=12
-      button "Exportar Reporte" tonal icon=download
-      button "Nuevo Despliegue" filled icon=rocket goto=@DeployModal
+      button "Export Report" tonal icon=download
+      button "New Deployment" filled icon=rocket goto=@DeployModal
 
   spacer height=12
 
   row spacing=12
-    chip "Últimos 30 días" variant=filter selected=true icon=calendar
-    chip "Producción (PRD)" variant=filter selected=true icon=server
-    chip "Latinoamérica" variant=filter
-    chip "Filtrar Errores" variant=filter icon=alert-triangle
+    chip "Last 30 Days" variant=filter selected=true icon=calendar
+    chip "Production (PRD)" variant=filter selected=true icon=server
+    chip "North America" variant=filter
+    chip "Error Alerts Only" variant=filter icon=alert-triangle
 
   spacer height=12
 
   grid cols=4 gap=16
-    metric label="Ingresos Mensuales" value="$148,250" delta="+18.4%" icon=dollar-sign
-    metric label="Usuarios Activos (MAU)" value="24,890" delta="+3,120 nuevos" icon=users
-    metric label="Tasa de Conversión" value="4.82%" delta="+0.6%" icon=pie-chart
-    metric label="Uptime del Sistema" value="99.98%" delta="Sin incidentes" icon=shield-check
+    metric label="Monthly Revenue" value="$148,250" delta="+18.4% MoM" icon=dollar-sign
+    metric label="Active Users (MAU)" value="24,890" delta="+3,120 new" icon=users
+    metric label="Conversion Rate" value="4.82%" delta="+0.6% vs avg" icon=pie-chart
+    metric label="System Uptime" value="99.98%" delta="Zero Incidents" icon=shield-check
 
   spacer height=16
 
   split
     left
       card elevated
-        text "Alertas y Notificaciones" title
-        listitem "Alta carga en base de datos" subtitle="Uso de CPU al 84% en replica-02" icon=alert-circle badge="Urgente"
-        listitem "Certificado SSL renovado" subtitle="Válido hasta Agosto 2027" icon=check-circle badge="OK"
-        listitem "Copia de seguridad completada" subtitle="Snapshot de 420 GB guardado" icon=database
+        text "System Alerts & Logs" title
+        listitem "High Database Load" subtitle="CPU usage at 84% on replica-02" icon=alert-circle badge="Urgent"
+        listitem "SSL Certificate Renewed" subtitle="Valid through August 2027" icon=check-circle badge="Healthy"
+        listitem "Automated Snapshot Finished" subtitle="420 GB backup stored to S3" icon=database
         spacer height=8
-        button "Ver todas las alertas" text icon=chevron-right
+        button "View All Alerts" text icon=chevron-right
 
     right
       card elevated
         row spacing=16 justify=between
-          text "Despliegues Recientes de Microservicios" title
-          segmentedbutton entorno options=["Todos", "PRD", "QAS", "DEV"] selected="PRD"
-        table columns=["Servicio", "Versión", "Rama", "Estado", "Acciones"] striped=true searchable=true
-          row ["auth-gateway-service", "v2.4.1", "main", "Activo", "Configurar"]
-          row ["payment-processor-node", "v1.9.0", "release/1.9", "Activo", "Configurar"]
-          row ["notification-dispatcher", "v3.0.0-rc", "feat/push", "Pendiente", "Configurar"]
-          row ["analytics-aggregator", "v2.1.2", "main", "Activo", "Configurar"]
-          row ["audit-trail-logger", "v1.4.0", "hotfix/sync", "Inactivo", "Configurar"]
+          text "Recent Microservice Deployments" title
+          segmentedbutton env options=["All", "PRD", "QAS", "DEV"] selected="PRD"
+        table columns=["Service", "Version", "Branch", "Status", "Actions"] striped=true searchable=true
+          row ["auth-gateway-service", "v2.4.1", "main", "Active", "Configure"]
+          row ["payment-processor-node", "v1.9.0", "release/1.9", "Active", "Configure"]
+          row ["notification-dispatcher", "v3.0.0-rc", "feat/push", "Pending", "Configure"]
+          row ["analytics-aggregator", "v2.1.2", "main", "Active", "Configure"]
+          row ["audit-trail-logger", "v1.4.0", "hotfix/sync", "Inactive", "Configure"]
 
 @DeployModal:dialog
   card elevated
-    text "Confirmar Nuevo Despliegue" headline color=primary
-    text "Estás a punto de desplegar la versión v2.4.0 en el clúster de PRODUCCIÓN."
+    text "Confirm Production Deployment" headline color=primary
+    text "You are about to deploy release artifact v2.4.0 to the PRODUCTION cluster."
     spacer height=12
-    textfield releaseTag label="Versión de Release" placeholder="v2.4.0-stable"
-    textarea deployNotes label="Notas del release / Changelog" rows=3 placeholder="Corrección de tipos de columna en MySQL y optimización de índices..."
-    switch runMigrations label="Ejecutar migraciones automáticas de base de datos" checked=true
-    switch notifySlack label="Notificar canal de ingeniería #ops-prod" checked=true
+    textfield releaseTag label="Release Tag" placeholder="v2.4.0-stable"
+    textarea deployNotes label="Release Notes / Changelog" rows=3 placeholder="Optimized database indexing and updated dependency schemas..."
+    switch runMigrations label="Execute automated database migrations" checked=true
+    switch notifySlack label="Notify #ops-prod Slack engineering channel" checked=true
     spacer height=16
     row spacing=12 justify=end
-      button "Cancelar" text goto=back
-      button "Confirmar y Desplegar" filled icon=rocket goto=@Dashboard
+      button "Cancel" text goto=back
+      button "Confirm & Deploy" filled icon=rocket goto=@Dashboard
 `,
   },
   {
     id: "ecommerce-checkout",
     title: "E-Commerce Checkout & Summary",
     category: "E-Commerce",
-    description: "Prototipo de compra con información de envío, selector de método de pago, resumen y cálculo de descuento.",
+    description: "Streamlined multi-column checkout flow with delivery information, payment methods, order summary, and promo codes.",
     code: `@theme material3
 
 @Checkout:screen
   row spacing=12
-    button "Volver a la Tienda" text icon=arrow-left goto=@Store
+    button "Return to Store" text icon=arrow-left goto=@Store
   
-  text "Finalizar Compra" display color=primary
-  text "Completa tus datos de envío y pago para procesar tu orden."
+  text "Complete Your Order" display color=primary
+  text "Review your delivery address and payment details to process checkout."
 
   spacer height=16
 
@@ -324,355 +512,624 @@ export const WISP_TEMPLATES: WispTemplate[] = [
     left
       column spacing=16
         card elevated
-          text "1. Información de Envío" title
+          text "1. Shipping Address" title
           grid cols=2 gap=16
-            textfield nombres label="Nombres" placeholder="Javier"
-            textfield apellidos label="Apellidos" placeholder="Díaz"
-          autocomplete pais label="País de Residencia" placeholder="Escribe para buscar..."
-            option "México"
-            option "España"
-            option "Colombia"
-            option "Argentina"
-            option "Chile"
-            option "Perú"
-            option "Costa Rica"
-          textfield direccion label="Dirección de Entrega" placeholder="Av. Insurgentes Sur 1450, Depto 4B" icon=map-pin
+            textfield firstName label="First Name" placeholder="Alex"
+            textfield lastName label="Last Name" placeholder="Morgan"
+          autocomplete country label="Country / Region" placeholder="Search country..."
+            option "United States"
+            option "Canada"
+            option "United Kingdom"
+            option "Germany"
+            option "Japan"
+            option "Australia"
+          textfield address label="Street Address" placeholder="742 Evergreen Terrace, Apt 4B" icon=map-pin
           grid cols=3 gap=12
-            textfield ciudad label="Ciudad" placeholder="Ciudad de México"
-            textfield estado label="Estado / Región" placeholder="CDMX"
-            textfield cp label="Código Postal" placeholder="03100" type=number
-          datepicker fechaEntrega label="Fecha preferida de entrega"
-          textfield telefono label="Teléfono de contacto" placeholder="+52 55 1234 5678" icon=phone
+            textfield city label="City" placeholder="San Francisco"
+            textfield state label="State / Region" placeholder="CA"
+            textfield zip label="Postal Code" placeholder="94107" type=number
+          datepicker deliveryDate label="Preferred Delivery Date"
+          textfield phone label="Phone Number" placeholder="+1 (555) 234-5678" icon=phone
 
         card elevated
-          text "2. Método de Pago y Envío" title
-          text "Tipo de Entrega:" label
+          text "2. Delivery & Payment Method" title
+          text "Shipping Method:" label
           row spacing=16
-            radio envio_std label="Estándar (3-5 días) - Gratis" group="tipoEnvio" checked=true
-            radio envio_exp label="Express 24h - $150 MXN" group="tipoEnvio"
+            radio shippingStd label="Standard (3-5 Days) - Free" group="shippingType" checked=true
+            radio shippingExp label="Express 24h - $15.00 USD" group="shippingType"
           spacer height=8
-          segmentedbutton metodoPago options=["Tarjeta de Crédito", "PayPal", "Apple Pay", "Transferencia SPEI"] selected="Tarjeta de Crédito"
+          segmentedbutton paymentMethod options=["Credit Card", "PayPal", "Apple Pay", "Wire Transfer"] selected="Credit Card"
           spacer height=8
-          textfield numeroTarjeta label="Número de Tarjeta" placeholder="4532 •••• •••• 8821" icon=credit-card
+          textfield cardNumber label="Card Number" placeholder="4532 •••• •••• 8821" icon=credit-card
           grid cols=2 gap=16
-            textfield expiracion label="Vigencia (MM/AA)" placeholder="08/28"
-            textfield cvv label="Código de Seguridad (CVV)" placeholder="821" type=password
-          switch guardarTarjeta label="Guardar tarjeta para futuras compras seguras" checked=true
+            textfield exp label="Expiration (MM/YY)" placeholder="08/28"
+            textfield cvv label="Security Code (CVV)" placeholder="821" type=password
+          switch saveCard label="Securely save card for future purchases" checked=true
 
     right
       column spacing=16
         card elevated
-          text "Resumen del Pedido (3 artículos)" title
-          listitem "Laptop Pro Ultra 16\"" subtitle="32GB RAM / 1TB SSD • Cantidad: 1" badge="$1,899.00" icon=laptop
-          listitem "Monitor 4K Ergonómico 27\"" subtitle="IPS / 144Hz • Cantidad: 1" badge="$450.00" icon=monitor
-          listitem "Teclado Mecánico Inalámbrico" subtitle="Switches Brown • Cantidad: 1" badge="$120.00" icon=keyboard
+          text "Order Summary (3 items)" title
+          listitem "Pro Laptop Ultra 16\"" subtitle="32GB RAM / 1TB SSD • Qty: 1" badge="$1,899.00" icon=laptop
+          listitem "Ergonomic 4K Monitor 27\"" subtitle="IPS / 144Hz • Qty: 1" badge="$450.00" icon=monitor
+          listitem "Wireless Mechanical Keyboard" subtitle="Brown Tactile Switches • Qty: 1" badge="$120.00" icon=keyboard
           divider
           row spacing=12
-            textfield cupon label="Código de Descuento" placeholder="PROMO2026"
-            button "Aplicar" tonal
+            textfield promoCode label="Promo Code" placeholder="SUMMER2026"
+            button "Apply" tonal
           divider
           row spacing=12 justify=between
             text "Subtotal"
             text "$2,469.00"
           row spacing=12 justify=between
-            text "Descuento Especial (10%)" color=primary
+            text "Special Discount (10%)" color=primary
             text "-$246.90" color=primary
           row spacing=12 justify=between
-            text "Envío Express Prioritario"
-            text "Gratis" color=primary
+            text "Priority Express Shipping"
+            text "Free" color=primary
           row spacing=12 justify=between
-            text "Total a Pagar (IVA incluido)" headline
+            text "Total Amount" headline
             text "$2,222.10" headline color=primary
           spacer height=12
-          button "Pagar $2,222.10" filled icon=shield-check goto=@OrderSuccess
+          button "Pay $2,222.10" filled icon=shield-check goto=@OrderSuccess
 
 @OrderSuccess:dialog
   card elevated
-    text "¡Orden Confirmada con Éxito!" headline color=primary
-    text "Tu orden #ORD-98421 ha sido procesada correctamente."
-    alert "Te enviamos el comprobante y el número de guía a tu correo electrónico." type=success title="Pago Aprobado"
+    text "Order Confirmed Successfully!" headline color=primary
+    text "Your order #ORD-98421 has been placed and is being prepared for dispatch."
+    alert "Receipt and carrier tracking number sent to your registered email." type=success title="Payment Authorized"
     spacer height=12
-    button "Ver Detalle de la Orden" filled goto=@Checkout
+    button "View Order Details" filled goto=@Checkout
 `,
   },
   {
     id: "clinic-patient-intake",
-    title: "Clínica: Admisión y Cita Médica",
+    title: "Clinical Patient Intake & Appointments",
     category: "Form",
-    description: "Formulario integral de admisión clínica con validación de alergias, seguros y selección de especialista.",
+    description: "Healthcare intake form with allergy validation, pain scale sliders, insurance verification, and scheduling.",
     code: `@theme material3
 
 @PatientIntake:form
-  text "Registro de Paciente y Cita Médica" display color=primary
-  text "Formulario de admisión para consulta con especialista. Evita omisiones de antecedentes clínicos."
+  text "Patient Intake & Consultation Scheduling" display color=primary
+  text "Comprehensive clinical registration form. Complete all sections to ensure medical history accuracy."
 
   spacer height=16
 
   card elevated
-    text "1. Datos Personales del Paciente" title
+    text "1. Patient Demographics" title
     grid cols=3 gap=16
-      textfield nombreCompleto label="Nombre Completo" placeholder="Dra. Mariana Gomez" icon=user
-      textfield curp label="Documento de Identidad / CURP" placeholder="GOMA850412HDF..."
-      textfield fechaNac label="Fecha de Nacimiento" placeholder="12/04/1985" icon=calendar
+      textfield fullName label="Full Legal Name" placeholder="Dr. Mariana Gomez" icon=user
+      textfield ssn label="National ID / SSN" placeholder="XXX-XX-4912"
+      textfield dob label="Date of Birth" placeholder="1985-04-12" icon=calendar
     grid cols=2 gap=16
-      textfield email label="Correo Electrónico" placeholder="mariana.gomez@gmail.com" icon=mail
-      textfield telefono label="Teléfono Celular" placeholder="+52 55 9876 5432" icon=phone
+      textfield email label="Email Address" placeholder="mariana.gomez@gmail.com" icon=mail
+      textfield phone label="Mobile Phone" placeholder="+1 (555) 987-6543" icon=phone
 
   card elevated
-    text "2. Antecedentes Médicos y Síntomas" title
-    text "Selecciona los síntomas o condiciones que presenta actualmente:" label
+    text "2. Clinical Background & Current Symptoms" title
+    text "Select any active symptoms or underlying medical conditions:" label
     row spacing=8
-      chip "Fiebre / Cefalea" variant=filter selected=true
-      chip "Hipertensión" variant=filter
-      chip "Diabetes" variant=filter
-      chip "Alergias a Medicamentos" variant=filter selected=true
-      chip "Cirugías Previas" variant=filter
+      chip "Fever / Headache" variant=filter selected=true
+      chip "Hypertension" variant=filter
+      chip "Diabetes Type 2" variant=filter
+      chip "Drug Allergies" variant=filter selected=true
+      chip "Prior Surgeries" variant=filter
     spacer height=8
-    textarea alergiasDetalle label="Detalle de Alergias conocidas o Medicación actual" rows=3 placeholder="Alergia a la penicilina y sulfas. Tratamiento con levotiroxina 50mcg..."
+    textarea allergiesDetail label="Known Allergies & Current Prescriptions" rows=3 placeholder="Penicillin and sulfa allergy. Daily levothyroxine 50mcg..."
     grid cols=2 gap=16
-      slider dolorEscala label="Escala de Dolor (1 a 10)" min=1 max=10 value=3
-      select especialidad label="Especialidad Médica Solicitada" options=["Medicina General", "Cardiología", "Dermatología", "Neurología", "Pediatría"]
+      slider painScale label="Pain Intensity Scale (1 to 10)" min=1 max=10 value=3
+      select specialty label="Requested Medical Specialty" options=["Internal Medicine", "Cardiology", "Dermatology", "Neurology", "Pediatrics"]
 
   card elevated
-    text "3. Seguro Médico y Términos" title
-    switch tieneSeguro label="¿Cuenta con póliza de Gastos Médicos Mayores?" checked=true
-    textfield aseguradora label="Nombre de la Aseguradora y No. de Póliza" placeholder="GNP Seguros - Póliza #984210"
-    checkbox aceptoAviso label="He leído y acepto el Aviso de Privacidad y Consentimiento Informado" checked=true
+    text "3. Medical Insurance & Consent" title
+    switch hasInsurance label="Covered by Major Medical Insurance" checked=true
+    textfield insurer label="Insurance Provider & Policy Number" placeholder="BlueCross BlueShield - Policy #984210"
+    checkbox consentTerms label="I have read and consent to the Clinical Privacy and Treatment Policies" checked=true
     spacer height=12
     row spacing=12 justify=end
-      button "Limpiar Formulario" text
-      button "Agendar Cita Médica" filled icon=calendar-check goto=@IntakeConfirm
+      button "Reset Form" text
+      button "Schedule Appointment" filled icon=calendar-check goto=@IntakeConfirm
 
 @IntakeConfirm:dialog
   card elevated
-    text "Cita Agendada Exitosamente" headline color=primary
-    text "Tu cita médica ha sido registrada con el Dr. Carlos Méndez para el 24 de Agosto a las 10:30 AM."
+    text "Appointment Scheduled Successfully" headline color=primary
+    text "Your clinical consultation has been reserved with Dr. Carlos Mendez for August 24 at 10:30 AM."
     spacer height=12
     row spacing=12
-      button "Descargar Recordatorio PDF" tonal icon=download
-      button "Cerrar" filled goto=@PatientIntake
+      button "Download Calendar Reminder (PDF)" tonal icon=download
+      button "Close" filled goto=@PatientIntake
 `,
   },
   {
     id: "mobile-banking-transfer",
-    title: "Banca Móvil & Transferencia Express",
+    title: "Mobile Banking & Express Transfers",
     category: "Mobile",
-    description: "Pantalla móvil optimizada para transferencias inmediatas con contactos frecuentes y límites dinámicos.",
+    description: "Mobile-first banking interface with quick contact chips, slider amount adjustments, and transfer confirmations.",
     code: `@theme material3
 
 @MobileWallet:screen
   card elevated
     row spacing=12 justify=between
       row spacing=8
-        avatar name="Javier D." size=md
+        avatar name="Alex M." size=md
         column spacing=2
-          text "Hola, Javier" title
-          text "Cuenta Priority ••• 4190" label
+          text "Hello, Alex" title
+          text "Priority Account ••• 4190" label
       button "" tonal icon=bell
 
     spacer height=16
-    text "Saldo Disponible" label
-    text "$48,920.50 MXN" display color=primary
+    text "Available Balance" label
+    text "$48,920.50 USD" display color=primary
     row spacing=8
-      chip "+$3,400 este mes" icon=trending-up selected=true
-      chip "Rendimiento 12.5% anual" icon=shield
+      chip "+$3,400 this month" icon=trending-up selected=true
+      chip "12.5% APY High Yield" icon=shield
 
     spacer height=16
     row spacing=12
-      button "Transferir" filled icon=send goto=@QuickTransfer
-      button "Ingresar" tonal icon=plus
-      button "Pagar Servicios" outlined icon=zap
-      button "Retiro sin Tarjeta" text icon=smartphone
+      button "Transfer" filled icon=send goto=@QuickTransfer
+      button "Deposit" tonal icon=plus
+      button "Pay Bills" outlined icon=zap
+      button "Cardless ATM" text icon=smartphone
 
   spacer height=16
   card elevated
     row spacing=12 justify=between
-      text "Movimientos Recientes" title
-      button "Ver todos" text
-    listitem "Transferencia a Carlos Méndez" subtitle="Hoy, 10:15 AM • SPEI" badge="-$1,250.00" icon=arrow-up-right
-    listitem "Depósito de Nómina Quincenal" subtitle="Ayer, 08:00 AM • Empresa SA" badge="+$24,500.00" icon=arrow-down-left
-    listitem "Suscripción Cloud Services" subtitle="18 Ago • Tarjeta Digital" badge="-$45.00" icon=credit-card
+      text "Recent Transactions" title
+      button "View All" text
+    listitem "Transfer to Carlos Mendez" subtitle="Today, 10:15 AM • Instant Wire" badge="-$1,250.00" icon=arrow-up-right
+    listitem "Payroll Direct Deposit" subtitle="Yesterday, 08:00 AM • Acme Corp" badge="+$24,500.00" icon=arrow-down-left
+    listitem "Cloud Services Subscription" subtitle="Aug 18 • Virtual Card" badge="-$45.00" icon=credit-card
 
 @QuickTransfer:sheet
   card elevated
     row spacing=12 justify=between
-      text "Nueva Transferencia SPEI" headline color=primary
+      text "Instant Wire Transfer" headline color=primary
       button "" text icon=x goto=back
     
-    text "Contactos Frecuentes:" label
+    text "Frequent Contacts:" label
     row spacing=12
-      chip "Carlos M. (BBVA)" icon=user selected=true
-      chip "Ana Sofía (Santander)" icon=user
-      chip "Rodrigo P. (Banorte)" icon=user
-      chip "+ Nuevo Contacto" icon=plus
+      chip "Carlos M. (Chase)" icon=user selected=true
+      chip "Ana Sofia (Wells Fargo)" icon=user
+      chip "Rodrigo P. (Citi)" icon=user
+      chip "+ Add New Contact" icon=plus
 
     spacer height=12
-    textfield cuentaDestino label="CLABE Interbancaria (18 dígitos) o Tarjeta" placeholder="012 180 01548291024 8" icon=hash
-    textfield beneficiario label="Nombre del Beneficiario" placeholder="Carlos Méndez López"
-    textfield monto label="Monto a Transferir ($ MXN)" placeholder="1500.00" type=number icon=dollar-sign
-    textfield concepto label="Concepto de Pago" placeholder="Pago de honorarios desarrollo"
+    textfield recipientAccount label="Recipient Account Number or Routing" placeholder="012 180 01548291024 8" icon=hash
+    textfield beneficiary label="Beneficiary Full Name" placeholder="Carlos Mendez Lopez"
+    textfield amount label="Transfer Amount ($ USD)" placeholder="1500.00" type=number icon=dollar-sign
+    textfield memo label="Payment Memo / Reference" placeholder="Q3 Software Consulting Retainer"
     
     spacer height=12
-    slider limiteSeguridad label="Monto rápido" min=100 max=10000 value=1500
+    slider quickSlider label="Quick Amount Slider" min=100 max=10000 value=1500
     
     spacer height=16
     row spacing=12 justify=between
-      button "Cancelar" text goto=back
-      button "Continuar Transferencia" filled icon=shield-check goto=@TransferSuccess
+      button "Cancel" text goto=back
+      button "Authorize Transfer" filled icon=shield-check goto=@TransferSuccess
 
 @TransferSuccess:dialog
   card elevated
-    text "¡Transferencia Exitosa!" headline color=primary
-    text "Se enviaron $1,500.00 MXN a Carlos Méndez con clave de rastreo SPEI #9842104."
-    alert "El dinero ya está disponible en la cuenta del destinatario." type=success title="Operación Inmediata"
+    text "Transfer Completed Successfully!" headline color=primary
+    text "$1,500.00 USD sent to Carlos Mendez with wire tracking ID #TRX-9842104."
+    alert "Funds are immediately available in the recipient account." type=success title="Instant Settlement"
     spacer height=12
-    button "Volver a la Billetera" filled goto=@MobileWallet
+    button "Return to Wallet" filled goto=@MobileWallet
 `,
   },
   {
     id: "saas-billing-support",
-    title: "SaaS Portal: Facturación & Soporte M3",
+    title: "SaaS Billing Portal & Support Hub",
     category: "Split View",
-    description: "Portal enterprise completo con migas de pan (breadcrumbs), acordeones colapsables, FAB de nuevo ticket, snackbars y calificación CSAT.",
+    description: "Enterprise billing portal with breadcrumbs, collapsible accordions, floating action button for tickets, and CSAT rating.",
     code: `@theme material3
 
-@FacturacionHub:screen
-  breadcrumbs items=["Portal Clientes", "Acme Corporation", "Facturación & Suscripción"] separator=chevron
+@BillingHub:screen
+  breadcrumbs items=["Customer Portal", "Acme Corporation", "Billing & Subscriptions"] separator=chevron
   
-  snackbar "Factura #INV-2024-08 generada y enviada a tesorería@acme.com" action="Ver PDF" icon=check-circle-2 type=success goto=@FacturaDetalleModal
+  snackbar "Invoice #INV-2024-08 issued and sent to billing@acme.com" action="View PDF" icon=check-circle-2 type=success goto=@InvoiceDetailModal
   
   row spacing=16 justify=between
     column spacing=4
-      text "Gestión de Facturación y Servicios" display color=primary
-      text "Administra tus datos fiscales, historial de cobros y tickets de soporte técnico"
+      text "Billing & Enterprise Support Management" display color=primary
+      text "Manage tax profiles, payment history, invoices, and technical support requests"
     row spacing=12
-      button "Descargar Todo (ZIP)" tonal icon=download
-      button "Nuevo Ticket" filled icon=help-circle goto=@NuevoTicketModal
+      button "Download All (ZIP)" tonal icon=download
+      button "New Ticket" filled icon=help-circle goto=@NewTicketModal
 
   spacer height=8
 
   grid cols=3 gap=16
-    metric label="Plan Activo" value="Enterprise 24/7" delta="Renovación Sep 1" icon=shield
-    metric label="Gasto Acumulado" value="$14,280 USD" delta="+8.2% vs prev" icon=dollar-sign
-    metric label="SLA de Respuesta" value="12 mins" delta="Excelente" icon=zap
+    metric label="Active Subscription" value="Enterprise 24/7" delta="Renews Sep 1" icon=shield
+    metric label="Year-to-Date Spend" value="$14,280 USD" delta="+8.2% vs prev" icon=dollar-sign
+    metric label="Support SLA Response" value="12 mins" delta="Optimal" icon=zap
 
   spacer height=12
 
   split
     left
       card elevated
-        text "Configuración de Cuenta" title
-        text "Despliega cada sección para actualizar la información de tu empresa:" body
+        text "Account & Tax Configuration" title
+        text "Expand each section to update your enterprise tax profile:" body
         
-        accordion "1. Datos Fiscales y Razón Social" expanded=true icon=file-text badge="Requerido"
-          textfield rfc label="RFC / Tax ID" placeholder="ACM890124-XX1" icon=hash
-          textfield razonSocial label="Razón Social" placeholder="Acme International S.A. de C.V."
-          select regimenFiscal label="Régimen Fiscal" options=["601 General de Ley Personas Morales", "626 Régimen Simplificado (RESICO)", "603 Personas Morales sin Fines Lucrativos"]
-          button "Actualizar Datos Fiscales" tonal icon=save
+        accordion "1. Tax ID & Corporate Legal Entity" expanded=true icon=file-text badge="Required"
+          textfield taxId label="Federal Tax ID / EIN" placeholder="12-3456789" icon=hash
+          textfield legalName label="Legal Entity Name" placeholder="Acme International Inc."
+          select taxRegime label="Tax Classification" options=["C Corporation", "S Corporation", "LLC Partnership", "Non-Profit 501(c)(3)"]
+          button "Update Tax Profile" tonal icon=save
 
-        accordion "2. Contacto de Cobranza y Notificaciones" expanded=false icon=mail
-          textfield emailCobranza label="Correo de Pagos" placeholder="facturacion@acme.com" icon=mail
-          textfield telefono label="Teléfono de Contacto" placeholder="+52 55 1234 5678" icon=phone
-          switch autoEnvio label="Enviar facturas XML y PDF en automático" checked=true
+        accordion "2. Billing Contacts & Automated Notifications" expanded=false icon=mail
+          textfield billingEmail label="Accounts Payable Email" placeholder="billing@acme.com" icon=mail
+          textfield phone label="Direct Phone" placeholder="+1 (555) 123-4567" icon=phone
+          switch autoEmail label="Automatically email PDF invoices upon billing" checked=true
 
-        accordion "3. Términos Legales y Contrato SLA" expanded=false icon=shield-check
-          text "Tu contrato Enterprise tiene vigencia hasta el 31 de Diciembre de 2026." caption
-          alert "Tu nivel de soporte incluye agente dedicado y tiempo de respuesta garantizado < 15 minutos." type=info
+        accordion "3. Enterprise SLA Terms & Addendums" expanded=false icon=shield-check
+          text "Your Enterprise Master Services Agreement is active through December 31, 2026." caption
+          alert "Your tier includes a dedicated Solutions Architect with guaranteed < 15-minute response SLA." type=info
 
     right
       card elevated
-        text "Historial de Facturas Emitidas" title
-        table columns=["Factura ID", "Fecha", "Monto", "Estado", "Acción"] striped=true
-          row ["#FAC-2026-089", "2026-08-15", "$4,850.00", "Pagado", "Descargar"]
-          row ["#FAC-2026-074", "2026-07-15", "$4,850.00", "Pagado", "Descargar"]
-          row ["#FAC-2026-061", "2026-06-15", "$3,920.00", "Pagado", "Descargar"]
-          row ["#FAC-2026-048", "2026-05-15", "$3,920.00", "Pagado", "Descargar"]
+        text "Billing History & Past Invoices" title
+        table columns=["Invoice ID", "Date", "Amount", "Status", "Action"] striped=true
+          row ["#INV-2026-089", "2026-08-15", "$4,850.00", "Paid", "Download"]
+          row ["#INV-2026-074", "2026-07-15", "$4,850.00", "Paid", "Download"]
+          row ["#INV-2026-061", "2026-06-15", "$3,920.00", "Paid", "Download"]
+          row ["#INV-2026-048", "2026-05-15", "$3,920.00", "Paid", "Download"]
         
         spacer height=12
-        text "¿Cómo calificarías la atención de tu gestor de cuenta?" label
-        rating satisfaccionCSAT label="Satisfacción del Cliente (CSAT)" value=5 max=5
+        text "How would you rate your Technical Account Manager support?" label
+        rating csatScore label="Customer Satisfaction (CSAT)" value=5 max=5
 
-  fab "Crear Nueva Factura" icon=plus extended=true goto=@FacturaDetalleModal
+  fab "Create New Invoice" icon=plus extended=true goto=@InvoiceDetailModal
 
-@FacturaDetalleModal:dialog
+@InvoiceDetailModal:dialog
   card elevated
-    text "Emisión de Nueva Factura" headline color=primary
-    breadcrumbs items=["Facturas", "Nueva Emisión", "Borrador #1042"]
-    textfield cliente label="Cliente / Receptor" placeholder="Acme Corporation" icon=user
-    textfield monto label="Total a Facturar ($ USD)" placeholder="2450.00" type=number icon=dollar-sign
-    select metodoPago label="Método de Pago" options=["PUE - Pago en una sola exhibición", "PPD - Pago en parcialidades o diferido"]
-    textarea concepto label="Descripción del Servicio" rows=2 placeholder="Servicios de desarrollo Wisp UI y consultoría Cloud"
+    text "Generate New Enterprise Invoice" headline color=primary
+    breadcrumbs items=["Invoices", "New Issuance", "Draft #1042"]
+    textfield customer label="Recipient / Account" placeholder="Acme Corporation" icon=user
+    textfield amount label="Invoice Amount ($ USD)" placeholder="2450.00" type=number icon=dollar-sign
+    select paymentTerms label="Payment Terms" options=["Net 30 Days", "Due on Receipt", "Net 60 Days"]
+    textarea description label="Service Description" rows=2 placeholder="Wisp UI System architecture and cloud consultation retainer"
     row spacing=12 justify=between
-      button "Cancelar" text goto=close
-      button "Timbrar y Enviar Factura" filled icon=send goto=close
+      button "Cancel" text goto=close
+      button "Issue & Send Invoice" filled icon=send goto=close
 
-@NuevoTicketModal:modal
+@NewTicketModal:modal
   card elevated
-    text "Nuevo Ticket de Soporte Técnico" headline color=primary
-    textfield asunto label="Asunto de la solicitud" placeholder="Duda sobre integración de Webhook"
-    select prioridad label="Nivel de Prioridad" options=["Baja - Consulta general", "Media - Inconveniente parcial", "Crítica - Servicio interrumpido"]
-    textarea detalle label="Descripción detallada" rows=3
+    text "Create Technical Support Ticket" headline color=primary
+    textfield subject label="Ticket Subject" placeholder="Question regarding Webhook HMAC signatures"
+    select priority label="Priority Level" options=["Low - General Inquiry", "Medium - Partial Degraded Performance", "Critical - Service Outage"]
+    textarea details label="Detailed Description" rows=3
     row spacing=12 justify=between
-      button "Cerrar" text goto=close
-      button "Enviar Solicitud" filled icon=send goto=close
+      button "Close" text goto=close
+      button "Submit Ticket" filled icon=send goto=close
 `,
   },
   {
     id: "data-tables-and-tabs",
-    title: "Data Hub: Tablas Dinámicas y Tabuladores M3",
+    title: "Data Hub: Dynamic Tables & Tabbed Views",
     category: "Dashboard",
-    description: "Muestra completa del poder de Wisp DSL para tablas con filas dinámicas, búsqueda, paginación y tabuladores por sección.",
+    description: "Showcase of Wisp DSL tables with dynamic rows, column formatters, search filtering, pagination, and tabs.",
     code: `@theme material3
 
 @DataHub:screen
   row spacing=16 justify=between
     column spacing=4
-      text "Centro de Control de Datos e Infraestructura" display color=primary
-      text "Tablas dinámicas con búsqueda en tiempo real, estados automáticos y navegación por pestañas"
+      text "Infrastructure Control & Data Operations" display color=primary
+      text "Real-time searchable tables, automated status pills, and tabbed resource navigation"
     row spacing=12
-      button "Actualizar Datos" tonal icon=refresh-cw
-      button "Nuevo Registro" filled icon=plus
+      button "Refresh Data" tonal icon=refresh-cw
+      button "Register Resource" filled icon=plus
 
   spacer height=12
 
-  tabs items=["Microservicios", "Usuarios y Accesos", "Auditoría de Transacciones", "Ajustes"]
-    tab "Microservicios"
+  tabs items=["Microservices", "Users & Permissions", "Transaction Audit", "Preferences"]
+    tab "Microservices"
       card elevated
-        text "Estado de Servicios del Clúster" title
-        table title="Inventario de Nodos Activos" columns=["ID:code", "Servicio:text", "Salud:progress", "Versión:code", "Estado:status", "Acción:action", "Opciones:dropdown"] striped=true searchable=true pageSize=4
-          row ["#SRV-101", "Auth Identity Gateway", "98%", "v2.5.0", "Activo", "Configurar", ""]
-          row ["#SRV-102", "Payment Settlement Engine", "85%", "v1.8.4", "Activo", "Configurar", ""]
-          row ["#SRV-103", "Notification Worker SQS", "35%", "v3.0.0-beta", "Pendiente", "Configurar", ""]
-          row ["#SRV-104", "Analytics Stream Sink", "100%", "v4.1.2", "Activo", "Configurar", ""]
-          row ["#SRV-105", "Legacy Sync Bridge", "12%", "v0.9.1", "Inactivo", "Configurar", ""]
-          row ["#SRV-106", "Search Indexer Service", "92%", "v2.2.0", "Activo", "Configurar", ""]
+        text "Cluster Service Health & Topology" title
+        table title="Active Microservices Inventory" columns=["ID:code", "Service:text", "Health:progress", "Version:code", "Status:status", "Action:action", "Options:dropdown"] striped=true searchable=true pageSize=4
+          row ["#SRV-101", "Auth Identity Gateway", "98%", "v2.5.0", "Active", "Configure", ""]
+          row ["#SRV-102", "Payment Settlement Engine", "85%", "v1.8.4", "Active", "Configure", ""]
+          row ["#SRV-103", "Notification Worker SQS", "35%", "v3.0.0-beta", "Pending", "Configure", ""]
+          row ["#SRV-104", "Analytics Stream Sink", "100%", "v4.1.2", "Active", "Configure", ""]
+          row ["#SRV-105", "Legacy Sync Bridge", "12%", "v0.9.1", "Inactive", "Configure", ""]
+          row ["#SRV-106", "Search Indexer Service", "92%", "v2.2.0", "Active", "Configure", ""]
 
-    tab "Usuarios y Accesos"
+    tab "Users & Permissions"
       card elevated
-        text "Directorio de Miembros de la Organización" title
-        table title="Usuarios Asignados" columns=["Miembro:avatar", "Correo:text", "Rol:status", "Último Acceso:date", "Acción:action", "Opciones:dropdown"] striped=true searchable=true
-          row ["Javier Diaz", "javier@empresa.com", "Super Admin", "2026-08-20", "Editar", ""]
-          row ["Elena Rodriguez", "elena@empresa.com", "DevOps Lead", "2026-08-19", "Editar", ""]
-          row ["Carlos Mendoza", "carlos@empresa.com", "QA Engineer", "2026-08-15", "Editar", ""]
-          row ["Sofia Castro", "sofia@empresa.com", "Security Lead", "2026-08-18", "Editar", ""]
+        text "Organization Members & Access Control" title
+        table title="Assigned Identity Accounts" columns=["Member:avatar", "Email:text", "Role:status", "Last Active:date", "Action:action", "Options:dropdown"] striped=true searchable=true
+          row ["Alex Morgan", "alex@company.com", "Super Admin", "2026-08-20", "Edit", ""]
+          row ["Elena Rodriguez", "elena@company.com", "DevOps Lead", "2026-08-19", "Edit", ""]
+          row ["Carlos Mendoza", "carlos@company.com", "QA Engineer", "2026-08-15", "Edit", ""]
+          row ["Sofia Castro", "sofia@company.com", "Security Lead", "2026-08-18", "Edit", ""]
 
-    tab "Auditoría de Transacciones"
+    tab "Transaction Audit"
       card elevated
-        text "Registro de Operaciones Recientes" title
-        table columns=["Tx ID:code", "Fecha:date", "Monto:currency", "Método:text", "Resultado:status"] striped=true searchable=true
-          | #TX-98412 | 2026-08-20 14:32 | $1,250.00 USD | Tarjeta Crédito | Activo |
-          | #TX-98413 | 2026-08-20 14:35 | $480.00 USD   | SPEI Transfer   | Activo |
-          | #TX-98414 | 2026-08-20 14:41 | $2,100.00 USD | PayPal API      | Pendiente |
-          | #TX-98415 | 2026-08-20 14:45 | $95.00 USD    | Apple Pay       | Activo |
+        text "Real-Time Transaction Audit Log" title
+        table columns=["Tx ID:code", "Timestamp:date", "Amount:currency", "Method:text", "Result:status"] striped=true searchable=true
+          | #TX-98412 | 2026-08-20 14:32 | $1,250.00 USD | Credit Card   | Active |
+          | #TX-98413 | 2026-08-20 14:35 | $480.00 USD   | Wire Transfer | Active |
+          | #TX-98414 | 2026-08-20 14:41 | $2,100.00 USD | PayPal API    | Pending |
+          | #TX-98415 | 2026-08-20 14:45 | $95.00 USD    | Apple Pay     | Active |
 
-    tab "Ajustes"
+    tab "Preferences"
       card elevated
-        text "Parámetros del Tablero" title
+        text "Dashboard Streaming Parameters" title
         row spacing=16
-          switch autoRefresh label="Refresco automático cada 30 segundos" checked=true
-          switch notifyAlerts label="Alertas sonoras en caso de fallo" checked=false
+          switch autoRefresh label="Auto-refresh metrics every 30 seconds" checked=true
+          switch notifyAlerts label="Play audio notification on critical error" checked=false
         spacer height=12
-        button "Guardar Preferencias" filled icon=save
+        button "Save Preferences" filled icon=save
+`,
+  },
+  {
+    id: "reusable-components-showcase",
+    title: "Reusable Components • Modular Architecture",
+    category: "Design System",
+    description: "Modular component definition via @Component:component and reuse across multiple screens in Checkout and Profile views.",
+    code: `@theme material3
+
+# 1. Reusable Block Definitions
+@CountrySelector:component
+  autocomplete country label="Country of Residence" placeholder="Select country..."
+    option "United States"
+    option "Canada"
+    option "United Kingdom"
+    option "Germany"
+    option "Japan"
+    option "Australia"
+
+@ShippingAddressBlock:component
+  grid cols=2 gap=12
+    textfield street label="Street Address" placeholder="100 Market St, Suite 400"
+    textfield district label="District / Suite" placeholder="Financial District"
+    textfield zip label="Postal / ZIP Code" placeholder="94105"
+    component @CountrySelector
+
+# 2. Main Checkout Screen Reusing the Modular Components
+@Checkout:screen
+  appbar "Modular Checkout & Billing" icon=shopping-bag
+    button icon=user text goto=@BillingProfile
+
+  breadcrumbs items=["Store", "Cart", "Checkout"] separator=chevron
+
+  row spacing=16 justify=between
+    column spacing=4
+      text "Complete Your Purchase" display color=primary
+      text "Enter your shipping details and preferred payment method."
+    row spacing=12
+      button "View Profile" tonal icon=user goto=@BillingProfile
+
+  spacer height=12
+
+  grid cols=3 gap=16
+    column spacing=16
+      card elevated
+        text "1. Shipping Information" title
+        grid cols=2 gap=12
+          textfield firstName label="First Name" placeholder="Alex"
+          textfield lastName label="Last Name" placeholder="Morgan"
+        spacer height=8
+        component @ShippingAddressBlock
+
+    column spacing=16
+      card elevated
+        text "2. Payment Method" title
+        radio method1 label="Credit / Debit Card" checked=true
+        grid cols=2 gap=12
+          textfield cardNum label="Card Number" placeholder="•••• •••• •••• 4242"
+          textfield exp label="Expiration" placeholder="12/28"
+        spacer height=8
+        radio method2 label="Instant Bank Wire"
+        radio method3 label="PayPal Express"
+
+    column spacing=16
+      card filled
+        text "Order Summary" title
+        row spacing=8 justify=between
+          text "Subtotal (3 items)" body
+          text "$1,450.00 USD" font-mono
+        row spacing=8 justify=between
+          text "Shipping Fee" body
+          text "Free" font-mono color=success
+        divider
+        row spacing=8 justify=between
+          text "Total Due" title
+          text "$1,450.00 USD" headline color=primary
+        spacer height=12
+        button "Authorize & Pay" filled icon=check-circle goto=@PaymentSuccessToast snackbar-type=success
+
+# 3. Profile Screen Reusing the Same Component
+@BillingProfile:screen
+  appbar "My Account • Tax & Billing Details" icon=user
+    button icon=arrow-left text goto=@Checkout
+
+  card elevated
+    text "Default Billing Address" title
+    text "This address will be automatically populated during future checkout sessions." body
+    spacer height=12
+    component @ShippingAddressBlock
+    spacer height=16
+    row spacing=12 justify=end
+      button "Return to Checkout" outlined goto=@Checkout
+      button "Save Changes" filled icon=save goto=@Checkout
+
+@PaymentSuccessToast:snackbar "Payment processed successfully! Confirmation sent to your email." snackbar-duration=4000 snackbar-action="View Order"
+`,
+  },
+  {
+    id: "design-system-components",
+    title: "Component Library • Design System Patterns",
+    category: "Design System",
+    description: "Advanced UI architecture with reusable components for global headers, KPI metric cards, filter bars, and tables.",
+    code: `@theme material3
+
+# ===================================================
+# 1. REUSABLE BLOCKS & COMPONENTS (DESIGN SYSTEM)
+# ===================================================
+
+@GlobalHeader:component
+  row spacing=12 justify=between align=center
+    row spacing=8 align=center
+      icon name=cpu size=28 color=primary
+      column spacing=2
+        text "Kiro Enterprise Platform" title
+        text "Multi-Cloud Observability & Cluster Management" caption
+    row spacing=8
+      chip "v2.6.4" assist
+      badge "Production" variant=success
+      button "Configure" outlined icon=settings
+
+@KpiMetricCard:component
+  card elevated
+    row spacing=12 justify=between align=center
+      column spacing=4
+        text "Transactions / Sec" caption
+        text "4,829 ops" headline color=primary
+      icon name=activity size=28 color=primary
+    divider
+    row spacing=8 justify=between align=center
+      badge "+14.2% vs yesterday" variant=success
+      text "99.98% uptime" caption
+
+@GlobalFilters:component
+  row spacing=12 align=center
+    searchbar query placeholder="Search services, nodes, or IP addresses..."
+    select timeRange label="Date Range"
+      option "Last 24 Hours"
+      option "Last 7 Days"
+      option "Current Month"
+    button "Export Report" tonal icon=download
+
+# ===================================================
+# 2. MAIN SCREEN CONSUMING THE COMPONENTS
+# ===================================================
+
+@MonitoringDashboard:screen
+  component @GlobalHeader
+  spacer height=12
+
+  component @GlobalFilters
+  spacer height=16
+
+  grid cols=3 gap=16
+    component @KpiMetricCard
+    card elevated
+      row spacing=12 justify=between align=center
+        column spacing=4
+          text "P99 Average Latency" caption
+          text "18.4 ms" headline color=primary
+        icon name=clock size=28 color=primary
+      divider
+      row spacing=8 justify=between align=center
+        badge "-3.1 ms" variant=success
+        text "Below threshold (50ms)" caption
+
+    card elevated
+      row spacing=12 justify=between align=center
+        column spacing=4
+          text "Healthy Nodes" caption
+          text "48 / 48" headline color=primary
+        icon name=server size=28 color=primary
+      divider
+      row spacing=8 justify=between align=center
+        badge "100% Healthy" variant=success
+        text "Region us-central1" caption
+
+  spacer height=16
+
+  card elevated
+    row spacing=12 justify=between align=center
+      text "Active Microservices in Cluster" title
+      button "New Deployment" filled icon=plus
+    
+    table title="Microservices" columns=["ID:code", "Service:text", "Health:status", "CPU:progress", "Actions:action"] striped searchable
+      row ["#SVC-01", "Auth Gateway API", "Active", "35%", "View Logs"]
+      row ["#SVC-02", "Payment Processor", "Active", "58%", "View Logs"]
+      row ["#SVC-03", "Notification Engine", "Active", "22%", "View Logs"]
+      row ["#SVC-04", "Analytics Pipeline", "Active", "84%", "View Logs"]
+`,
+  },
+  {
+    id: "app-rail-and-sheets",
+    title: "Navigation Rail, App Rail & Side Sheet",
+    category: "Design System",
+    description: "Vertical navigation rail, collapsible side sheets, contextual drawers, and progress indicators.",
+    code: `@theme material3
+
+@RailStudio:screen
+  split
+    left
+      navigationrail title="Studio" fab=plus
+        navitem "Dashboard" icon=home active
+        navitem "Analytics" icon=bar-chart-2 badge="8"
+        navitem "Inbox" icon=inbox badge="5"
+        navitem "Inventory" icon=package
+        navitem "Settings" icon=settings
+
+    right
+      column spacing=16
+        appbar "Navigation Rail & App Rail Showcase" icon=layout
+          button icon=bell text badge="3"
+          button icon=share-2 text
+
+        row spacing=16 justify=between
+          column spacing=4
+            text "Material 3 Vertical Navigation & Auxiliary Surfaces" display color=primary
+            text "Designed for medium and expanded screens (tablets, foldables, desktops) following official M3 guidelines."
+          row spacing=12
+            button "Open Side Sheet" filled icon=sidebar goto=@SideSheetModal
+            button "Open Drawer" tonal icon=menu goto=@DrawerModal
+
+        grid cols=3 gap=16
+          metric label="Active Rail Items" value="5 Dest" delta="3 with Badges" icon=compass
+          metric label="FAB Action" value="Primary" delta="Extended / Standard" icon=plus
+          metric label="Screen Scale" value="Adaptive" delta="M3 Expressive" icon=maximize-2
+
+        card elevated
+          text "Progress & Loading States" title
+          loading "Synchronizing design tokens with cloud backend..."
+          spacer height=8
+          linearprogress value=68 message="Compiling assets (68%)"
+          spacer height=8
+          row spacing=16
+            circularprogress value=84 message="RAM Usage"
+            circularprogress value=96 message="Efficiency"
+
+        card elevated
+          text "Interactive Card Carousel" title
+          carousel
+            card outlined
+              text "Emerald Executive Suite" title
+              text "Dedicated workspace with high-speed fiber connection and ergonomic station." body
+            card outlined
+              text "Panoramic Sky Lounge" title
+              text "Scenic meeting area with natural daylight and collaboration boards." body
+            card outlined
+              text "Innovation Lab" title
+              text "Equipped with multi-device hardware testing rigs." body
+
+@SideSheetModal:sidesheet
+  sidesheet title="Auxiliary Filtering & Details"
+    text "Side sheets provide quick contextual editing without leaving the main dashboard." body
+    spacer height=12
+    select filterCategory label="Category Filter" options=["All Categories", "Observability", "Security", "Billing"]
+    slider budgetLimit label="Memory Threshold (MB)" min=256 max=8192 value=2048
+    switch alertOnExceed label="Trigger webhook when exceeded" checked=true
+    spacer height=16
+    row spacing=12 justify=end
+      button "Cancel" text goto=close
+      button "Apply" filled goto=close
+
+@DrawerModal:drawer
+  drawer title="Management Console" subtitle="admin@company.com"
+    draweritem "Main Overview" icon=home active
+    draweritem "Microservices" icon=server badge="12"
+    draweritem "API Gateways" icon=globe
+    section "Administration"
+    draweritem "Security & Audit" icon=shield-check
+    draweritem "Settings" icon=settings
+    draweritem "Close Panel" icon=x goto=close
 `,
   },
 ];

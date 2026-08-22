@@ -19,6 +19,35 @@ html, body, #root {
   border-left: 3px solid #C084FC !important;
 }
 
+/* Real-time Edit Flash & Live Location Beacon Animation */
+@keyframes wisp-live-flash {
+  0% {
+    box-shadow: 0 0 0 4px rgba(168, 85, 247, 0.75), 0 0 25px rgba(168, 85, 247, 0.45);
+    background-color: rgba(168, 85, 247, 0.22);
+    transform: scale(1.015);
+  }
+  30% {
+    box-shadow: 0 0 0 3px rgba(168, 85, 247, 0.6), 0 0 18px rgba(168, 85, 247, 0.35);
+    background-color: rgba(168, 85, 247, 0.16);
+    transform: scale(1.008);
+  }
+  70% {
+    box-shadow: 0 0 0 2px rgba(168, 85, 247, 0.35), 0 0 10px rgba(168, 85, 247, 0.15);
+    background-color: rgba(168, 85, 247, 0.08);
+    transform: scale(1.002);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba(168, 85, 247, 0), 0 0 0 rgba(168, 85, 247, 0);
+    background-color: transparent;
+    transform: scale(1);
+  }
+}
+
+.wisp-element-flash {
+  animation: wisp-live-flash 1.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  border-radius: inherit;
+}
+
 .no-scrollbar::-webkit-scrollbar {
   display: none;
 }
@@ -26,3 +55,88 @@ html, body, #root {
   -ms-overflow-style: none;
   scrollbar-width: none;
 }
+
+/* Material 3 Expressive Motion Curves */
+:root {
+  --m3-easing-emphasized: cubic-bezier(0.2, 0, 0, 1);
+  --m3-easing-emphasized-decelerate: cubic-bezier(0.05, 0.7, 0.1, 1);
+  --m3-easing-emphasized-accelerate: cubic-bezier(0.3, 0, 0.8, 0.15);
+  --m3-easing-standard: cubic-bezier(0.2, 0, 0, 1);
+}
+
+.m3-press-effect {
+  transition: transform 0.18s var(--m3-easing-emphasized), box-shadow 0.18s var(--m3-easing-emphasized);
+}
+.m3-press-effect:active {
+  transform: scale(0.96);
+}
+
+/* Material 3 Expressive Ripple Wave Animation */
+@keyframes m3-ripple-expand {
+  0% {
+    transform: scale(0);
+    opacity: 0.35;
+  }
+  60% {
+    opacity: 0.22;
+  }
+  100% {
+    transform: scale(2.8);
+    opacity: 0;
+  }
+}
+
+.m3-ripple-effect {
+  position: absolute;
+  border-radius: 50%;
+  pointer-events: none;
+  background-color: currentColor;
+  transform: scale(0);
+  animation: m3-ripple-expand 0.65s cubic-bezier(0.2, 0, 0, 1) forwards;
+  z-index: 10;
+}
+
+/* Material 3 Expressive State Layer */
+.m3-state-layer {
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  pointer-events: none;
+  background-color: currentColor;
+  opacity: 0;
+  transition: opacity 0.2s cubic-bezier(0.2, 0, 0, 1);
+}
+
+/* Material 3 Expressive Spinner Rotating & Elastic Arcs */
+@keyframes m3-spinner-rotate {
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes m3-spinner-dash {
+  0% {
+    stroke-dasharray: 1, 200;
+    stroke-dashoffset: 0;
+  }
+  50% {
+    stroke-dasharray: 100, 200;
+    stroke-dashoffset: -35px;
+  }
+  100% {
+    stroke-dasharray: 100, 200;
+    stroke-dashoffset: -124px;
+  }
+}
+
+.m3-spinner-anim {
+  animation: m3-spinner-rotate 1.4s linear infinite;
+}
+
+.m3-spinner-arc {
+  stroke-dasharray: 1, 200;
+  stroke-dashoffset: 0;
+  animation: m3-spinner-dash 1.4s ease-in-out infinite;
+  stroke-linecap: round;
+}
+

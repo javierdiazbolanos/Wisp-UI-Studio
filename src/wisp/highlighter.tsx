@@ -20,11 +20,18 @@ export interface HighlightToken {
 }
 
 const COMPONENT_KEYWORDS = new Set([
-  "card", "text", "button", "textfield", "textarea", "select", "option", "autocomplete", "datepicker",
+  "component", "include", "use",
+  "card", "text", "button", "textfield", "textarea", "select", "option", "autocomplete", "datepicker", "timepicker", "time-picker",
   "segmentedbutton", "chip", "switch", "checkbox", "slider",
-  "listitem", "avatar", "badge", "icon", "image", "progress",
-  "metric", "stat", "divider", "spacer", "alert", "tabs", "table",
-  "radio", "fab", "accordion", "snackbar", "breadcrumbs", "rating", "searchbar", "bottomnav", "navigationrail", "tag"
+  "list", "listitem", "list-item", "listgroup", "avatar", "badge", "icon", "image", "progress",
+  "loading", "spinner", "circularprogress", "linearprogress",
+  "metric", "stat", "divider", "spacer", "alert", "tabs", "tab", "panel", "tabitem", "table",
+  "radio", "fab", "accordion", "snackbar", "toast", "breadcrumbs", "rating", "searchbar", "search", "appbar", "topappbar", "navbar", "topbar", "bottomnav", "bottombar", "navitem",
+  "navigationrail", "apprail", "navrail", "rail", "railitem", "rail-item", "destination",
+  "drawer", "navigationdrawer", "appdrawer", "navdrawer", "draweritem",
+  "sidesheet", "side-sheet", "bottomsheet", "bottom-sheet",
+  "carousel", "iconbutton", "icon-button", "menu", "dropdown", "dropdownmenu", "menuitem", "menu-item", "section",
+  "tooltip", "richtooltip", "rich-tooltip", "tag"
 ]);
 
 const LAYOUT_KEYWORDS = new Set([

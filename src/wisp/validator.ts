@@ -8,6 +8,11 @@ const KNOWN_COMPONENTS = new Set([
   "sheet",
   "modal",
   "step",
+  "component",
+  "include",
+  "use",
+  "searchbar",
+  "search",
   "card",
   "text",
   "textfield",
@@ -20,15 +25,25 @@ const KNOWN_COMPONENTS = new Set([
   "select",
   "autocomplete",
   "datepicker",
+  "timepicker",
+  "time-picker",
   "radio",
   "option",
   "segmentedbutton",
+  "list",
   "listitem",
+  "list-item",
+  "listgroup",
+  "listcontainer",
   "avatar",
   "badge",
   "icon",
   "image",
   "progress",
+  "loading",
+  "spinner",
+  "circularprogress",
+  "linearprogress",
   "metric",
   "stat",
   "divider",
@@ -38,6 +53,7 @@ const KNOWN_COMPONENTS = new Set([
   "tab",
   "panel",
   "tabitem",
+  "tab-item",
   "table",
   "row",
   "tablerow",
@@ -50,9 +66,44 @@ const KNOWN_COMPONENTS = new Set([
   "left",
   "right",
   "container",
-  "navbar",
+  "appbar",
   "topappbar",
+  "navbar",
+  "topbar",
+  "header",
   "bottomnav",
+  "bottombar",
+  "navigationbar",
+  "navitem",
+  "navigationrail",
+  "apprail",
+  "navrail",
+  "rail",
+  "railitem",
+  "rail-item",
+  "destination",
+  "drawer",
+  "navigationdrawer",
+  "appdrawer",
+  "navdrawer",
+  "draweritem",
+  "drawer-item",
+  "sidesheet",
+  "side-sheet",
+  "bottomsheet",
+  "bottom-sheet",
+  "carousel",
+  "iconbutton",
+  "icon-button",
+  "menu",
+  "dropdown",
+  "dropdownmenu",
+  "menuitem",
+  "menu-item",
+  "section",
+  "tooltip",
+  "richtooltip",
+  "rich-tooltip",
   "accordion",
   "fab",
   "snackbar",
@@ -62,9 +113,17 @@ const KNOWN_COMPONENTS = new Set([
   "if",
   "for",
   "data",
+  "tag",
 ]);
 
 const COMPONENT_SUGGESTIONS: Record<string, string> = {
+  comp: "component",
+  widget: "component",
+  template: "component",
+  block: "component",
+  searchbox: "searchbar",
+  buscar: "searchbar",
+  busqueda: "searchbar",
   btn: "button",
   input: "textfield",
   textbox: "textfield",
@@ -77,7 +136,6 @@ const COMPONENT_SUGGESTIONS: Record<string, string> = {
   heading: "text",
   title: "text",
   item: "listitem",
-  list: "column",
   box: "card",
   surface: "card",
   panel: "card",
@@ -88,6 +146,13 @@ const COMPONENT_SUGGESTIONS: Record<string, string> = {
   star: "rating",
   stars: "rating",
   breadcrumb: "breadcrumbs",
+  topbar: "appbar",
+  header: "appbar",
+  menubar: "appbar",
+  toolbar: "appbar",
+  nav: "navbar",
+  bottombar: "bottomnav",
+  navigationbar: "bottomnav",
 };
 
 export function validateWispDocument(doc: WispDocument): WispDiagnostic[] {
@@ -100,7 +165,7 @@ export function validateWispDocument(doc: WispDocument): WispDiagnostic[] {
       diagnostics.push({
         line: screen.position?.line || 1,
         column: screen.position?.column || 1,
-        message: `Pantalla duplicada: "@${screen.name}". Cada pantalla debe tener un identificador único.`,
+        message: `Duplicate screen: "@${screen.name}". Each screen must have a unique identifier.`,
         severity: "error",
       });
     }
@@ -112,7 +177,7 @@ export function validateWispDocument(doc: WispDocument): WispDiagnostic[] {
         diagnostics.push({
           line: screen.position?.line || 1,
           column: 1,
-          message: `El wizard "@${screen.name}" no contiene ningún bloque 'step'. Agrega 'step "Paso 1"' para definir el flujo.`,
+          message: `The wizard "@${screen.name}" contains no 'step' blocks. Add 'step "Step 1"' to define the flow.`,
           severity: "warning",
         });
       }
@@ -127,8 +192,8 @@ export function validateWispDocument(doc: WispDocument): WispDiagnostic[] {
       diagnostics.push({
         line: node.position?.line || 1,
         column: node.position?.column || 1,
-        message: `Componente desconocido: "${node.type}". ${
-          suggestion ? `¿Quisiste escribir '${suggestion}'?` : "Revisa la sintaxis de Wisp DSL."
+        message: `Unknown component: "${node.type}". ${
+          suggestion ? `Did you mean '${suggestion}'?` : "Check Wisp DSL syntax."
         }`,
         severity: "warning",
       });
@@ -144,7 +209,7 @@ export function validateWispDocument(doc: WispDocument): WispDiagnostic[] {
           diagnostics.push({
             line: node.position?.line || 1,
             column: 1,
-            message: `Destino de navegación "@${targetScreen}" no existe en el documento. Pantallas disponibles: ${Array.from(screenNames).map(s => "@" + s).join(", ")}`,
+            message: `Navigation target "@${targetScreen}" does not exist in the document. Available screens: ${Array.from(screenNames).map(s => "@" + s).join(", ")}`,
             severity: "warning",
           });
         }
@@ -159,7 +224,7 @@ export function validateWispDocument(doc: WispDocument): WispDiagnostic[] {
         diagnostics.push({
           line: node.position?.line || 1,
           column: 1,
-          message: `Referencia de snackbar "@${targetToast}" no existe en el documento. Notificaciones declaradas: ${Array.from(screenNames).map(s => "@" + s).join(", ")}`,
+          message: `Snackbar reference "@${targetToast}" does not exist in the document. Declared notifications: ${Array.from(screenNames).map(s => "@" + s).join(", ")}`,
           severity: "warning",
         });
       }
@@ -173,7 +238,7 @@ export function validateWispDocument(doc: WispDocument): WispDiagnostic[] {
         diagnostics.push({
           line: node.position?.line || 1,
           column: 1,
-          message: `El layout 'split' debe contener los slots 'left' y 'right' indentados.`,
+          message: `The 'split' layout must contain indented 'left' and 'right' child blocks.`,
           severity: "info",
         });
       }

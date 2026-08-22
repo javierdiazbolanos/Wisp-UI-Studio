@@ -79,69 +79,74 @@ export function parseWispDSL(dslText: string): WispDocument {
       continue;
     }
 
-    // 2. Screen / Modal / Form / Wizard / Snackbar / Toast declaration: @ScreenName:type [props...]
+    // 2. Screen / Modal / Form / Wizard / Snackbar / Toast / Reusable Component declaration: @ScreenName:type [props...]
     if (trimmed.startsWith("@")) {
-      const screenMatch = trimmed.match(/^@([a-zA-Z0-9_-]+)(?::([a-zA-Z0-9_-]+))?/);
-      if (screenMatch) {
-        const screenName = screenMatch[1];
-        const screenTypeRaw = (screenMatch[2] || "screen").toLowerCase();
-        const validTypes: ScreenType[] = ["screen", "dialog", "form", "wizard", "sheet", "modal", "snackbar", "toast"];
-        const screenType: ScreenType = validTypes.includes(screenTypeRaw as ScreenType)
-          ? (screenTypeRaw as ScreenType)
-          : "screen";
+      // If indented inside a container, treat @ComponentName as a component reference
+      if (indent > 0) {
+        // Fall through to normal component line parser where @Name is resolved as a component
+      } else {
+        const screenMatch = trimmed.match(/^@([a-zA-Z0-9_-]+)(?::([a-zA-Z0-9_-]+))?/);
+        if (screenMatch) {
+          const screenName = screenMatch[1];
+          const screenTypeRaw = (screenMatch[2] || "screen").toLowerCase();
+          const validTypes: ScreenType[] = ["screen", "dialog", "form", "wizard", "sheet", "modal", "snackbar", "toast", "component", "drawer", "sidesheet"];
+          const screenType: ScreenType = validTypes.includes(screenTypeRaw as ScreenType)
+            ? (screenTypeRaw as ScreenType)
+            : "screen";
 
-        const screenProps: Record<string, any> = { name: screenName };
+          const screenProps: Record<string, any> = { name: screenName };
 
-        // Parse any trailing parameters on the declaration line e.g. @FacturaToast:snackbar "Factura #1024 enviada" snackbar-action="Deshacer" snackbar-duration=400
-        const declarationRemainder = trimmed.substring(screenMatch[0].length).trim();
-        if (declarationRemainder) {
-          const declTokens = mergeKeyValueTokens(tokenizeLine(declarationRemainder));
-          let posIdx = 0;
-          for (const tok of declTokens) {
-            if (tok.includes("=")) {
-              const eqIdx = tok.indexOf("=");
-              const k = tok.substring(0, eqIdx).trim();
-              const v = tok.substring(eqIdx + 1).trim();
-              const parsedVal = parseValue(v);
-              screenProps[k] = parsedVal;
-              if (k.includes("-")) {
-                screenProps[k.replace(/-/g, "_")] = parsedVal;
+          // Parse any trailing parameters on the declaration line e.g. @FacturaToast:snackbar "Factura #1024 enviada" snackbar-action="Deshacer" snackbar-duration=400
+          const declarationRemainder = trimmed.substring(screenMatch[0].length).trim();
+          if (declarationRemainder) {
+            const declTokens = mergeKeyValueTokens(tokenizeLine(declarationRemainder));
+            let posIdx = 0;
+            for (const tok of declTokens) {
+              if (tok.includes("=")) {
+                const eqIdx = tok.indexOf("=");
+                const k = tok.substring(0, eqIdx).trim();
+                const v = tok.substring(eqIdx + 1).trim();
+                const parsedVal = parseValue(v);
+                screenProps[k] = parsedVal;
+                if (k.includes("-")) {
+                  screenProps[k.replace(/-/g, "_")] = parsedVal;
+                }
+                if (k.includes("_")) {
+                  screenProps[k.replace(/_/g, "-")] = parsedVal;
+                }
+              } else {
+                if (posIdx === 0) {
+                  screenProps.message = unquote(tok);
+                  screenProps.value = unquote(tok);
+                } else if (["info", "success", "warning", "error"].includes(tok.toLowerCase())) {
+                  screenProps.type = tok.toLowerCase();
+                }
+                posIdx++;
               }
-              if (k.includes("_")) {
-                screenProps[k.replace(/_/g, "-")] = parsedVal;
-              }
-            } else {
-              if (posIdx === 0) {
-                screenProps.message = unquote(tok);
-                screenProps.value = unquote(tok);
-              } else if (["info", "success", "warning", "error"].includes(tok.toLowerCase())) {
-                screenProps.type = tok.toLowerCase();
-              }
-              posIdx++;
             }
           }
+
+          currentScreen = {
+            id: generateId(screenType === "component" ? "comp" : "screen"),
+            type: screenType,
+            name: screenName,
+            props: screenProps,
+            children: [],
+            position: { line: lineNum, column: 1 },
+            steps: screenType === "wizard" ? [] : undefined,
+          };
+
+          screens.push(currentScreen);
+          stack = [{ node: currentScreen, indent: -1 }];
+          continue;
+        } else {
+          diagnostics.push({
+            line: lineNum,
+            column: 1,
+            message: `Declaración de pantalla inválida: "${trimmed}". Usa el formato @Nombre:tipo (ej. @Login:screen o @Countries:component)`,
+            severity: "error",
+          });
         }
-
-        currentScreen = {
-          id: generateId("screen"),
-          type: screenType,
-          name: screenName,
-          props: screenProps,
-          children: [],
-          position: { line: lineNum, column: 1 },
-          steps: screenType === "wizard" ? [] : undefined,
-        };
-
-        screens.push(currentScreen);
-        stack = [{ node: currentScreen, indent: -1 }];
-        continue;
-      } else {
-        diagnostics.push({
-          line: lineNum,
-          column: 1,
-          message: `Declaración de pantalla inválida: "${trimmed}". Usa el formato @Nombre:tipo (ej. @Login:screen)`,
-          severity: "error",
-        });
       }
     }
 
@@ -297,11 +302,22 @@ export function parseWispDSL(dslText: string): WispDocument {
       "container",
       "navbar",
       "topappbar",
+      "appbar",
       "bottomnav",
+      "navigationrail",
+      "apprail",
+      "navrail",
+      "rail",
+      "drawer",
+      "navigationdrawer",
+      "appdrawer",
+      "navdrawer",
+      "sidesheet",
+      "sheet",
+      "bottomsheet",
       "form",
       "dialog",
       "modal",
-      "sheet",
       "split",
       "left",
       "right",
@@ -316,7 +332,16 @@ export function parseWispDSL(dslText: string): WispDocument {
       "select",
       "autocomplete",
       "datepicker",
+      "timepicker",
       "radio",
+      "carousel",
+      "menu",
+      "dropdown",
+      "dropdownmenu",
+      "list",
+      "tooltip",
+      "richtooltip",
+      "rich-tooltip",
     ];
 
     if (containerTypes.includes(parsedNode.type)) {
@@ -352,6 +377,75 @@ export function parseWispDSL(dslText: string): WispDocument {
     } else if (s === screens.length - 1) {
       screen.lineEnd = Math.max(screen.lineEnd || screen.lineStart || 1, lines.length);
     }
+  }
+
+  // 8. Resolve and expand reusable component references (@Countries:component used via `component @Countries` or `@Countries`)
+  const componentMap = new Map<string, ScreenNode>();
+  for (const screen of screens) {
+    if (screen.type === "component") {
+      componentMap.set(screen.name.toLowerCase(), screen);
+    }
+  }
+
+  function cloneNodeWithOverrides(node: WispNode, overrides: Record<string, any>): WispNode {
+    const clonedProps = { ...node.props };
+    for (const [k, v] of Object.entries(overrides)) {
+      if (k !== "id" && k !== "name" && k !== "component" && k !== "type") {
+        clonedProps[k] = v;
+      }
+    }
+    return {
+      ...node,
+      id: generateId(node.type),
+      props: clonedProps,
+      children: (node.children || []).map((c) => cloneNodeWithOverrides(c, overrides)),
+    };
+  }
+
+  function resolveComponentsInTree(node: WispNode, visited: Set<string>) {
+    if (!node.children) return;
+
+    for (let c = 0; c < node.children.length; c++) {
+      const child = node.children[c];
+      if (child.type === "component" || child.type === "include" || child.type === "use") {
+        const targetName = (
+          child.props.id ||
+          child.props.name ||
+          child.props.value ||
+          child.props.component ||
+          ""
+        )
+          .toString()
+          .replace(/^@/, "")
+          .toLowerCase();
+
+        const compDef = componentMap.get(targetName);
+        if (compDef && !visited.has(targetName)) {
+          const nextVisited = new Set(visited);
+          nextVisited.add(targetName);
+
+          const clonedChildren = compDef.children.map((n) => cloneNodeWithOverrides(n, child.props));
+          child.children = clonedChildren;
+
+          for (const nested of clonedChildren) {
+            resolveComponentsInTree(nested, nextVisited);
+          }
+        } else if (!compDef && targetName) {
+          diagnostics.push({
+            line: child.position?.line || 1,
+            column: 1,
+            message: `Componente @${targetName} no encontrado. Decláralo con @${targetName}:component`,
+            severity: "warning",
+          });
+        }
+      } else {
+        resolveComponentsInTree(child, visited);
+      }
+    }
+  }
+
+  for (const screen of screens) {
+    resolveComponentsInTree(screen, new Set());
   }
 
   // Basic document diagnostics check
@@ -527,13 +621,14 @@ function parseComponentLine(
     return node;
   }
 
-  // Tab panel definition: tab "Nombre de la pestaña" | panel "Nombre" | tabitem "Nombre"
+  // Tab / Panel definition: tab "Nombre" | panel "Nombre" | tabitem "Nombre"
   if (rawType === "tab" || rawType === "panel" || rawType === "tabitem" || rawType === "tab-item") {
-    node.type = "tab";
+    node.type = rawType === "panel" ? "panel" : "tab";
     const title = tokens[1] ? unquote(tokens[1]) : "Pestaña";
     node.props.title = title;
     node.props.label = title;
-    return node;
+    node.props.value = title;
+    // Don't return early so properties like icon=home badge="3" active are parsed
   }
 
   // Control: if condition
@@ -552,9 +647,20 @@ function parseComponentLine(
     return node;
   }
 
-  // Layout slots: left, right
-  if (rawType === "left" || rawType === "right") {
-    return node;
+  // Component reference: component @Countries, component id=@Countries, include @Countries, use @Countries, or @Countries
+  if (rawType === "component" || rawType === "include" || rawType === "use" || rawType.startsWith("@")) {
+    node.type = "component";
+    let target = "";
+    if (rawType.startsWith("@")) {
+      target = rawType;
+    } else if (tokens[1] && !tokens[1].includes("=")) {
+      target = unquote(tokens[1]);
+    }
+    if (target) {
+      node.props.id = target;
+      node.props.name = target.replace(/^@/, "");
+      node.props.component = target.replace(/^@/, "");
+    }
   }
 
   // Process remaining tokens
@@ -671,9 +777,108 @@ function parseComponentLine(
         }
       }
       positionalIndex++;
+    } else if (rawType === "loading" || rawType === "spinner" || rawType === "circularprogress" || rawType === "linearprogress") {
+      if (positionalIndex === 0) {
+        if (!isNaN(Number(unquote(token)))) {
+          node.props.value = Number(unquote(token));
+        } else {
+          node.props.message = unquote(token);
+          node.props.label = unquote(token);
+        }
+      } else if (["circular", "linear", "spinner"].includes(token.toLowerCase())) {
+        node.props.variant = token.toLowerCase();
+      } else if (["sm", "md", "lg"].includes(token.toLowerCase())) {
+        node.props.size = token.toLowerCase();
+      }
+      positionalIndex++;
+    } else if (rawType === "navigationrail" || rawType === "apprail" || rawType === "navrail" || rawType === "rail") {
+      if (positionalIndex === 0) {
+        node.props.title = unquote(token);
+      }
+      positionalIndex++;
+    } else if (rawType === "drawer" || rawType === "navigationdrawer" || rawType === "appdrawer" || rawType === "navdrawer") {
+      if (positionalIndex === 0) {
+        node.props.title = unquote(token);
+      } else if (["standard", "modal", "dismissible"].includes(token.toLowerCase())) {
+        node.props.variant = token.toLowerCase();
+      }
+      positionalIndex++;
+    } else if (rawType === "sidesheet" || rawType === "side-sheet") {
+      if (positionalIndex === 0) {
+        node.props.title = unquote(token);
+      } else if (["standard", "modal"].includes(token.toLowerCase())) {
+        node.props.variant = token.toLowerCase();
+      }
+      positionalIndex++;
+    } else if (rawType === "bottomsheet" || rawType === "sheet") {
+      if (positionalIndex === 0) {
+        node.props.title = unquote(token);
+      }
+      positionalIndex++;
+    } else if (rawType === "iconbutton" || rawType === "icon-button") {
+      if (positionalIndex === 0) {
+        node.props.icon = unquote(token);
+        node.props.name = unquote(token);
+      } else if (["standard", "filled", "tonal", "outlined"].includes(token.toLowerCase())) {
+        node.props.variant = token.toLowerCase();
+      }
+      positionalIndex++;
+    } else if (rawType === "timepicker" || rawType === "time-picker") {
+      if (positionalIndex === 0) {
+        node.props.name = unquote(token);
+        if (!node.props.label) {
+          node.props.label = capitalize(unquote(token).replace(/[_-]/g, " "));
+        }
+      }
+      positionalIndex++;
+    } else if (rawType === "carousel") {
+      if (["multi-browse", "hero", "uncontained", "multibrowse"].includes(token.toLowerCase())) {
+        node.props.variant = token.toLowerCase();
+      }
+    } else if (rawType === "tooltip" || rawType === "richtooltip" || rawType === "rich-tooltip") {
+      if (positionalIndex === 0) {
+        node.props.text = unquote(token);
+        node.props.message = unquote(token);
+      }
+      positionalIndex++;
+    } else if (rawType === "menu" || rawType === "dropdown" || rawType === "dropdownmenu") {
+      if (positionalIndex === 0) {
+        node.props.label = unquote(token);
+      }
+      positionalIndex++;
+    } else if (rawType === "section") {
+      if (positionalIndex === 0) {
+        node.props.title = unquote(token);
+      }
+      positionalIndex++;
+    } else if (
+      rawType === "draweritem" ||
+      rawType === "menuitem" ||
+      rawType === "navitem" ||
+      rawType === "railitem" ||
+      rawType === "destination" ||
+      rawType === "rail-item" ||
+      rawType === "nav-item" ||
+      rawType === "panel" ||
+      rawType === "tab" ||
+      rawType === "tabitem" ||
+      rawType === "tab-item"
+    ) {
+      if (positionalIndex === 0) {
+        node.props.label = unquote(token);
+        node.props.title = unquote(token);
+        node.props.value = unquote(token);
+      } else if (token.toLowerCase() === "active" || token.toLowerCase() === "selected") {
+        node.props.active = true;
+      }
+      positionalIndex++;
     } else {
       // General positional flag or string
-      if (positionalIndex === 0 && !token.includes("=")) {
+      if (token.toLowerCase() === "active" || token.toLowerCase() === "selected") {
+        node.props.active = true;
+      } else if (token.toLowerCase() === "expanded") {
+        node.props.expanded = true;
+      } else if (positionalIndex === 0 && !token.includes("=")) {
         node.props.value = unquote(token);
       }
       positionalIndex++;
@@ -688,6 +893,37 @@ function parseComponentLine(
 
 function applyDefaults(node: WispNode) {
   switch (node.type) {
+    case "loading":
+    case "spinner":
+    case "circularprogress":
+    case "linearprogress":
+      node.props.variant = node.props.variant || (node.type === "linearprogress" ? "linear" : "circular");
+      node.props.size = node.props.size || "md";
+      break;
+    case "navigationrail":
+    case "apprail":
+    case "navrail":
+    case "rail":
+      node.props.variant = node.props.variant || "standard";
+      break;
+    case "drawer":
+    case "navigationdrawer":
+    case "appdrawer":
+    case "navdrawer":
+      node.props.variant = node.props.variant || "standard";
+      break;
+    case "sidesheet":
+    case "side-sheet":
+      node.props.variant = node.props.variant || "standard";
+      node.props.position = node.props.position || "right";
+      break;
+    case "carousel":
+      node.props.variant = node.props.variant || "multi-browse";
+      break;
+    case "iconbutton":
+    case "icon-button":
+      node.props.variant = node.props.variant || "standard";
+      break;
     case "table": {
       const cols = node.props.columns || node.props.headers || node.props.cols;
       let rawColArr: string[] = [];

@@ -2,14 +2,22 @@ import React, { useState, useEffect, useMemo, useRef, useCallback } from "react"
 import { parseWispDSL, findNodeByLine, findScreenByLine } from "./wisp/parser";
 import { validateWispDocument } from "./wisp/validator";
 import { ScreenNode, WispNode } from "./wisp/types";
-import { M3_PRESETS, M3Preset, M3ColorScheme } from "./theme/material3";
+import {
+  M3_PRESETS,
+  M3Preset,
+  M3ColorScheme,
+  M3SchemeVariant,
+  generateM3Scheme,
+} from "./theme/material3";
 import { MaterialRenderer, ActiveToastData } from "./renderer/MaterialRenderer";
 import { WispCodeEditor } from "./components/WispCodeEditor";
 import { AICopilotModal } from "./components/AICopilotModal";
 import { ExportModal } from "./components/ExportModal";
 import { WispDocsModal } from "./components/WispDocsModal";
 import { UnsavedChangesModal } from "./components/UnsavedChangesModal";
+import { M3ThemeStudioModal } from "./components/M3ThemeStudioModal";
 import { WispLogo } from "./components/WispLogo";
+import { ScreenNavigatorDropdown } from "./components/ScreenNavigatorDropdown";
 import { WISP_TEMPLATES, WispTemplate } from "./data/templates";
 import { DynamicIcon } from "./components/DynamicIcon";
 import { motion, AnimatePresence } from "motion/react";
@@ -137,12 +145,27 @@ export default function App() {
     }
   };
 
-  // 4. Theme & Appearance
+  // 4. Material 3 Expressive Dynamic Theme Engine (Material Baseline default)
   const [currentPresetId, setCurrentPresetId] = useState<string>("indigo");
+  const [seedHex, setSeedHex] = useState<string>("#6750A4");
+  const [schemeVariant, setSchemeVariant] = useState<M3SchemeVariant>("tonal_spot");
+  const [contrastLevel, setContrastLevel] = useState<number>(0.0);
   const [isDark, setIsDark] = useState<boolean>(false);
+  const [isM3ThemeStudioOpen, setIsM3ThemeStudioOpen] = useState<boolean>(false);
 
-  const activePreset: M3Preset = M3_PRESETS[currentPresetId] || M3_PRESETS.indigo;
-  const activeColorScheme: M3ColorScheme = isDark ? activePreset.dark : activePreset.light;
+  // Dynamically compute the full official Material 3 color tokens
+  const activeColorScheme: M3ColorScheme = useMemo(() => {
+    return generateM3Scheme(seedHex, isDark, schemeVariant, contrastLevel);
+  }, [seedHex, isDark, schemeVariant, contrastLevel]);
+
+  const handleSelectPreset = (presetId: string) => {
+    const preset = M3_PRESETS[presetId];
+    if (preset) {
+      setCurrentPresetId(presetId);
+      setSeedHex(preset.seedHex);
+      setSchemeVariant(preset.variant);
+    }
+  };
 
   // 5. Workspace Controls & Resizable Layout
   const [editorWidthPercent, setEditorWidthPercent] = useState<number>(45); // 25 to 80
@@ -170,6 +193,12 @@ export default function App() {
   const [highlightBlock, setHighlightBlock] = useState<{ start: number; end: number } | null>(null);
   const [selectedNodeId, setSelectedNodeId] = useState<string | null>(null);
   const [isPresentationMode, setIsPresentationMode] = useState<boolean>(false);
+
+  // Real-time flash & live cursor indicator state
+  const [flashNodeId, setFlashNodeId] = useState<string | null>(null);
+  const [flashTimestamp, setFlashTimestamp] = useState<number>(0);
+  const [activeCursorLineNumber, setActiveCursorLineNumber] = useState<number>(1);
+  const flashTimerRef = useRef<any>(null);
 
   // 6. Modals & AI Copilot Pre-fill
   const [isAICopilotOpen, setIsAICopilotOpen] = useState<boolean>(false);
@@ -221,11 +250,12 @@ export default function App() {
   };
 
   // Cursor line change callback from Editor (Editor -> Canvas)
+  // Automatically switches screen to wherever the user is editing, and tracks active node
   const handleCursorLineChange = useCallback(
     (lineNum: number) => {
-      if (!inspectMode) return;
+      setActiveCursorLineNumber(lineNum);
 
-      // 1. Check if line belongs to a screen
+      // 1. Check which screen contains this line
       const matchedScreen = findScreenByLine(wispDocument.screens, lineNum);
       if (matchedScreen && matchedScreen.name !== activeScreenName) {
         setActiveScreenName(matchedScreen.name);
@@ -240,7 +270,7 @@ export default function App() {
             const start = step.lineStart ?? step.position?.line ?? 1;
             const end = step.lineEnd ?? start;
             if (lineNum >= start && lineNum <= end) {
-              const stepIndex = step.index || (idx + 1);
+              const stepIndex = step.index || idx + 1;
               setActiveWizardStep(stepIndex);
               break;
             }
@@ -262,7 +292,41 @@ export default function App() {
         }
       }
     },
-    [inspectMode, wispDocument.screens, activeScreenName, currentScreen]
+    [wispDocument.screens, activeScreenName, currentScreen]
+  );
+
+  // Trigger flash on current node when user writes / edits code
+  const handleCodeChange = useCallback(
+    (newCode: string) => {
+      setWispCode(newCode);
+
+      // Parse quickly to find edited element at cursor line
+      try {
+        const nextDoc = parseWispDSL(newCode);
+        const line = activeCursorLineNumber || 1;
+        const matchedScreen = findScreenByLine(nextDoc.screens, line);
+        if (matchedScreen) {
+          if (matchedScreen.name !== activeScreenName) {
+            setActiveScreenName(matchedScreen.name);
+          }
+          const matchedNode = findNodeByLine(matchedScreen, line);
+          if (matchedNode) {
+            setFlashNodeId(matchedNode.id);
+            setFlashTimestamp(Date.now());
+
+            if (flashTimerRef.current) {
+              clearTimeout(flashTimerRef.current);
+            }
+            flashTimerRef.current = setTimeout(() => {
+              setFlashNodeId(null);
+            }, 1900);
+          }
+        }
+      } catch {
+        // Continue if parsing intermediate syntax
+      }
+    },
+    [activeCursorLineNumber, activeScreenName]
   );
 
   // Apply code from AI Copilot
@@ -349,12 +413,12 @@ export default function App() {
       {/* Presentation Fullscreen Banner */}
       {isPresentationMode && (
         <div className="fixed top-4 right-4 z-50 flex items-center gap-2 bg-neutral-900/90 backdrop-blur-md text-white px-4 py-2 rounded-full shadow-2xl border border-neutral-700">
-          <span className="text-xs font-semibold">Modo Presentación Cliente</span>
+          <span className="text-xs font-semibold">Client Presentation Mode</span>
           <button
             type="button"
             onClick={() => setIsPresentationMode(false)}
             className="p-1 rounded-full hover:bg-neutral-800 text-neutral-300 hover:text-white cursor-pointer"
-            title="Salir de presentación (ESC)"
+            title="Exit presentation (ESC)"
           >
             <Minimize2 className="w-4 h-4" />
           </button>
@@ -385,44 +449,29 @@ export default function App() {
                 </span>
               </div>
               <p className="text-[11px] text-neutral-500 dark:text-neutral-400 leading-tight hidden sm:block">
-                Vibe Coding Architecture • Definición Declarativa de Pantallas
+                Vibe Coding Architecture • Declarative Screen Modeling
               </p>
             </div>
           </div>
 
-          {/* Center Screen Navigator */}
-          <div className="hidden lg:flex items-center gap-2">
+          {/* Center Screen Navigator Dropdown */}
+          <div className="hidden sm:flex items-center">
             {wispDocument.screens.length > 0 && (
-              <div className="flex items-center bg-neutral-100/90 dark:bg-neutral-900/90 p-1 rounded-2xl border border-neutral-200/80 dark:border-neutral-800 shadow-inner">
-                <span className="text-[10px] uppercase font-bold tracking-wider text-neutral-400 dark:text-neutral-500 px-2.5">
-                  Pantallas
-                </span>
-                <div className="flex items-center gap-1">
-                  {wispDocument.screens.map((screen) => {
-                    const isActive = screen.name === activeScreenName;
-                    return (
-                      <button
-                        key={screen.name}
-                        type="button"
-                        onClick={() => {
-                          setActiveScreenName(screen.name);
-                          setActiveWizardStep(1);
-                        }}
-                        className={`px-3 py-1 rounded-xl text-xs font-semibold transition-all flex items-center gap-1.5 cursor-pointer ${
-                          isActive
-                            ? "bg-white dark:bg-neutral-800 text-purple-700 dark:text-purple-300 shadow-xs border border-purple-200/50 dark:border-purple-800/40"
-                            : "text-neutral-600 dark:text-neutral-400 hover:text-neutral-900 dark:hover:text-white"
-                        }`}
-                      >
-                        <span className="font-mono text-[11px]">@{screen.name}</span>
-                        <span className="text-[9px] uppercase px-1.5 py-0.2 rounded-md bg-neutral-200/60 dark:bg-neutral-700/60 text-neutral-600 dark:text-neutral-400 font-sans font-medium">
-                          {screen.type}
-                        </span>
-                      </button>
-                    );
-                  })}
-                </div>
-              </div>
+              <ScreenNavigatorDropdown
+                screens={wispDocument.screens}
+                activeScreenName={activeScreenName}
+                onSelectScreen={(screenName) => {
+                  setActiveScreenName(screenName);
+                  setActiveWizardStep(1);
+                }}
+                onJumpToLine={(line) => {
+                  setHighlightLine(line);
+                  setHighlightBlock({ start: line, end: line });
+                }}
+                onInsertSnippet={(snippet) => {
+                  setWispCode((prev) => prev + snippet);
+                }}
+              />
             )}
           </div>
 
@@ -434,17 +483,17 @@ export default function App() {
                 type="button"
                 onClick={() => setIsTemplateMenuOpen(!isTemplateMenuOpen)}
                 className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold rounded-xl bg-neutral-100 hover:bg-neutral-200/80 dark:bg-neutral-800/90 dark:hover:bg-neutral-700 text-neutral-700 dark:text-neutral-200 transition-all cursor-pointer border border-neutral-200/80 dark:border-neutral-700/70"
-                title="Cargar plantillas prediseñadas en WDL"
+                title="Load prebuilt WDL templates"
               >
                 <Layout className="w-3.5 h-3.5 text-purple-500" />
-                <span className="hidden sm:inline">Plantillas</span>
+                <span className="hidden sm:inline">Templates</span>
                 <ChevronDown className="w-3 h-3 opacity-60" />
               </button>
 
               {isTemplateMenuOpen && (
                 <div className="absolute right-0 mt-2 w-72 bg-white dark:bg-[#181622] rounded-2xl p-2 shadow-2xl border border-neutral-200 dark:border-neutral-800 z-50 space-y-1">
                   <div className="px-3 py-1.5 text-[10px] font-bold text-neutral-400 dark:text-neutral-500 uppercase tracking-wider">
-                    Ejemplos Estándar WDL
+                    Standard WDL Examples
                   </div>
                   {WISP_TEMPLATES.map((tmpl) => (
                     <button
@@ -475,7 +524,7 @@ export default function App() {
               type="button"
               onClick={() => setIsDocsOpen(true)}
               className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold rounded-xl bg-purple-50 hover:bg-purple-100/90 dark:bg-purple-950/70 dark:hover:bg-purple-900 text-purple-900 dark:text-purple-200 border border-purple-200 dark:border-purple-800/70 transition-all cursor-pointer shadow-xs"
-              title="Especificación Completa de Sintaxis WDL y README para GitHub"
+              title="Complete WDL Syntax Specification and GitHub Documentation"
             >
               <BookOpen className="w-3.5 h-3.5 text-purple-600 dark:text-purple-400" />
               <span className="hidden md:inline">Docs & Spec WDL</span>
@@ -484,56 +533,27 @@ export default function App() {
 
             <div className="h-5 w-px bg-neutral-200 dark:bg-neutral-800 mx-1 hidden sm:block" />
 
-            {/* Theme Selector Dropdown */}
-            <div className="relative">
-              <button
-                type="button"
-                onClick={() => setIsThemeMenuOpen(!isThemeMenuOpen)}
-                className="p-2 rounded-xl bg-neutral-100 hover:bg-neutral-200/80 dark:bg-neutral-800/90 dark:hover:bg-neutral-700 text-neutral-700 dark:text-neutral-200 transition-all cursor-pointer border border-neutral-200/80 dark:border-neutral-700/70"
-                title="Paleta de Colores Material 3"
-              >
-                <Palette className="w-4 h-4" />
-              </button>
-
-              {isThemeMenuOpen && (
-                <div className="absolute right-0 mt-2 w-64 bg-white dark:bg-[#181622] rounded-2xl p-3 shadow-2xl border border-neutral-200 dark:border-neutral-800 z-50 space-y-2">
-                  <div className="text-[10px] font-bold text-neutral-400 dark:text-neutral-500 uppercase tracking-wider px-1">
-                    Semilla de Color Material 3
-                  </div>
-                  {Object.values(M3_PRESETS).map((preset) => (
-                    <button
-                      key={preset.id}
-                      type="button"
-                      onClick={() => {
-                        setCurrentPresetId(preset.id);
-                        setIsThemeMenuOpen(false);
-                      }}
-                      className="w-full flex items-center justify-between p-2 rounded-xl hover:bg-purple-50 dark:hover:bg-purple-950/40 transition-all cursor-pointer text-xs"
-                    >
-                      <div className="flex items-center gap-2.5">
-                        <span
-                          className="w-4 h-4 rounded-full shadow-xs border border-white/40"
-                          style={{ backgroundColor: preset.seedHex }}
-                        />
-                        <span className="font-medium text-neutral-800 dark:text-neutral-200">
-                          {preset.name}
-                        </span>
-                      </div>
-                      {currentPresetId === preset.id && (
-                        <Check className="w-3.5 h-3.5 text-purple-600" />
-                      )}
-                    </button>
-                  ))}
-                </div>
-              )}
-            </div>
+            {/* Material 3 Expressive Color Studio Button */}
+            <button
+              type="button"
+              onClick={() => setIsM3ThemeStudioOpen(true)}
+              className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold rounded-xl bg-neutral-100 hover:bg-neutral-200/80 dark:bg-neutral-800/90 dark:hover:bg-neutral-700 text-neutral-700 dark:text-neutral-200 transition-all cursor-pointer border border-neutral-200/80 dark:border-neutral-700/70 shadow-xs"
+              title="Open Material 3 Expressive Color Studio"
+            >
+              <span
+                className="w-3 h-3 rounded-full shadow-xs border border-white/50"
+                style={{ backgroundColor: activeColorScheme.primary }}
+              />
+              <Palette className="w-3.5 h-3.5 text-purple-600 dark:text-purple-400" />
+              <span className="hidden sm:inline">Color M3</span>
+            </button>
 
             {/* Light / Dark Mode Toggle */}
             <button
               type="button"
               onClick={() => setIsDark(!isDark)}
               className="p-2 rounded-xl bg-neutral-100 hover:bg-neutral-200/80 dark:bg-neutral-800/90 dark:hover:bg-neutral-700 text-neutral-700 dark:text-neutral-200 transition-all cursor-pointer border border-neutral-200/80 dark:border-neutral-700/70"
-              title={isDark ? "Cambiar a modo claro" : "Cambiar a modo oscuro"}
+              title={isDark ? "Switch to light mode" : "Switch to dark mode"}
             >
               {isDark ? <Sun className="w-4 h-4 text-amber-400" /> : <Moon className="w-4 h-4 text-neutral-600" />}
             </button>
@@ -543,10 +563,10 @@ export default function App() {
               type="button"
               onClick={() => setIsExportOpen(true)}
               className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold rounded-xl bg-neutral-900 hover:bg-neutral-800 dark:bg-neutral-100 dark:hover:bg-white text-white dark:text-neutral-900 transition-all cursor-pointer shadow-sm"
-              title="Exportar a React/TypeScript, Flutter, JSON AST o Wisp"
+              title="Export to React/TypeScript, Flutter, JSON AST or Wisp"
             >
               <Download className="w-3.5 h-3.5" />
-              <span className="hidden sm:inline">Exportar</span>
+              <span className="hidden sm:inline">Export</span>
             </button>
           </div>
         </header>
@@ -566,7 +586,7 @@ export default function App() {
               }`}
             >
               <FileCode className="w-3.5 h-3.5 text-purple-500" />
-              <span>Código WDL</span>
+              <span>WDL Code</span>
               {wispDocument.diagnostics.length > 0 && (
                 <span className="text-[10px] px-1.5 py-0.2 rounded-full font-bold bg-amber-100 text-amber-800 dark:bg-amber-950/80 dark:text-amber-300 border border-amber-300/40">
                   {wispDocument.diagnostics.length}
@@ -584,7 +604,7 @@ export default function App() {
               }`}
             >
               <Eye className="w-3.5 h-3.5 text-indigo-400" />
-              <span>Salida / Vista Previa</span>
+              <span>Live Preview</span>
               {currentScreen && (
                 <span className="text-[10px] px-1.5 py-0.2 rounded-md font-mono bg-purple-100 dark:bg-purple-950/80 text-purple-800 dark:text-purple-300 border border-purple-200/60 dark:border-purple-800/40 truncate max-w-[100px]">
                   @{currentScreen.name}
@@ -594,7 +614,7 @@ export default function App() {
           </div>
 
           <div className="hidden sm:flex items-center text-[11px] text-neutral-400 dark:text-neutral-500 font-mono">
-            <span>Modo Compacto (&lt;1320px)</span>
+            <span>Compact Mode (&lt;1320px)</span>
           </div>
         </div>
       )}
@@ -615,7 +635,7 @@ export default function App() {
           >
             <WispCodeEditor
               code={wispCode}
-              onChange={setWispCode}
+              onChange={handleCodeChange}
               diagnostics={wispDocument.diagnostics}
               highlightLine={highlightLine}
               highlightBlock={highlightBlock}
@@ -624,6 +644,7 @@ export default function App() {
               onOpenDocs={() => setIsDocsOpen(true)}
               isMaximized={isEditorMaximized}
               onToggleMaximize={() => setIsEditorMaximized(!isEditorMaximized)}
+              previewIsDark={isDark}
             />
           </div>
         )}
@@ -635,7 +656,7 @@ export default function App() {
             className={`w-3 mx-1 flex items-center justify-center cursor-col-resize select-none group transition-all shrink-0 z-20 ${
               isDraggingSplitter ? "bg-purple-600/30 rounded-full" : "hover:bg-purple-500/10"
             }`}
-            title="Arrastra para cambiar el tamaño del editor y la vista previa"
+            title="Drag to resize editor and live preview"
           >
             <div
               className={`w-1 h-12 rounded-full transition-all flex items-center justify-center ${
@@ -668,7 +689,7 @@ export default function App() {
                         ? "bg-white dark:bg-neutral-700 text-purple-700 dark:text-purple-300 shadow-xs"
                         : "text-neutral-500 hover:text-neutral-800 dark:hover:text-white"
                     }`}
-                    title="Vista Desktop (100% ancho)"
+                    title="Desktop View (100% width)"
                   >
                     <Monitor className="w-3.5 h-3.5" />
                   </button>
@@ -681,7 +702,7 @@ export default function App() {
                         ? "bg-white dark:bg-neutral-700 text-purple-700 dark:text-purple-300 shadow-xs"
                         : "text-neutral-500 hover:text-neutral-800 dark:hover:text-white"
                     }`}
-                    title="Vista Tablet iPad (768px)"
+                    title="iPad Tablet View (768px)"
                   >
                     <Tablet className="w-3.5 h-3.5" />
                   </button>
@@ -694,7 +715,7 @@ export default function App() {
                         ? "bg-white dark:bg-neutral-700 text-purple-700 dark:text-purple-300 shadow-xs"
                         : "text-neutral-500 hover:text-neutral-800 dark:hover:text-white"
                     }`}
-                    title="Vista Móvil Pixel (390px)"
+                    title="Pixel Mobile View (390px)"
                   >
                     <Smartphone className="w-3.5 h-3.5" />
                   </button>
@@ -739,20 +760,20 @@ export default function App() {
                       ? "bg-purple-100 dark:bg-purple-950 text-purple-800 dark:text-purple-300 border-purple-400 shadow-xs ring-1 ring-purple-400/40"
                       : "bg-white dark:bg-neutral-800 text-neutral-600 dark:text-neutral-400 border-neutral-200 dark:border-neutral-700"
                   }`}
-                  title="Modo Inspeccionar bidireccional: haz clic en cualquier elemento para resaltar su bloque de código, o mueve el cursor en el editor para resaltar el componente"
+                  title="Bidirectional Inspect Mode: Click any element to highlight its code block, or move editor cursor to locate component on canvas"
                 >
                   <Eye className="w-3.5 h-3.5" />
-                  <span>Modo Inspeccionar</span>
+                  <span>Inspect Mode</span>
                 </button>
 
                 <button
                   type="button"
                   onClick={() => setIsPresentationMode(true)}
                   className="flex items-center gap-1.5 px-3 py-1 rounded-xl text-xs font-semibold bg-neutral-100 hover:bg-neutral-200 dark:bg-neutral-800 dark:hover:bg-neutral-700 text-neutral-700 dark:text-neutral-300 transition-all border border-neutral-200 dark:border-neutral-700 cursor-pointer"
-                  title="Demostración a pantalla completa sin código"
+                  title="Fullscreen presentation mode without code"
                 >
                   <Maximize2 className="w-3.5 h-3.5" />
-                  <span>Presentación</span>
+                  <span>Presentation</span>
                 </button>
               </div>
             </div>
@@ -795,6 +816,8 @@ export default function App() {
                     isDark={isDark}
                     inspectMode={inspectMode}
                     selectedNodeId={selectedNodeId}
+                    flashNodeId={flashNodeId}
+                    flashTimestamp={flashTimestamp}
                     onSelectNode={handleInspectSelect}
                     onNavigate={handleNavigate}
                     activeWizardStep={activeWizardStep}
@@ -805,9 +828,9 @@ export default function App() {
                   />
                 ) : (
                   <div className="text-center py-16 text-neutral-400 space-y-2">
-                    <p className="text-lg font-bold">No hay pantallas declaradas</p>
+                    <p className="text-lg font-bold">No screens declared</p>
                     <p className="text-xs">
-                      Escribe <code className="font-mono text-purple-600">@Home:screen</code> en el editor para comenzar.
+                      Write <code className="font-mono text-purple-600">@Home:screen</code> in the editor to start prototyping.
                     </p>
                   </div>
                 )}
@@ -870,7 +893,7 @@ export default function App() {
                         type="button"
                         onClick={() => setActiveToast(null)}
                         className="p-1 rounded-full hover:bg-white/15 text-neutral-400 hover:text-white transition-colors cursor-pointer"
-                        title="Cerrar notificación"
+                        title="Close notification"
                       >
                         <X className="w-3.5 h-3.5" />
                       </button>
@@ -910,6 +933,22 @@ export default function App() {
         onConfirmDownloadAndApply={handleConfirmDownloadAndApplyTemplate}
         onConfirmDiscardAndApply={handleConfirmDiscardTemplate}
         onCancel={handleCancelTemplateSwitch}
+      />
+
+      <M3ThemeStudioModal
+        isOpen={isM3ThemeStudioOpen}
+        onClose={() => setIsM3ThemeStudioOpen(false)}
+        currentPresetId={currentPresetId}
+        onSelectPreset={handleSelectPreset}
+        seedHex={seedHex}
+        onChangeSeedHex={setSeedHex}
+        schemeVariant={schemeVariant}
+        onChangeSchemeVariant={setSchemeVariant}
+        contrastLevel={contrastLevel}
+        onChangeContrastLevel={setContrastLevel}
+        isDark={isDark}
+        onToggleDarkMode={() => setIsDark(!isDark)}
+        activeColorScheme={activeColorScheme}
       />
     </div>
   );

@@ -46,6 +46,13 @@ import {
   Rows,
   SquareAsterisk,
   Image as ImageIcon,
+  PanelLeft,
+  PanelRight,
+  Loader2,
+  Menu as MenuIcon,
+  MoreHorizontal,
+  HelpCircle,
+  Compass,
 } from "lucide-react";
 
 export type PaletteCategory =
@@ -80,7 +87,7 @@ export interface PaletteComponentItem {
   description: string;
   modifiers: string[];
   contextRules: ContextRules;
-  renderPreview: () => React.ReactNode;
+  renderPreview: (isLight?: boolean) => React.ReactNode;
 }
 
 export interface WispCursorContext {
@@ -106,10 +113,22 @@ export interface WispCursorContext {
  */
 export const CONTAINER_ELEMENT_TYPES = new Set([
   "screen",
+  "component",
   "form",
   "dialog",
   "wizard",
   "sheet",
+  "drawer",
+  "navigationdrawer",
+  "appdrawer",
+  "navdrawer",
+  "sidesheet",
+  "side-sheet",
+  "bottomsheet",
+  "navigationrail",
+  "apprail",
+  "navrail",
+  "rail",
   "card",
   "grid",
   "row",
@@ -125,6 +144,11 @@ export const CONTAINER_ELEMENT_TYPES = new Set([
   "datatable",
   "select",
   "autocomplete",
+  "carousel",
+  "menu",
+  "dropdown",
+  "dropdownmenu",
+  "list",
 ]);
 
 /**
@@ -553,13 +577,35 @@ export const WISP_PALETTE_CATALOG: PaletteComponentItem[] = [
     description: "Declara una vista o pantalla principal con soporte para transiciones y navegación.",
     modifiers: ["@Nombre:screen", "theme=material3", "padding=16"],
     contextRules: { rootOnly: true },
-    renderPreview: () => (
-      <div className="p-3 bg-neutral-900/95 rounded-2xl border border-neutral-800 space-y-2">
-        <div className="flex items-center justify-between text-[11px] font-bold text-purple-300">
+    renderPreview: (isLight = false) => (
+      <div
+        className={`p-3 rounded-2xl border space-y-2 transition-colors ${
+          isLight ? "bg-neutral-100/90 border-neutral-200" : "bg-neutral-900/95 border-neutral-800"
+        }`}
+      >
+        <div
+          className={`flex items-center justify-between text-[11px] font-bold ${
+            isLight ? "text-purple-700" : "text-purple-300"
+          }`}
+        >
           <span>@Dashboard:screen</span>
-          <span className="text-[9px] px-1.5 py-0.5 rounded bg-purple-950 text-purple-400 border border-purple-800">Vista M3</span>
+          <span
+            className={`text-[9px] px-1.5 py-0.5 rounded border ${
+              isLight
+                ? "bg-purple-100 text-purple-700 border-purple-200"
+                : "bg-purple-950 text-purple-400 border-purple-800"
+            }`}
+          >
+            Vista M3
+          </span>
         </div>
-        <div className="p-2.5 rounded-xl bg-neutral-800/80 border border-neutral-700/60 text-[10px] text-neutral-300">
+        <div
+          className={`p-2.5 rounded-xl border text-[10px] ${
+            isLight
+              ? "bg-white border-neutral-200 text-neutral-700 shadow-xs"
+              : "bg-neutral-800/80 border-neutral-700/60 text-neutral-300"
+          }`}
+        >
           Contenido de la pantalla...
         </div>
       </div>
@@ -576,14 +622,34 @@ export const WISP_PALETTE_CATALOG: PaletteComponentItem[] = [
     description: "Ventana modal emergente con fondo oscurecido para confirmaciones y formularios rápidos.",
     modifiers: ["@Nombre:dialog", "goto=close", "justify=end"],
     contextRules: { rootOnly: true },
-    renderPreview: () => (
-      <div className="p-3 bg-neutral-900/95 rounded-2xl border border-neutral-800">
-        <div className="p-3 rounded-2xl bg-neutral-800 border border-neutral-700 shadow-xl space-y-2">
-          <div className="font-bold text-xs text-white">¿Confirmar Acción?</div>
-          <div className="text-[10px] text-neutral-400">Esta acción no se puede deshacer.</div>
+    renderPreview: (isLight = false) => (
+      <div
+        className={`p-3 rounded-2xl border transition-colors ${
+          isLight ? "bg-neutral-100/90 border-neutral-200" : "bg-neutral-900/95 border-neutral-800"
+        }`}
+      >
+        <div
+          className={`p-3 rounded-2xl border shadow-xl space-y-2 ${
+            isLight ? "bg-white border-neutral-200" : "bg-neutral-800 border-neutral-700"
+          }`}
+        >
+          <div className={`font-bold text-xs ${isLight ? "text-neutral-900" : "text-white"}`}>
+            ¿Confirmar Acción?
+          </div>
+          <div className={`text-[10px] ${isLight ? "text-neutral-500" : "text-neutral-400"}`}>
+            Esta acción no se puede deshacer.
+          </div>
           <div className="flex justify-end gap-1.5 pt-1">
-            <span className="px-2 py-0.5 rounded text-[9px] text-neutral-400">Cancelar</span>
-            <span className="px-2 py-0.5 rounded-full bg-purple-600 text-white text-[9px] font-semibold">Aceptar</span>
+            <span
+              className={`px-2 py-0.5 rounded text-[9px] ${
+                isLight ? "text-neutral-600" : "text-neutral-400"
+              }`}
+            >
+              Cancelar
+            </span>
+            <span className="px-2 py-0.5 rounded-full bg-purple-600 text-white text-[9px] font-semibold">
+              Aceptar
+            </span>
           </div>
         </div>
       </div>
@@ -600,16 +666,38 @@ export const WISP_PALETTE_CATALOG: PaletteComponentItem[] = [
     description: "Flujo guiado paso a paso con indicador visual de progreso y navegación entre fases.",
     modifiers: ["steps: N", "step \"...\"", "goto=@Wizard(step=N)"],
     contextRules: { rootOnly: true },
-    renderPreview: () => (
-      <div className="p-3 bg-neutral-900/95 rounded-2xl border border-neutral-800">
+    renderPreview: (isLight = false) => (
+      <div
+        className={`p-3 rounded-2xl border transition-colors ${
+          isLight ? "bg-neutral-100/90 border-neutral-200" : "bg-neutral-900/95 border-neutral-800"
+        }`}
+      >
         <div className="flex items-center justify-between px-1 py-1 text-[10px]">
-          <div className="flex items-center gap-1 text-purple-400 font-bold">
-            <span className="w-4 h-4 rounded-full bg-purple-600 text-white flex items-center justify-center text-[9px]">1</span>
+          <div
+            className={`flex items-center gap-1 font-bold ${
+              isLight ? "text-purple-700" : "text-purple-400"
+            }`}
+          >
+            <span className="w-4 h-4 rounded-full bg-purple-600 text-white flex items-center justify-center text-[9px]">
+              1
+            </span>
             <span>Datos</span>
           </div>
-          <div className="flex-1 h-0.5 bg-neutral-700 mx-2" />
+          <div
+            className={`flex-1 h-0.5 mx-2 ${
+              isLight ? "bg-neutral-300" : "bg-neutral-700"
+            }`}
+          />
           <div className="flex items-center gap-1 text-neutral-500">
-            <span className="w-4 h-4 rounded-full bg-neutral-800 text-neutral-400 flex items-center justify-center text-[9px]">2</span>
+            <span
+              className={`w-4 h-4 rounded-full flex items-center justify-center text-[9px] ${
+                isLight
+                  ? "bg-neutral-200 text-neutral-600"
+                  : "bg-neutral-800 text-neutral-400"
+              }`}
+            >
+              2
+            </span>
             <span>Pago</span>
           </div>
         </div>
@@ -627,14 +715,85 @@ export const WISP_PALETTE_CATALOG: PaletteComponentItem[] = [
     description: "Declara una notificación reutilizable invocable desde botones con `snackbar=@FacturaToast`.",
     modifiers: ["snackbar-action=\"...\"", "snackbar-type=success|info|warning|error", "snackbar-duration=400"],
     contextRules: { rootOnly: true },
-    renderPreview: () => (
-      <div className="p-3 bg-neutral-900/95 rounded-2xl border border-neutral-800">
-        <div className="p-2 rounded-xl bg-neutral-950 border border-neutral-700 flex items-center justify-between text-xs text-white">
+    renderPreview: (isLight = false) => (
+      <div
+        className={`p-3 rounded-2xl border transition-colors ${
+          isLight ? "bg-neutral-100/90 border-neutral-200" : "bg-neutral-900/95 border-neutral-800"
+        }`}
+      >
+        <div
+          className={`p-2 rounded-xl border flex items-center justify-between text-xs ${
+            isLight
+              ? "bg-white border-neutral-200 text-neutral-800 shadow-sm"
+              : "bg-neutral-950 border-neutral-700 text-white"
+          }`}
+        >
           <div className="flex items-center gap-1.5">
-            <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
-            <span className="text-[10px] text-neutral-300">Guardado correctamente</span>
+            <CheckCircle2
+              className={`w-3.5 h-3.5 shrink-0 ${
+                isLight ? "text-emerald-600" : "text-emerald-400"
+              }`}
+            />
+            <span
+              className={`text-[10px] ${
+                isLight ? "text-neutral-700" : "text-neutral-300"
+              }`}
+            >
+              Guardado correctamente
+            </span>
           </div>
-          <span className="text-[10px] font-bold text-purple-400 uppercase">Ver</span>
+          <span
+            className={`text-[10px] font-bold uppercase ${
+              isLight ? "text-purple-700" : "text-purple-400"
+            }`}
+          >
+            Ver
+          </span>
+        </div>
+      </div>
+    ),
+  },
+  {
+    id: "component-def",
+    name: "@Componente:component",
+    label: "Componente Modular",
+    category: "Vistas & Raíz",
+    icon: Sparkles,
+    color: "from-cyan-500 to-blue-600",
+    snippet: `@DireccionFiscal:component\n  grid cols=2 gap=12\n    textfield calle label="Calle y Número" placeholder="Av. Insurgentes 100"\n    textfield cp label="Código Postal" placeholder="03940"\n    autocomplete pais label="País"\n      option "México"\n      option "España"`,
+    description: "Declara un bloque reutilizable modular en el nivel raíz que puede ser incrustado en múltiples pantallas.",
+    modifiers: ["@Nombre:component"],
+    contextRules: { rootOnly: true },
+    renderPreview: (isLight = false) => (
+      <div
+        className={`p-3 rounded-2xl border space-y-2 transition-colors ${
+          isLight ? "bg-neutral-100/90 border-neutral-200" : "bg-neutral-900/95 border-neutral-800"
+        }`}
+      >
+        <div
+          className={`flex items-center justify-between text-[11px] font-bold ${
+            isLight ? "text-blue-700" : "text-cyan-300"
+          }`}
+        >
+          <span>@MiBloque:component</span>
+          <span
+            className={`text-[9px] px-1.5 py-0.5 rounded border ${
+              isLight
+                ? "bg-blue-100 text-blue-700 border-blue-200"
+                : "bg-cyan-950 text-cyan-400 border-cyan-800"
+            }`}
+          >
+            Reutilizable
+          </span>
+        </div>
+        <div
+          className={`p-2 rounded-xl border border-dashed text-[10px] ${
+            isLight
+              ? "bg-white/80 border-blue-300 text-neutral-700"
+              : "bg-neutral-800/80 border-cyan-700/60 text-neutral-300"
+          }`}
+        >
+          Campos o elementos compartidos...
         </div>
       </div>
     ),
@@ -643,6 +802,34 @@ export const WISP_PALETTE_CATALOG: PaletteComponentItem[] = [
   // =========================================================
   // 2. LAYOUT & SUPERFICIE
   // =========================================================
+  {
+    id: "component-use",
+    name: "component @Nombre",
+    label: "Incrustar Componente",
+    category: "Layout & Superficie",
+    icon: Sparkles,
+    color: "from-cyan-500 to-blue-500",
+    snippet: `component @DireccionFiscal`,
+    description: "Incrusta e inserta un componente reutilizable (@Nombre:component) dentro de la vista actual.",
+    modifiers: ["component @Nombre", "include @Nombre", "@Nombre"],
+    contextRules: { containerOnly: true },
+    renderPreview: (isLight = false) => (
+      <div
+        className={`p-3 rounded-2xl border transition-colors ${
+          isLight ? "bg-neutral-100/90 border-neutral-200" : "bg-neutral-900/95 border-neutral-800"
+        }`}
+      >
+        <div
+          className={`p-2.5 rounded-xl border border-dashed flex items-center justify-between text-[11px] font-semibold ${
+            isLight ? "bg-cyan-50 border-cyan-300 text-cyan-800" : "bg-cyan-950/40 border-cyan-700 text-cyan-300"
+          }`}
+        >
+          <span>component @DireccionFiscal</span>
+          <span className="text-[9px] px-1.5 py-0.5 rounded bg-cyan-600 text-white font-mono">Incrustar</span>
+        </div>
+      </div>
+    ),
+  },
   {
     id: "card",
     name: "card",
@@ -654,13 +841,29 @@ export const WISP_PALETTE_CATALOG: PaletteComponentItem[] = [
     description: "Contenedor de superficie M3 con elevación o bordes para agrupar contenido y acciones.",
     modifiers: ["elevated", "outlined", "filled", "padding=16"],
     contextRules: { containerOnly: true },
-    renderPreview: () => (
-      <div className="p-3 bg-neutral-900/95 rounded-2xl border border-neutral-800">
-        <div className="p-3 rounded-2xl bg-neutral-800 border border-neutral-700/80 shadow-lg space-y-1">
-          <div className="font-bold text-xs text-white">Tarjeta de Superficie</div>
-          <div className="text-[10px] text-neutral-400">Contenido estructurado M3...</div>
+    renderPreview: (isLight = false) => (
+      <div
+        className={`p-3 rounded-2xl border transition-colors ${
+          isLight ? "bg-neutral-100/90 border-neutral-200" : "bg-neutral-900/95 border-neutral-800"
+        }`}
+      >
+        <div
+          className={`p-3 rounded-2xl border shadow-md space-y-1 ${
+            isLight ? "bg-white border-neutral-200" : "bg-neutral-800 border-neutral-700/80"
+          }`}
+        >
+          <div className={`font-bold text-xs ${isLight ? "text-neutral-900" : "text-white"}`}>
+            Tarjeta de Superficie
+          </div>
+          <div className={`text-[10px] ${isLight ? "text-neutral-600" : "text-neutral-400"}`}>
+            Contenido estructurado M3...
+          </div>
           <div className="pt-1 flex justify-end">
-            <span className="text-[10px] font-semibold text-purple-400 flex items-center gap-1">
+            <span
+              className={`text-[10px] font-semibold flex items-center gap-1 ${
+                isLight ? "text-purple-600" : "text-purple-400"
+              }`}
+            >
               Ver más <ArrowRight className="w-3 h-3" />
             </span>
           </div>
@@ -679,10 +882,18 @@ export const WISP_PALETTE_CATALOG: PaletteComponentItem[] = [
     description: "Bloque de texto tipográfico Material 3 con jerarquía (display, headline, title, body, label).",
     modifiers: ["display", "headline", "title", "body", "label", "color=primary|secondary|error|muted", "align=left|center|right"],
     contextRules: { containerOnly: true },
-    renderPreview: () => (
-      <div className="p-3 bg-neutral-900/95 rounded-2xl border border-neutral-800 space-y-1">
-        <div className="text-xs font-bold text-white">Título de Sección</div>
-        <div className="text-[10px] text-neutral-400">Texto descriptivo con cuerpo legible.</div>
+    renderPreview: (isLight = false) => (
+      <div
+        className={`p-3 rounded-2xl border space-y-1 transition-colors ${
+          isLight ? "bg-neutral-100/90 border-neutral-200" : "bg-neutral-900/95 border-neutral-800"
+        }`}
+      >
+        <div className={`text-xs font-bold ${isLight ? "text-neutral-900" : "text-white"}`}>
+          Título de Sección
+        </div>
+        <div className={`text-[10px] ${isLight ? "text-neutral-600" : "text-neutral-400"}`}>
+          Texto descriptivo con cuerpo legible.
+        </div>
       </div>
     ),
   },
@@ -697,17 +908,39 @@ export const WISP_PALETTE_CATALOG: PaletteComponentItem[] = [
     description: "Matriz adaptable de columnas para tableros, indicadores KPI y catálogos.",
     modifiers: ["cols=1|2|3|4", "gap=8|16|24"],
     contextRules: { containerOnly: true },
-    renderPreview: () => (
-      <div className="p-3 bg-neutral-900/95 rounded-2xl border border-neutral-800">
+    renderPreview: (isLight = false) => (
+      <div
+        className={`p-3 rounded-2xl border transition-colors ${
+          isLight ? "bg-neutral-100/90 border-neutral-200" : "bg-neutral-900/95 border-neutral-800"
+        }`}
+      >
         <div className="grid grid-cols-3 gap-1.5 text-center">
-          <div className="p-1 bg-neutral-800 rounded-lg border border-neutral-700">
-            <div className="text-[9px] text-white font-bold">$12K</div>
+          <div
+            className={`p-1 rounded-lg border shadow-2xs ${
+              isLight ? "bg-white border-neutral-200" : "bg-neutral-800 border-neutral-700"
+            }`}
+          >
+            <div className={`text-[9px] font-bold ${isLight ? "text-neutral-900" : "text-white"}`}>
+              $12K
+            </div>
           </div>
-          <div className="p-1 bg-neutral-800 rounded-lg border border-neutral-700">
-            <div className="text-[9px] text-white font-bold">1.2K</div>
+          <div
+            className={`p-1 rounded-lg border shadow-2xs ${
+              isLight ? "bg-white border-neutral-200" : "bg-neutral-800 border-neutral-700"
+            }`}
+          >
+            <div className={`text-[9px] font-bold ${isLight ? "text-neutral-900" : "text-white"}`}>
+              1.2K
+            </div>
           </div>
-          <div className="p-1 bg-neutral-800 rounded-lg border border-neutral-700">
-            <div className="text-[9px] text-white font-bold">99%</div>
+          <div
+            className={`p-1 rounded-lg border shadow-2xs ${
+              isLight ? "bg-white border-neutral-200" : "bg-neutral-800 border-neutral-700"
+            }`}
+          >
+            <div className={`text-[9px] font-bold ${isLight ? "text-neutral-900" : "text-white"}`}>
+              99%
+            </div>
           </div>
         </div>
       </div>
@@ -724,11 +957,23 @@ export const WISP_PALETTE_CATALOG: PaletteComponentItem[] = [
     description: "Contenedor horizontal flexible (Flexbox row) para alinear elementos lado a lado.",
     modifiers: ["spacing=8|12|16|24", "align=center|start|end", "justify=between|center|end"],
     contextRules: { containerOnly: true },
-    renderPreview: () => (
-      <div className="p-3 bg-neutral-900/95 rounded-2xl border border-neutral-800">
-        <div className="flex items-center justify-between p-2 bg-neutral-800 rounded-xl border border-neutral-700">
-          <span className="text-xs text-white font-medium">Elemento Izq</span>
-          <span className="px-2 py-0.5 bg-purple-600 text-white rounded-full text-[9px] font-semibold">Der</span>
+    renderPreview: (isLight = false) => (
+      <div
+        className={`p-3 rounded-2xl border transition-colors ${
+          isLight ? "bg-neutral-100/90 border-neutral-200" : "bg-neutral-900/95 border-neutral-800"
+        }`}
+      >
+        <div
+          className={`flex items-center justify-between p-2 rounded-xl border ${
+            isLight ? "bg-white border-neutral-200 shadow-2xs" : "bg-neutral-800 border-neutral-700"
+          }`}
+        >
+          <span className={`text-xs font-medium ${isLight ? "text-neutral-900" : "text-white"}`}>
+            Elemento Izq
+          </span>
+          <span className="px-2 py-0.5 bg-purple-600 text-white rounded-full text-[9px] font-semibold">
+            Der
+          </span>
         </div>
       </div>
     ),
@@ -744,10 +989,30 @@ export const WISP_PALETTE_CATALOG: PaletteComponentItem[] = [
     description: "Contenedor vertical flexible (Flexbox column) con espaciado constante entre elementos.",
     modifiers: ["spacing=8|12|16|24"],
     contextRules: { containerOnly: true },
-    renderPreview: () => (
-      <div className="p-3 bg-neutral-900/95 rounded-2xl border border-neutral-800 space-y-1.5">
-        <div className="p-1.5 bg-neutral-800 rounded-lg text-[10px] text-neutral-300">Bloque 1</div>
-        <div className="p-1.5 bg-neutral-800 rounded-lg text-[10px] text-neutral-300">Bloque 2</div>
+    renderPreview: (isLight = false) => (
+      <div
+        className={`p-3 rounded-2xl border space-y-1.5 transition-colors ${
+          isLight ? "bg-neutral-100/90 border-neutral-200" : "bg-neutral-900/95 border-neutral-800"
+        }`}
+      >
+        <div
+          className={`p-1.5 rounded-lg border text-[10px] ${
+            isLight
+              ? "bg-white border-neutral-200 text-neutral-700"
+              : "bg-neutral-800 border-neutral-700 text-neutral-300"
+          }`}
+        >
+          Bloque 1
+        </div>
+        <div
+          className={`p-1.5 rounded-lg border text-[10px] ${
+            isLight
+              ? "bg-white border-neutral-200 text-neutral-700"
+              : "bg-neutral-800 border-neutral-700 text-neutral-300"
+          }`}
+        >
+          Bloque 2
+        </div>
       </div>
     ),
   },
@@ -762,13 +1027,23 @@ export const WISP_PALETTE_CATALOG: PaletteComponentItem[] = [
     description: "Inserta una separación espacial vertical u horizontal regulable entre elementos.",
     modifiers: ["height=8|16|24|32", "width=8|16|24", "flex=1"],
     contextRules: { containerOnly: true },
-    renderPreview: () => (
-      <div className="p-3 bg-neutral-900/95 rounded-2xl border border-neutral-800 space-y-1.5">
-        <div className="h-2 bg-neutral-800 rounded" />
-        <div className="h-4 border border-dashed border-purple-500/40 rounded flex items-center justify-center text-[8px] text-purple-400 font-mono">
+    renderPreview: (isLight = false) => (
+      <div
+        className={`p-3 rounded-2xl border space-y-1.5 transition-colors ${
+          isLight ? "bg-neutral-100/90 border-neutral-200" : "bg-neutral-900/95 border-neutral-800"
+        }`}
+      >
+        <div className={`h-2 rounded ${isLight ? "bg-neutral-200" : "bg-neutral-800"}`} />
+        <div
+          className={`h-4 border border-dashed rounded flex items-center justify-center text-[8px] font-mono ${
+            isLight
+              ? "border-purple-400 text-purple-700 bg-purple-50/50"
+              : "border-purple-500/40 text-purple-400"
+          }`}
+        >
           spacer height=16
         </div>
-        <div className="h-2 bg-neutral-800 rounded" />
+        <div className={`h-2 rounded ${isLight ? "bg-neutral-200" : "bg-neutral-800"}`} />
       </div>
     ),
   },
@@ -783,11 +1058,19 @@ export const WISP_PALETTE_CATALOG: PaletteComponentItem[] = [
     description: "Línea divisoria sutil para separar secciones o filas de contenido de forma pulida.",
     modifiers: ["inset=true|false", "vertical=true|false"],
     contextRules: { containerOnly: true },
-    renderPreview: () => (
-      <div className="p-3 bg-neutral-900/95 rounded-2xl border border-neutral-800 space-y-2">
-        <div className="text-[9px] text-neutral-400">Sección Superior</div>
-        <div className="h-px bg-neutral-700 w-full" />
-        <div className="text-[9px] text-neutral-400">Sección Inferior</div>
+    renderPreview: (isLight = false) => (
+      <div
+        className={`p-3 rounded-2xl border space-y-2 transition-colors ${
+          isLight ? "bg-neutral-100/90 border-neutral-200" : "bg-neutral-900/95 border-neutral-800"
+        }`}
+      >
+        <div className={`text-[9px] ${isLight ? "text-neutral-600" : "text-neutral-400"}`}>
+          Sección Superior
+        </div>
+        <div className={`h-px w-full ${isLight ? "bg-neutral-300" : "bg-neutral-700"}`} />
+        <div className={`text-[9px] ${isLight ? "text-neutral-600" : "text-neutral-400"}`}>
+          Sección Inferior
+        </div>
       </div>
     ),
   },
@@ -802,11 +1085,33 @@ export const WISP_PALETTE_CATALOG: PaletteComponentItem[] = [
     description: "Diseño dividido responsivo: barra lateral izquierda y área de trabajo principal a la derecha.",
     modifiers: ["left", "right", "gap=16"],
     contextRules: { containerOnly: true },
-    renderPreview: () => (
-      <div className="p-3 bg-neutral-900/95 rounded-2xl border border-neutral-800">
-        <div className="flex h-14 rounded-xl border border-neutral-700 overflow-hidden text-[9px]">
-          <div className="w-1/3 bg-neutral-800 p-1.5 border-r border-neutral-700 text-purple-300 font-semibold">Sidebar</div>
-          <div className="flex-1 bg-neutral-950 p-1.5 text-neutral-400 flex items-center justify-center">Principal</div>
+    renderPreview: (isLight = false) => (
+      <div
+        className={`p-3 rounded-2xl border transition-colors ${
+          isLight ? "bg-neutral-100/90 border-neutral-200" : "bg-neutral-900/95 border-neutral-800"
+        }`}
+      >
+        <div
+          className={`flex h-14 rounded-xl border overflow-hidden text-[9px] ${
+            isLight ? "border-neutral-200 shadow-2xs" : "border-neutral-700"
+          }`}
+        >
+          <div
+            className={`w-1/3 p-1.5 border-r font-semibold ${
+              isLight
+                ? "bg-purple-50 border-neutral-200 text-purple-800"
+                : "bg-neutral-800 border-neutral-700 text-purple-300"
+            }`}
+          >
+            Sidebar
+          </div>
+          <div
+            className={`flex-1 p-1.5 flex items-center justify-center ${
+              isLight ? "bg-white text-neutral-600" : "bg-neutral-950 text-neutral-400"
+            }`}
+          >
+            Principal
+          </div>
         </div>
       </div>
     ),
@@ -822,13 +1127,29 @@ export const WISP_PALETTE_CATALOG: PaletteComponentItem[] = [
     description: "Pestañas interactivas para alternar entre diferentes paneles de contenido.",
     modifiers: ["items=[\"...\", \"...\"]", "tab \"...\"", "active=0"],
     contextRules: { containerOnly: true },
-    renderPreview: () => (
-      <div className="p-3 bg-neutral-900/95 rounded-2xl border border-neutral-800 space-y-1.5">
-        <div className="flex border-b border-neutral-700 text-[10px] gap-2 pb-1">
-          <span className="text-purple-400 font-bold border-b border-purple-400 pb-0.5">General</span>
-          <span className="text-neutral-500">Seguridad</span>
+    renderPreview: (isLight = false) => (
+      <div
+        className={`p-3 rounded-2xl border space-y-1.5 transition-colors ${
+          isLight ? "bg-neutral-100/90 border-neutral-200" : "bg-neutral-900/95 border-neutral-800"
+        }`}
+      >
+        <div
+          className={`flex border-b text-[10px] gap-2 pb-1 ${
+            isLight ? "border-neutral-200" : "border-neutral-700"
+          }`}
+        >
+          <span
+            className={`font-bold border-b pb-0.5 ${
+              isLight ? "text-purple-700 border-purple-600" : "text-purple-400 border-purple-400"
+            }`}
+          >
+            General
+          </span>
+          <span className={isLight ? "text-neutral-500" : "text-neutral-500"}>Seguridad</span>
         </div>
-        <div className="text-[9px] text-neutral-400">Contenido pestaña...</div>
+        <div className={`text-[9px] ${isLight ? "text-neutral-600" : "text-neutral-400"}`}>
+          Contenido pestaña...
+        </div>
       </div>
     ),
   },
@@ -843,11 +1164,21 @@ export const WISP_PALETTE_CATALOG: PaletteComponentItem[] = [
     description: "Contenedor colapsable con chevron animado para FAQs o secciones opcionales de formularios.",
     modifiers: ["expanded=false|true", "icon=file-text", "variant=outlined|elevated"],
     contextRules: { containerOnly: true },
-    renderPreview: () => (
-      <div className="p-3 bg-neutral-900/95 rounded-2xl border border-neutral-800">
-        <div className="rounded-xl border border-neutral-700 bg-neutral-800 p-2 flex items-center justify-between text-xs text-neutral-200">
+    renderPreview: (isLight = false) => (
+      <div
+        className={`p-3 rounded-2xl border transition-colors ${
+          isLight ? "bg-neutral-100/90 border-neutral-200" : "bg-neutral-900/95 border-neutral-800"
+        }`}
+      >
+        <div
+          className={`rounded-xl border p-2 flex items-center justify-between text-xs ${
+            isLight
+              ? "border-neutral-200 bg-white text-neutral-800 shadow-2xs"
+              : "border-neutral-700 bg-neutral-800 text-neutral-200"
+          }`}
+        >
           <span className="font-semibold text-[11px]">Datos Fiscales</span>
-          <ChevronDown className="w-3.5 h-3.5 text-neutral-400" />
+          <ChevronDown className={`w-3.5 h-3.5 ${isLight ? "text-neutral-500" : "text-neutral-400"}`} />
         </div>
       </div>
     ),
@@ -863,12 +1194,16 @@ export const WISP_PALETTE_CATALOG: PaletteComponentItem[] = [
     description: "Línea de navegación jerárquica con separadores para SaaS y tableros.",
     modifiers: ["items=[\"...\", \"...\"]", "separator=chevron|slash"],
     contextRules: { containerOnly: true },
-    renderPreview: () => (
-      <div className="p-3 bg-neutral-900/95 rounded-2xl border border-neutral-800">
-        <div className="flex items-center gap-1 text-[10px] text-neutral-400">
+    renderPreview: (isLight = false) => (
+      <div
+        className={`p-3 rounded-2xl border transition-colors ${
+          isLight ? "bg-neutral-100/90 border-neutral-200" : "bg-neutral-900/95 border-neutral-800"
+        }`}
+      >
+        <div className={`flex items-center gap-1 text-[10px] ${isLight ? "text-neutral-600" : "text-neutral-400"}`}>
           <span>Clientes</span>
-          <span className="text-neutral-600">&gt;</span>
-          <span className="font-bold text-purple-300">Facturas</span>
+          <span className={isLight ? "text-neutral-400" : "text-neutral-600"}>&gt;</span>
+          <span className={`font-bold ${isLight ? "text-purple-700" : "text-purple-300"}`}>Facturas</span>
         </div>
       </div>
     ),
@@ -884,13 +1219,35 @@ export const WISP_PALETTE_CATALOG: PaletteComponentItem[] = [
     description: "Barra superior de aplicación con título, navegación y botones de acción rápidos.",
     modifiers: ["title=\"...\"", "icon=menu|arrow-left"],
     contextRules: { containerOnly: true },
-    renderPreview: () => (
-      <div className="p-3 bg-neutral-900/95 rounded-2xl border border-neutral-800">
-        <div className="flex items-center justify-between p-1.5 rounded-xl bg-neutral-800 border border-neutral-700 text-xs text-white">
+    renderPreview: (isLight = false) => (
+      <div
+        className={`p-3 rounded-2xl border transition-colors ${
+          isLight ? "bg-neutral-100/90 border-neutral-200" : "bg-neutral-900/95 border-neutral-800"
+        }`}
+      >
+        <div
+          className={`flex items-center justify-between p-1.5 rounded-xl border text-xs ${
+            isLight
+              ? "bg-white border-neutral-200 text-neutral-900 shadow-2xs"
+              : "bg-neutral-800 border-neutral-700 text-white"
+          }`}
+        >
           <span className="font-bold text-[10px]">Panel de Control</span>
           <div className="flex gap-1">
-            <span className="w-3.5 h-3.5 rounded bg-neutral-700 flex items-center justify-center text-[8px]">🔍</span>
-            <span className="w-3.5 h-3.5 rounded bg-neutral-700 flex items-center justify-center text-[8px]">🔔</span>
+            <span
+              className={`w-3.5 h-3.5 rounded flex items-center justify-center text-[8px] ${
+                isLight ? "bg-neutral-100 text-neutral-700" : "bg-neutral-700 text-white"
+              }`}
+            >
+              🔍
+            </span>
+            <span
+              className={`w-3.5 h-3.5 rounded flex items-center justify-center text-[8px] ${
+                isLight ? "bg-neutral-100 text-neutral-700" : "bg-neutral-700 text-white"
+              }`}
+            >
+              🔔
+            </span>
           </div>
         </div>
       </div>
@@ -911,13 +1268,31 @@ export const WISP_PALETTE_CATALOG: PaletteComponentItem[] = [
     description: "Campo de texto Material 3 con etiqueta flotante, ícono integrado y validación.",
     modifiers: ["label=\"...\"", "placeholder=\"...\"", "icon=mail", "type=password", "required=true"],
     contextRules: { containerOnly: true },
-    renderPreview: () => (
-      <div className="p-3 bg-neutral-900/95 rounded-2xl border border-neutral-800">
-        <div className="relative border-2 border-purple-500 rounded-xl px-3 py-1.5 bg-neutral-950/80">
-          <span className="text-[9px] text-purple-400 font-semibold block">Correo Electrónico</span>
-          <div className="flex items-center gap-1.5 text-xs text-neutral-200">
-            <Mail className="w-3 h-3 text-neutral-400" />
-            <span className="text-[10px] text-neutral-400">usuario@correo.com</span>
+    renderPreview: (isLight = false) => (
+      <div
+        className={`p-3 rounded-2xl border transition-colors ${
+          isLight ? "bg-neutral-100/90 border-neutral-200" : "bg-neutral-900/95 border-neutral-800"
+        }`}
+      >
+        <div
+          className={`relative border-2 rounded-xl px-3 py-1.5 ${
+            isLight
+              ? "border-purple-600 bg-white shadow-2xs"
+              : "border-purple-500 bg-neutral-950/80"
+          }`}
+        >
+          <span
+            className={`text-[9px] font-semibold block ${
+              isLight ? "text-purple-700" : "text-purple-400"
+            }`}
+          >
+            Correo Electrónico
+          </span>
+          <div className="flex items-center gap-1.5 text-xs">
+            <Mail className={`w-3 h-3 ${isLight ? "text-neutral-400" : "text-neutral-400"}`} />
+            <span className={`text-[10px] ${isLight ? "text-neutral-700" : "text-neutral-400"}`}>
+              usuario@correo.com
+            </span>
           </div>
         </div>
       </div>
@@ -934,11 +1309,27 @@ export const WISP_PALETTE_CATALOG: PaletteComponentItem[] = [
     description: "Campo multilínea para descripciones, notas o retroalimentación extensa.",
     modifiers: ["label=\"...\"", "rows=3|4|5", "placeholder=\"...\""],
     contextRules: { containerOnly: true },
-    renderPreview: () => (
-      <div className="p-3 bg-neutral-900/95 rounded-2xl border border-neutral-800">
-        <div className="border border-neutral-700 rounded-xl p-2 bg-neutral-950 space-y-1">
-          <span className="text-[9px] text-purple-400 font-semibold block">Observaciones</span>
-          <div className="text-[9px] text-neutral-500 h-6">Escribe aquí...</div>
+    renderPreview: (isLight = false) => (
+      <div
+        className={`p-3 rounded-2xl border transition-colors ${
+          isLight ? "bg-neutral-100/90 border-neutral-200" : "bg-neutral-900/95 border-neutral-800"
+        }`}
+      >
+        <div
+          className={`border rounded-xl p-2 space-y-1 ${
+            isLight ? "border-neutral-300 bg-white" : "border-neutral-700 bg-neutral-950"
+          }`}
+        >
+          <span
+            className={`text-[9px] font-semibold block ${
+              isLight ? "text-purple-700" : "text-purple-400"
+            }`}
+          >
+            Observaciones
+          </span>
+          <div className={`text-[9px] h-6 ${isLight ? "text-neutral-400" : "text-neutral-500"}`}>
+            Escribe aquí...
+          </div>
         </div>
       </div>
     ),
@@ -954,10 +1345,20 @@ export const WISP_PALETTE_CATALOG: PaletteComponentItem[] = [
     description: "Barra de búsqueda Material 3 interactiva con ícono integrado.",
     modifiers: ["placeholder=\"...\"", "value=\"...\""],
     contextRules: { containerOnly: true },
-    renderPreview: () => (
-      <div className="p-3 bg-neutral-900/95 rounded-2xl border border-neutral-800">
-        <div className="border border-neutral-700 rounded-xl px-2.5 py-1.5 bg-neutral-950 flex items-center gap-1.5 text-xs text-neutral-400">
-          <Search className="w-3 h-3 text-purple-400" />
+    renderPreview: (isLight = false) => (
+      <div
+        className={`p-3 rounded-2xl border transition-colors ${
+          isLight ? "bg-neutral-100/90 border-neutral-200" : "bg-neutral-900/95 border-neutral-800"
+        }`}
+      >
+        <div
+          className={`border rounded-xl px-2.5 py-1.5 flex items-center gap-1.5 text-xs ${
+            isLight
+              ? "border-neutral-300 bg-white text-neutral-600 shadow-2xs"
+              : "border-neutral-700 bg-neutral-950 text-neutral-400"
+          }`}
+        >
+          <Search className={`w-3 h-3 ${isLight ? "text-purple-600" : "text-purple-400"}`} />
           <span className="text-[10px]">Buscar registros...</span>
         </div>
       </div>
@@ -974,14 +1375,26 @@ export const WISP_PALETTE_CATALOG: PaletteComponentItem[] = [
     description: "Menú desplegable de selección única con lista de opciones anidadas.",
     modifiers: ["label=\"...\"", "value=\"...\"", "option \"...\""],
     contextRules: { containerOnly: true },
-    renderPreview: () => (
-      <div className="p-3 bg-neutral-900/95 rounded-2xl border border-neutral-800">
-        <div className="border border-neutral-700 rounded-xl px-2.5 py-1.5 bg-neutral-800 flex items-center justify-between text-xs text-neutral-200">
+    renderPreview: (isLight = false) => (
+      <div
+        className={`p-3 rounded-2xl border transition-colors ${
+          isLight ? "bg-neutral-100/90 border-neutral-200" : "bg-neutral-900/95 border-neutral-800"
+        }`}
+      >
+        <div
+          className={`border rounded-xl px-2.5 py-1.5 flex items-center justify-between text-xs ${
+            isLight
+              ? "border-neutral-300 bg-white text-neutral-900 shadow-2xs"
+              : "border-neutral-700 bg-neutral-800 text-neutral-200"
+          }`}
+        >
           <div>
-            <div className="text-[8px] text-purple-400">Categoría</div>
+            <div className={`text-[8px] ${isLight ? "text-purple-700 font-semibold" : "text-purple-400"}`}>
+              Categoría
+            </div>
             <div className="font-semibold text-[10px]">Diseño UI</div>
           </div>
-          <ListFilter className="w-3.5 h-3.5 text-neutral-400" />
+          <ListFilter className={`w-3.5 h-3.5 ${isLight ? "text-neutral-500" : "text-neutral-400"}`} />
         </div>
       </div>
     ),
@@ -997,15 +1410,31 @@ export const WISP_PALETTE_CATALOG: PaletteComponentItem[] = [
     description: "Menú desplegable con filtro en vivo y sugerencias dinámicas al teclear.",
     modifiers: ["label=\"...\"", "placeholder=\"...\"", "option \"...\""],
     contextRules: { containerOnly: true },
-    renderPreview: () => (
-      <div className="p-3 bg-neutral-900/95 rounded-2xl border border-neutral-800 space-y-1.5">
-        <div className="flex items-center gap-1.5 px-2 py-1 rounded-lg bg-neutral-950 border border-purple-500/60 text-xs">
-          <Search className="w-3 h-3 text-purple-400" />
-          <span className="text-neutral-200 text-[10px]">Méx</span>
+    renderPreview: (isLight = false) => (
+      <div
+        className={`p-3 rounded-2xl border space-y-1.5 transition-colors ${
+          isLight ? "bg-neutral-100/90 border-neutral-200" : "bg-neutral-900/95 border-neutral-800"
+        }`}
+      >
+        <div
+          className={`flex items-center gap-1.5 px-2 py-1 rounded-lg border text-xs ${
+            isLight
+              ? "bg-white border-purple-400 text-neutral-900"
+              : "bg-neutral-950 border-purple-500/60 text-neutral-200"
+          }`}
+        >
+          <Search className={`w-3 h-3 ${isLight ? "text-purple-600" : "text-purple-400"}`} />
+          <span className="text-[10px]">Méx</span>
         </div>
-        <div className="px-2 py-0.5 rounded bg-purple-900/50 text-purple-200 text-[9px] font-semibold flex justify-between">
+        <div
+          className={`px-2 py-0.5 rounded text-[9px] font-semibold flex justify-between ${
+            isLight
+              ? "bg-purple-100 text-purple-800 border border-purple-200"
+              : "bg-purple-900/50 text-purple-200"
+          }`}
+        >
           <span>México</span>
-          <Check className="w-2.5 h-2.5 text-purple-400" />
+          <Check className={`w-2.5 h-2.5 ${isLight ? "text-purple-700" : "text-purple-400"}`} />
         </div>
       </div>
     ),
@@ -1021,9 +1450,19 @@ export const WISP_PALETTE_CATALOG: PaletteComponentItem[] = [
     description: "Opción de selección para insertar dentro de un bloque `select` o `autocomplete`.",
     modifiers: ["option \"...\""],
     contextRules: { selectOnly: true },
-    renderPreview: () => (
-      <div className="p-3 bg-neutral-900/95 rounded-2xl border border-neutral-800">
-        <div className="px-2 py-1 rounded bg-purple-950 text-purple-200 text-xs font-mono">
+    renderPreview: (isLight = false) => (
+      <div
+        className={`p-3 rounded-2xl border transition-colors ${
+          isLight ? "bg-neutral-100/90 border-neutral-200" : "bg-neutral-900/95 border-neutral-800"
+        }`}
+      >
+        <div
+          className={`px-2 py-1 rounded text-xs font-mono border ${
+            isLight
+              ? "bg-purple-50 text-purple-800 border-purple-200"
+              : "bg-purple-950 text-purple-200 border-purple-800/60"
+          }`}
+        >
           option "Nuevo Valor"
         </div>
       </div>
@@ -1040,10 +1479,16 @@ export const WISP_PALETTE_CATALOG: PaletteComponentItem[] = [
     description: "Control interruptor on/off Material 3 con animación y etiqueta.",
     modifiers: ["label=\"...\"", "checked=true|false"],
     contextRules: { containerOnly: true },
-    renderPreview: () => (
-      <div className="p-3 bg-neutral-900/95 rounded-2xl border border-neutral-800 flex items-center justify-between">
-        <span className="text-[10px] text-neutral-300">Activar alertas</span>
-        <div className="w-7 h-3.5 bg-purple-600 rounded-full p-0.5 flex justify-end">
+    renderPreview: (isLight = false) => (
+      <div
+        className={`p-3 rounded-2xl border flex items-center justify-between transition-colors ${
+          isLight ? "bg-neutral-100/90 border-neutral-200" : "bg-neutral-900/95 border-neutral-800"
+        }`}
+      >
+        <span className={`text-[10px] ${isLight ? "text-neutral-800" : "text-neutral-300"}`}>
+          Activar alertas
+        </span>
+        <div className="w-7 h-3.5 bg-purple-600 rounded-full p-0.5 flex justify-end shadow-xs">
           <div className="w-2.5 h-2.5 bg-white rounded-full" />
         </div>
       </div>
@@ -1060,12 +1505,18 @@ export const WISP_PALETTE_CATALOG: PaletteComponentItem[] = [
     description: "Casilla de verificación interactiva para términos y selecciones booleanas.",
     modifiers: ["label=\"...\"", "checked=true|false"],
     contextRules: { containerOnly: true },
-    renderPreview: () => (
-      <div className="p-3 bg-neutral-900/95 rounded-2xl border border-neutral-800 flex items-center gap-2">
-        <div className="w-4 h-4 rounded bg-purple-600 text-white flex items-center justify-center">
+    renderPreview: (isLight = false) => (
+      <div
+        className={`p-3 rounded-2xl border flex items-center gap-2 transition-colors ${
+          isLight ? "bg-neutral-100/90 border-neutral-200" : "bg-neutral-900/95 border-neutral-800"
+        }`}
+      >
+        <div className="w-4 h-4 rounded bg-purple-600 text-white flex items-center justify-center shadow-xs">
           <Check className="w-3 h-3" />
         </div>
-        <span className="text-[10px] text-neutral-200">Acepto términos</span>
+        <span className={`text-[10px] ${isLight ? "text-neutral-800" : "text-neutral-200"}`}>
+          Acepto términos
+        </span>
       </div>
     ),
   },
@@ -1080,12 +1531,18 @@ export const WISP_PALETTE_CATALOG: PaletteComponentItem[] = [
     description: "Opción de selección única circular dentro de un grupo.",
     modifiers: ["label=\"...\"", "value=\"...\"", "checked=true|false"],
     contextRules: { containerOnly: true },
-    renderPreview: () => (
-      <div className="p-3 bg-neutral-900/95 rounded-2xl border border-neutral-800 flex items-center gap-2">
-        <div className="w-4 h-4 rounded-full border-2 border-purple-500 flex items-center justify-center">
-          <div className="w-2 h-2 rounded-full bg-purple-500" />
+    renderPreview: (isLight = false) => (
+      <div
+        className={`p-3 rounded-2xl border flex items-center gap-2 transition-colors ${
+          isLight ? "bg-neutral-100/90 border-neutral-200" : "bg-neutral-900/95 border-neutral-800"
+        }`}
+      >
+        <div className="w-4 h-4 rounded-full border-2 border-purple-600 flex items-center justify-center">
+          <div className="w-2 h-2 rounded-full bg-purple-600" />
         </div>
-        <span className="text-[10px] text-neutral-200">Plan Empresarial</span>
+        <span className={`text-[10px] ${isLight ? "text-neutral-800" : "text-neutral-200"}`}>
+          Plan Empresarial
+        </span>
       </div>
     ),
   },
@@ -1100,14 +1557,18 @@ export const WISP_PALETTE_CATALOG: PaletteComponentItem[] = [
     description: "Control deslizante para rangos numéricos con etiqueta de valor.",
     modifiers: ["min=0", "max=100", "value=50", "step=5"],
     contextRules: { containerOnly: true },
-    renderPreview: () => (
-      <div className="p-3 bg-neutral-900/95 rounded-2xl border border-neutral-800 space-y-1">
-        <div className="flex justify-between text-[9px] text-neutral-400">
+    renderPreview: (isLight = false) => (
+      <div
+        className={`p-3 rounded-2xl border space-y-1 transition-colors ${
+          isLight ? "bg-neutral-100/90 border-neutral-200" : "bg-neutral-900/95 border-neutral-800"
+        }`}
+      >
+        <div className={`flex justify-between text-[9px] ${isLight ? "text-neutral-600" : "text-neutral-400"}`}>
           <span>Volumen</span>
-          <span className="text-purple-400 font-bold">75%</span>
+          <span className={`font-bold ${isLight ? "text-purple-700" : "text-purple-400"}`}>75%</span>
         </div>
-        <div className="h-1.5 bg-neutral-700 rounded-full overflow-hidden">
-          <div className="h-full w-3/4 bg-purple-500" />
+        <div className={`h-1.5 rounded-full overflow-hidden ${isLight ? "bg-neutral-300" : "bg-neutral-700"}`}>
+          <div className="h-full w-3/4 bg-purple-600" />
         </div>
       </div>
     ),
@@ -1123,11 +1584,21 @@ export const WISP_PALETTE_CATALOG: PaletteComponentItem[] = [
     description: "Selector de fechas interactivo con calendario popup y formato estándar.",
     modifiers: ["label=\"...\"", "value=\"YYYY-MM-DD\""],
     contextRules: { containerOnly: true },
-    renderPreview: () => (
-      <div className="p-3 bg-neutral-900/95 rounded-2xl border border-neutral-800">
-        <div className="border border-neutral-700 rounded-xl px-2.5 py-1.5 bg-neutral-800 flex items-center justify-between text-[10px] text-neutral-200">
+    renderPreview: (isLight = false) => (
+      <div
+        className={`p-3 rounded-2xl border transition-colors ${
+          isLight ? "bg-neutral-100/90 border-neutral-200" : "bg-neutral-900/95 border-neutral-800"
+        }`}
+      >
+        <div
+          className={`border rounded-xl px-2.5 py-1.5 flex items-center justify-between text-[10px] ${
+            isLight
+              ? "border-neutral-300 bg-white text-neutral-900 shadow-2xs"
+              : "border-neutral-700 bg-neutral-800 text-neutral-200"
+          }`}
+        >
           <span>20 Ago 2026</span>
-          <Calendar className="w-3.5 h-3.5 text-purple-400" />
+          <Calendar className={`w-3.5 h-3.5 ${isLight ? "text-purple-600" : "text-purple-400"}`} />
         </div>
       </div>
     ),
@@ -1143,14 +1614,20 @@ export const WISP_PALETTE_CATALOG: PaletteComponentItem[] = [
     description: "Selector de 1 a 5 estrellas interactivo para evaluaciones de satisfacción CSAT.",
     modifiers: ["label=\"...\"", "value=4", "max=5", "readonly=false|true"],
     contextRules: { containerOnly: true },
-    renderPreview: () => (
-      <div className="p-3 bg-neutral-900/95 rounded-2xl border border-neutral-800 flex items-center gap-1 text-amber-400">
-        <Star className="w-3 h-3 fill-amber-400" />
-        <Star className="w-3 h-3 fill-amber-400" />
-        <Star className="w-3 h-3 fill-amber-400" />
-        <Star className="w-3 h-3 fill-amber-400" />
-        <Star className="w-3 h-3 text-neutral-600" />
-        <span className="text-[10px] font-bold text-neutral-300 ml-1">4/5</span>
+    renderPreview: (isLight = false) => (
+      <div
+        className={`p-3 rounded-2xl border flex items-center gap-1 text-amber-500 transition-colors ${
+          isLight ? "bg-neutral-100/90 border-neutral-200" : "bg-neutral-900/95 border-neutral-800"
+        }`}
+      >
+        <Star className="w-3 h-3 fill-amber-400 text-amber-500" />
+        <Star className="w-3 h-3 fill-amber-400 text-amber-500" />
+        <Star className="w-3 h-3 fill-amber-400 text-amber-500" />
+        <Star className="w-3 h-3 fill-amber-400 text-amber-500" />
+        <Star className={`w-3 h-3 ${isLight ? "text-neutral-300" : "text-neutral-600"}`} />
+        <span className={`text-[10px] font-bold ml-1 ${isLight ? "text-neutral-700" : "text-neutral-300"}`}>
+          4/5
+        </span>
       </div>
     ),
   },
@@ -1169,12 +1646,22 @@ export const WISP_PALETTE_CATALOG: PaletteComponentItem[] = [
     description: "Botón Material 3 interactivo con variantes (filled, outlined, tonal, elevated, text), íconos y navegación.",
     modifiers: ["filled", "outlined", "tonal", "elevated", "text", "icon=save", "goto=@Screen"],
     contextRules: { containerOnly: true },
-    renderPreview: () => (
-      <div className="p-3 bg-neutral-900/95 rounded-2xl border border-neutral-800 flex items-center gap-2">
+    renderPreview: (isLight = false) => (
+      <div
+        className={`p-3 rounded-2xl border flex items-center gap-2 transition-colors ${
+          isLight ? "bg-neutral-100/90 border-neutral-200" : "bg-neutral-900/95 border-neutral-800"
+        }`}
+      >
         <span className="px-3 py-1 rounded-full bg-purple-600 text-white text-[10px] font-semibold flex items-center gap-1 shadow-md">
           <Save className="w-3 h-3" /> Guardar
         </span>
-        <span className="px-2.5 py-1 rounded-full border border-purple-400/50 text-purple-300 text-[10px]">
+        <span
+          className={`px-2.5 py-1 rounded-full border text-[10px] ${
+            isLight
+              ? "border-purple-300 text-purple-700 bg-purple-50/50"
+              : "border-purple-400/50 text-purple-300"
+          }`}
+        >
           Cancelar
         </span>
       </div>
@@ -1191,8 +1678,12 @@ export const WISP_PALETTE_CATALOG: PaletteComponentItem[] = [
     description: "Dispara una notificación emergente (Toast) y navega a otra pantalla simultáneamente.",
     modifiers: ["snackbar=\"...\"", "snackbar-action=\"...\"", "goto=@Screen"],
     contextRules: { containerOnly: true },
-    renderPreview: () => (
-      <div className="p-3 bg-neutral-900/95 rounded-2xl border border-neutral-800">
+    renderPreview: (isLight = false) => (
+      <div
+        className={`p-3 rounded-2xl border transition-colors ${
+          isLight ? "bg-neutral-100/90 border-neutral-200" : "bg-neutral-900/95 border-neutral-800"
+        }`}
+      >
         <span className="px-3 py-1 rounded-full bg-emerald-600 text-white text-[10px] font-semibold flex items-center gap-1 shadow-md w-fit">
           <Check className="w-3 h-3" /> Facturar &amp; Notificar
         </span>
@@ -1210,12 +1701,32 @@ export const WISP_PALETTE_CATALOG: PaletteComponentItem[] = [
     description: "Grupo de botones segmentados para alternar vistas o filtros exclusivos.",
     modifiers: ["options=[\"...\", \"...\"]", "selected=\"...\""],
     contextRules: { containerOnly: true },
-    renderPreview: () => (
-      <div className="p-3 bg-neutral-900/95 rounded-2xl border border-neutral-800">
-        <div className="flex border border-neutral-700 rounded-xl overflow-hidden text-[9px]">
-          <span className="px-2 py-0.5 bg-neutral-800 text-neutral-400">Día</span>
+    renderPreview: (isLight = false) => (
+      <div
+        className={`p-3 rounded-2xl border transition-colors ${
+          isLight ? "bg-neutral-100/90 border-neutral-200" : "bg-neutral-900/95 border-neutral-800"
+        }`}
+      >
+        <div
+          className={`flex border rounded-xl overflow-hidden text-[9px] ${
+            isLight ? "border-neutral-300 shadow-2xs" : "border-neutral-700"
+          }`}
+        >
+          <span
+            className={`px-2 py-0.5 ${
+              isLight ? "bg-white text-neutral-600" : "bg-neutral-800 text-neutral-400"
+            }`}
+          >
+            Día
+          </span>
           <span className="px-2 py-0.5 bg-purple-600 text-white font-bold">Mes</span>
-          <span className="px-2 py-0.5 bg-neutral-800 text-neutral-400">Año</span>
+          <span
+            className={`px-2 py-0.5 ${
+              isLight ? "bg-white text-neutral-600" : "bg-neutral-800 text-neutral-400"
+            }`}
+          >
+            Año
+          </span>
         </div>
       </div>
     ),
@@ -1231,8 +1742,12 @@ export const WISP_PALETTE_CATALOG: PaletteComponentItem[] = [
     description: "Botón de acción flotante (Floating Action Button) Material 3 para la acción primaria.",
     modifiers: ["extended=true|false", "icon=plus", "goto=@Screen", "variant=primary|surface"],
     contextRules: { containerOnly: true },
-    renderPreview: () => (
-      <div className="p-3 bg-neutral-900/95 rounded-2xl border border-neutral-800 flex justify-end">
+    renderPreview: (isLight = false) => (
+      <div
+        className={`p-3 rounded-2xl border flex justify-end transition-colors ${
+          isLight ? "bg-neutral-100/90 border-neutral-200" : "bg-neutral-900/95 border-neutral-800"
+        }`}
+      >
         <div className="px-3 py-1.5 rounded-full bg-purple-600 text-white text-[10px] font-bold flex items-center gap-1 shadow-lg">
           <Plus className="w-3 h-3" />
           <span>Nuevo</span>
@@ -1251,12 +1766,22 @@ export const WISP_PALETTE_CATALOG: PaletteComponentItem[] = [
     description: "Píldoras interactivas para filtros, sugerencias y selecciones rápidas.",
     modifiers: ["selected=true|false", "variant=assist|filter|input|suggestion", "icon=check"],
     contextRules: { containerOnly: true },
-    renderPreview: () => (
-      <div className="p-3 bg-neutral-900/95 rounded-2xl border border-neutral-800 flex gap-1.5">
-        <span className="px-2 py-0.5 rounded-lg bg-purple-600 text-white text-[9px] font-semibold flex items-center gap-1">
+    renderPreview: (isLight = false) => (
+      <div
+        className={`p-3 rounded-2xl border flex gap-1.5 transition-colors ${
+          isLight ? "bg-neutral-100/90 border-neutral-200" : "bg-neutral-900/95 border-neutral-800"
+        }`}
+      >
+        <span className="px-2 py-0.5 rounded-lg bg-purple-600 text-white text-[9px] font-semibold flex items-center gap-1 shadow-xs">
           <Check className="w-2.5 h-2.5" /> Activo
         </span>
-        <span className="px-2 py-0.5 rounded-lg bg-neutral-800 text-neutral-300 text-[9px] border border-neutral-700">
+        <span
+          className={`px-2 py-0.5 rounded-lg text-[9px] border ${
+            isLight
+              ? "bg-white text-neutral-700 border-neutral-300"
+              : "bg-neutral-800 text-neutral-300 border-neutral-700"
+          }`}
+        >
           Pendiente
         </span>
       </div>
@@ -1282,19 +1807,41 @@ export const WISP_PALETTE_CATALOG: PaletteComponentItem[] = [
       "pageSize=5",
     ],
     contextRules: { containerOnly: true },
-    renderPreview: () => (
-      <div className="p-3 bg-neutral-900/95 rounded-2xl border border-neutral-800 space-y-1">
-        <div className="text-[10px] font-bold text-neutral-200">Servicios y Miembros</div>
-        <div className="rounded-lg border border-neutral-700/60 overflow-hidden text-[8px]">
-          <div className="bg-neutral-800 px-2 py-0.5 flex justify-between font-semibold text-neutral-300">
+    renderPreview: (isLight = false) => (
+      <div
+        className={`p-3 rounded-2xl border space-y-1 transition-colors ${
+          isLight ? "bg-neutral-100/90 border-neutral-200" : "bg-neutral-900/95 border-neutral-800"
+        }`}
+      >
+        <div className={`text-[10px] font-bold ${isLight ? "text-neutral-900" : "text-neutral-200"}`}>
+          Servicios y Miembros
+        </div>
+        <div
+          className={`rounded-lg border overflow-hidden text-[8px] ${
+            isLight ? "border-neutral-300 bg-white" : "border-neutral-700/60 bg-neutral-950/50"
+          }`}
+        >
+          <div
+            className={`px-2 py-0.5 flex justify-between font-semibold ${
+              isLight
+                ? "bg-neutral-100 text-neutral-700 border-b border-neutral-200"
+                : "bg-neutral-800 text-neutral-300"
+            }`}
+          >
             <span>ID:code</span>
             <span>Usuario</span>
             <span>Estado</span>
           </div>
-          <div className="px-2 py-0.5 flex justify-between text-neutral-400 bg-neutral-950/50">
-            <span className="text-purple-400 font-mono">#101</span>
-            <span className="text-white">Javier D.</span>
-            <span className="text-emerald-400">Activo</span>
+          <div
+            className={`px-2 py-0.5 flex justify-between ${
+              isLight ? "text-neutral-600 bg-white" : "text-neutral-400 bg-neutral-950/50"
+            }`}
+          >
+            <span className={`font-mono ${isLight ? "text-purple-700 font-semibold" : "text-purple-400"}`}>
+              #101
+            </span>
+            <span className={isLight ? "text-neutral-900 font-medium" : "text-white"}>Javier D.</span>
+            <span className={isLight ? "text-emerald-700 font-semibold" : "text-emerald-400"}>Activo</span>
           </div>
         </div>
       </div>
@@ -1311,9 +1858,19 @@ export const WISP_PALETTE_CATALOG: PaletteComponentItem[] = [
     description: "Inserta una fila de datos estructurados dentro de una tabla activa.",
     modifiers: ["row [\"col1\", \"col2\", \"col3\"]"],
     contextRules: { tableOnly: true },
-    renderPreview: () => (
-      <div className="p-3 bg-neutral-900/95 rounded-2xl border border-neutral-800">
-        <div className="px-2 py-1 rounded bg-neutral-950 font-mono text-[9px] text-purple-300">
+    renderPreview: (isLight = false) => (
+      <div
+        className={`p-3 rounded-2xl border transition-colors ${
+          isLight ? "bg-neutral-100/90 border-neutral-200" : "bg-neutral-900/95 border-neutral-800"
+        }`}
+      >
+        <div
+          className={`px-2 py-1 rounded font-mono text-[9px] border ${
+            isLight
+              ? "bg-white border-neutral-300 text-purple-700 shadow-2xs"
+              : "bg-neutral-950 border-neutral-800 text-purple-300"
+          }`}
+        >
           row ["#104", "Servicio", "80%", "Activo"]
         </div>
       </div>
@@ -1330,14 +1887,30 @@ export const WISP_PALETTE_CATALOG: PaletteComponentItem[] = [
     description: "Tarjeta de analíticas e indicador clave KPI con número destacado, etiqueta y tasa porcentual.",
     modifiers: ["label=\"...\"", "value=\"...\"", "delta=\"+X%\"", "icon=dollar-sign"],
     contextRules: { containerOnly: true },
-    renderPreview: () => (
-      <div className="p-3 bg-neutral-900/95 rounded-2xl border border-neutral-800">
-        <div className="p-2 rounded-xl bg-neutral-800 border border-neutral-700 flex items-center justify-between">
+    renderPreview: (isLight = false) => (
+      <div
+        className={`p-3 rounded-2xl border transition-colors ${
+          isLight ? "bg-neutral-100/90 border-neutral-200" : "bg-neutral-900/95 border-neutral-800"
+        }`}
+      >
+        <div
+          className={`p-2 rounded-xl border flex items-center justify-between ${
+            isLight ? "bg-white border-neutral-200 shadow-2xs" : "bg-neutral-800 border-neutral-700"
+          }`}
+        >
           <div>
-            <div className="text-[9px] text-neutral-400">Ingresos</div>
-            <div className="text-xs font-bold text-white mt-0.5">$48,250</div>
+            <div className={`text-[9px] ${isLight ? "text-neutral-500" : "text-neutral-400"}`}>Ingresos</div>
+            <div className={`text-xs font-bold mt-0.5 ${isLight ? "text-neutral-900" : "text-white"}`}>
+              $48,250
+            </div>
           </div>
-          <span className="px-1 py-0.5 rounded bg-emerald-950 text-emerald-300 text-[9px] font-bold">
+          <span
+            className={`px-1 py-0.5 rounded text-[9px] font-bold ${
+              isLight
+                ? "bg-emerald-100 text-emerald-800 border border-emerald-200"
+                : "bg-emerald-950 text-emerald-300"
+            }`}
+          >
             +24.5%
           </span>
         </div>
@@ -1355,13 +1928,17 @@ export const WISP_PALETTE_CATALOG: PaletteComponentItem[] = [
     description: "Barra de progreso lineal para estados de avance y finalización.",
     modifiers: ["valor=0-100", "label=\"...\""],
     contextRules: { containerOnly: true },
-    renderPreview: () => (
-      <div className="p-3 bg-neutral-900/95 rounded-2xl border border-neutral-800 space-y-1">
-        <div className="flex justify-between text-[9px] text-neutral-300">
+    renderPreview: (isLight = false) => (
+      <div
+        className={`p-3 rounded-2xl border space-y-1 transition-colors ${
+          isLight ? "bg-neutral-100/90 border-neutral-200" : "bg-neutral-900/95 border-neutral-800"
+        }`}
+      >
+        <div className={`flex justify-between text-[9px] ${isLight ? "text-neutral-700" : "text-neutral-300"}`}>
           <span>Progreso</span>
-          <span className="text-emerald-400 font-bold">65%</span>
+          <span className={`font-bold ${isLight ? "text-emerald-700" : "text-emerald-400"}`}>65%</span>
         </div>
-        <div className="h-1.5 bg-neutral-800 rounded-full overflow-hidden">
+        <div className={`h-1.5 rounded-full overflow-hidden ${isLight ? "bg-neutral-300" : "bg-neutral-800"}`}>
           <div className="h-full w-[65%] bg-emerald-500 rounded-full" />
         </div>
       </div>
@@ -1378,15 +1955,25 @@ export const WISP_PALETTE_CATALOG: PaletteComponentItem[] = [
     description: "Avatar circular con iniciales o foto e indicador de presencia online/offline.",
     modifiers: ["initials=\"...\"", "status=online|offline|busy", "size=sm|md|lg"],
     contextRules: { containerOnly: true },
-    renderPreview: () => (
-      <div className="p-3 bg-neutral-900/95 rounded-2xl border border-neutral-800 flex items-center gap-2">
+    renderPreview: (isLight = false) => (
+      <div
+        className={`p-3 rounded-2xl border flex items-center gap-2 transition-colors ${
+          isLight ? "bg-neutral-100/90 border-neutral-200" : "bg-neutral-900/95 border-neutral-800"
+        }`}
+      >
         <div className="relative">
           <div className="w-6 h-6 rounded-full bg-purple-600 text-white flex items-center justify-center text-[10px] font-bold">
             JD
           </div>
-          <div className="absolute bottom-0 right-0 w-2 h-2 rounded-full bg-emerald-500 border border-neutral-900" />
+          <div
+            className={`absolute bottom-0 right-0 w-2 h-2 rounded-full bg-emerald-500 border ${
+              isLight ? "border-white" : "border-neutral-900"
+            }`}
+          />
         </div>
-        <span className="text-[10px] text-neutral-200">Javier Díaz</span>
+        <span className={`text-[10px] ${isLight ? "text-neutral-800 font-medium" : "text-neutral-200"}`}>
+          Javier Díaz
+        </span>
       </div>
     ),
   },
@@ -1401,12 +1988,28 @@ export const WISP_PALETTE_CATALOG: PaletteComponentItem[] = [
     description: "Insignia o etiqueta de estado de tamaño compacto.",
     modifiers: ["color=primary|secondary|tertiary|error"],
     contextRules: { containerOnly: true },
-    renderPreview: () => (
-      <div className="p-3 bg-neutral-900/95 rounded-2xl border border-neutral-800 flex gap-2">
-        <span className="px-2 py-0.5 rounded-full bg-purple-950 text-purple-300 border border-purple-800 text-[9px] font-semibold">
+    renderPreview: (isLight = false) => (
+      <div
+        className={`p-3 rounded-2xl border flex gap-2 transition-colors ${
+          isLight ? "bg-neutral-100/90 border-neutral-200" : "bg-neutral-900/95 border-neutral-800"
+        }`}
+      >
+        <span
+          className={`px-2 py-0.5 rounded-full text-[9px] font-semibold border ${
+            isLight
+              ? "bg-purple-100 text-purple-800 border-purple-200"
+              : "bg-purple-950 text-purple-300 border-purple-800"
+          }`}
+        >
           Proceso
         </span>
-        <span className="px-2 py-0.5 rounded-full bg-emerald-950 text-emerald-300 border border-emerald-800 text-[9px] font-semibold">
+        <span
+          className={`px-2 py-0.5 rounded-full text-[9px] font-semibold border ${
+            isLight
+              ? "bg-emerald-100 text-emerald-800 border-emerald-200"
+              : "bg-emerald-950 text-emerald-300 border-emerald-800"
+          }`}
+        >
           Completado
         </span>
       </div>
@@ -1423,12 +2026,28 @@ export const WISP_PALETTE_CATALOG: PaletteComponentItem[] = [
     description: "Etiqueta compacta con color semántico para clasificaciones.",
     modifiers: ["color=primary|secondary|success|warning|error"],
     contextRules: { containerOnly: true },
-    renderPreview: () => (
-      <div className="p-3 bg-neutral-900/95 rounded-2xl border border-neutral-800 flex gap-1.5">
-        <span className="px-1.5 py-0.5 rounded bg-emerald-950 text-emerald-400 border border-emerald-800/80 text-[8px] font-mono font-bold">
+    renderPreview: (isLight = false) => (
+      <div
+        className={`p-3 rounded-2xl border flex gap-1.5 transition-colors ${
+          isLight ? "bg-neutral-100/90 border-neutral-200" : "bg-neutral-900/95 border-neutral-800"
+        }`}
+      >
+        <span
+          className={`px-1.5 py-0.5 rounded border text-[8px] font-mono font-bold ${
+            isLight
+              ? "bg-emerald-100 text-emerald-800 border-emerald-300"
+              : "bg-emerald-950 text-emerald-400 border-emerald-800/80"
+          }`}
+        >
           PROD
         </span>
-        <span className="px-1.5 py-0.5 rounded bg-amber-950 text-amber-400 border border-amber-800/80 text-[8px] font-mono font-bold">
+        <span
+          className={`px-1.5 py-0.5 rounded border text-[8px] font-mono font-bold ${
+            isLight
+              ? "bg-amber-100 text-amber-800 border-amber-300"
+              : "bg-amber-950 text-amber-400 border-amber-800/80"
+          }`}
+        >
           QAS
         </span>
       </div>
@@ -1445,17 +2064,31 @@ export const WISP_PALETTE_CATALOG: PaletteComponentItem[] = [
     description: "Fila interactiva de lista con ícono, subtítulo, flecha de navegación o interruptor.",
     modifiers: ["subtitle=\"...\"", "icon=bell", "goto=@Screen"],
     contextRules: { containerOnly: true },
-    renderPreview: () => (
-      <div className="p-3 bg-neutral-900/95 rounded-2xl border border-neutral-800">
-        <div className="flex items-center justify-between p-1.5 bg-neutral-800 rounded-xl">
+    renderPreview: (isLight = false) => (
+      <div
+        className={`p-3 rounded-2xl border transition-colors ${
+          isLight ? "bg-neutral-100/90 border-neutral-200" : "bg-neutral-900/95 border-neutral-800"
+        }`}
+      >
+        <div
+          className={`flex items-center justify-between p-1.5 rounded-xl border ${
+            isLight
+              ? "bg-white border-neutral-200 shadow-2xs"
+              : "bg-neutral-800 border-neutral-700"
+          }`}
+        >
           <div className="flex items-center gap-1.5">
-            <BellRing className="w-3 h-3 text-purple-400" />
+            <BellRing className={`w-3 h-3 ${isLight ? "text-purple-600" : "text-purple-400"}`} />
             <div>
-              <div className="text-[10px] text-white font-medium">Alertas</div>
-              <div className="text-[8px] text-neutral-400">En tiempo real</div>
+              <div className={`text-[10px] font-medium ${isLight ? "text-neutral-900" : "text-white"}`}>
+                Alertas
+              </div>
+              <div className={`text-[8px] ${isLight ? "text-neutral-500" : "text-neutral-400"}`}>
+                En tiempo real
+              </div>
             </div>
           </div>
-          <ArrowRight className="w-3 h-3 text-neutral-500" />
+          <ArrowRight className={`w-3 h-3 ${isLight ? "text-neutral-400" : "text-neutral-500"}`} />
         </div>
       </div>
     ),
@@ -1475,11 +2108,29 @@ export const WISP_PALETTE_CATALOG: PaletteComponentItem[] = [
     description: "Mensaje flotante temporal de retroalimentación con botón de acción opcional.",
     modifiers: ["action=\"...\"", "type=success|info|warning|error", "icon=check-circle-2"],
     contextRules: { containerOnly: true },
-    renderPreview: () => (
-      <div className="p-3 bg-neutral-900/95 rounded-2xl border border-neutral-800">
-        <div className="p-2 rounded-xl bg-neutral-950 border border-neutral-700 flex items-center justify-between text-xs text-white">
-          <span className="text-[9px] text-neutral-300">Mensaje enviado</span>
-          <span className="text-[9px] font-bold text-purple-400 uppercase">Deshacer</span>
+    renderPreview: (isLight = false) => (
+      <div
+        className={`p-3 rounded-2xl border transition-colors ${
+          isLight ? "bg-neutral-100/90 border-neutral-200" : "bg-neutral-900/95 border-neutral-800"
+        }`}
+      >
+        <div
+          className={`p-2 rounded-xl border flex items-center justify-between text-xs ${
+            isLight
+              ? "bg-white border-neutral-200 text-neutral-800 shadow-sm"
+              : "bg-neutral-950 border-neutral-700 text-white"
+          }`}
+        >
+          <span className={`text-[9px] ${isLight ? "text-neutral-700" : "text-neutral-300"}`}>
+            Mensaje enviado
+          </span>
+          <span
+            className={`text-[9px] font-bold uppercase ${
+              isLight ? "text-purple-700" : "text-purple-400"
+            }`}
+          >
+            Deshacer
+          </span>
         </div>
       </div>
     ),
@@ -1495,10 +2146,24 @@ export const WISP_PALETTE_CATALOG: PaletteComponentItem[] = [
     description: "Banner destacado de notificación o advertencia con ícono temático.",
     modifiers: ["type=info|warning|error|success", "icon=alert-triangle"],
     contextRules: { containerOnly: true },
-    renderPreview: () => (
-      <div className="p-3 bg-neutral-900/95 rounded-2xl border border-neutral-800">
-        <div className="p-2 rounded-xl bg-amber-950/60 border border-amber-800/80 text-amber-200 text-[9px] flex items-center gap-1.5">
-          <AlertCircle className="w-3.5 h-3.5 text-amber-400 shrink-0" />
+    renderPreview: (isLight = false) => (
+      <div
+        className={`p-3 rounded-2xl border transition-colors ${
+          isLight ? "bg-neutral-100/90 border-neutral-200" : "bg-neutral-900/95 border-neutral-800"
+        }`}
+      >
+        <div
+          className={`p-2 rounded-xl text-[9px] flex items-center gap-1.5 border ${
+            isLight
+              ? "bg-amber-50 border-amber-200 text-amber-900"
+              : "bg-amber-950/60 border-amber-800/80 text-amber-200"
+          }`}
+        >
+          <AlertCircle
+            className={`w-3.5 h-3.5 shrink-0 ${
+              isLight ? "text-amber-600" : "text-amber-400"
+            }`}
+          />
           <span>Renovación de suscripción pendiente</span>
         </div>
       </div>
@@ -1519,8 +2184,14 @@ export const WISP_PALETTE_CATALOG: PaletteComponentItem[] = [
     description: "Declara un paso específico dentro de un bloque `@Wizard:wizard`.",
     modifiers: ["step \"...\""],
     contextRules: { wizardOnly: true },
-    renderPreview: () => (
-      <div className="p-3 bg-neutral-900/95 rounded-2xl border border-neutral-800 font-mono text-[9px] text-purple-300">
+    renderPreview: (isLight = false) => (
+      <div
+        className={`p-3 rounded-2xl border font-mono text-[9px] transition-colors ${
+          isLight
+            ? "bg-neutral-100/90 border-neutral-200 text-purple-700"
+            : "bg-neutral-900/95 border-neutral-800 text-purple-300"
+        }`}
+      >
         step "Paso 2: Datos"
       </div>
     ),
@@ -1536,8 +2207,14 @@ export const WISP_PALETTE_CATALOG: PaletteComponentItem[] = [
     description: "Declara el contenido de un panel dentro de un contenedor `tabs`.",
     modifiers: ["tab \"...\""],
     contextRules: { tabsOnly: true },
-    renderPreview: () => (
-      <div className="p-3 bg-neutral-900/95 rounded-2xl border border-neutral-800 font-mono text-[9px] text-purple-300">
+    renderPreview: (isLight = false) => (
+      <div
+        className={`p-3 rounded-2xl border font-mono text-[9px] transition-colors ${
+          isLight
+            ? "bg-neutral-100/90 border-neutral-200 text-purple-700"
+            : "bg-neutral-900/95 border-neutral-800 text-purple-300"
+        }`}
+      >
         tab "Seguridad"
       </div>
     ),
@@ -1553,8 +2230,14 @@ export const WISP_PALETTE_CATALOG: PaletteComponentItem[] = [
     description: "Ranura izquierda de contenido para el contenedor `split`.",
     modifiers: ["left"],
     contextRules: { splitOnly: true },
-    renderPreview: () => (
-      <div className="p-3 bg-neutral-900/95 rounded-2xl border border-neutral-800 font-mono text-[9px] text-emerald-300">
+    renderPreview: (isLight = false) => (
+      <div
+        className={`p-3 rounded-2xl border font-mono text-[9px] transition-colors ${
+          isLight
+            ? "bg-neutral-100/90 border-neutral-200 text-emerald-700"
+            : "bg-neutral-900/95 border-neutral-800 text-emerald-300"
+        }`}
+      >
         left
       </div>
     ),
@@ -1570,9 +2253,280 @@ export const WISP_PALETTE_CATALOG: PaletteComponentItem[] = [
     description: "Ranura derecha de contenido para el contenedor `split`.",
     modifiers: ["right"],
     contextRules: { splitOnly: true },
-    renderPreview: () => (
-      <div className="p-3 bg-neutral-900/95 rounded-2xl border border-neutral-800 font-mono text-[9px] text-cyan-300">
+    renderPreview: (isLight = false) => (
+      <div
+        className={`p-3 rounded-2xl border font-mono text-[9px] transition-colors ${
+          isLight
+            ? "bg-neutral-100/90 border-neutral-200 text-cyan-700"
+            : "bg-neutral-900/95 border-neutral-800 text-cyan-300"
+        }`}
+      >
         right
+      </div>
+    ),
+  },
+
+  // =========================================================
+  // MATERIAL 3 EXPANDED SUITE (Rails, Drawers, Sheets, Loading, Tooltips, Menus)
+  // =========================================================
+  {
+    id: "navigationrail",
+    name: "navigationrail",
+    label: "Barra de Navegación Vertical (Rail)",
+    category: "Layout & Superficie",
+    icon: Compass,
+    color: "from-purple-600 to-indigo-600",
+    snippet: `navigationrail title="Espacio" subtitle="v2.0" fab=plus fabLabel="Nuevo" user="Admin" role="Editor"\n  railitem "Inicio" icon=home active\n    appbar "Panel Principal" icon=home\n    card elevated\n      text "Bienvenido al Espacio" title\n      text "Selecciona elementos en la barra lateral para cambiar de panel fluidamente." body\n  railitem "Analíticas" icon=bar-chart-2 badge="8"\n    appbar "Métricas y Rendimiento" icon=bar-chart-2\n    grid cols=2 gap=12\n      metric label="Sesiones" value="1,240" delta="+12%"\n      metric label="Retención" value="94%" delta="+3.2%"\n  railitem "Ajustes" icon=settings\n    appbar "Configuración" icon=settings\n    switch dark label="Modo Oscuro" checked=true`,
+    description: "Barra de navegación vertical Material 3 (Rail) con soporte completo de cambio de paneles anidados, modo expandible, FAB de acción, badges e indicador de perfil.",
+    modifiers: ["title=...", "subtitle=...", "fab=...", "fabLabel=...", "fabGoto=...", "expanded=true|false", "user=...", "role=..."],
+    contextRules: {},
+    renderPreview: (isLight = false) => (
+      <div className={`p-2 rounded-2xl border flex flex-col items-center gap-1.5 w-16 ${isLight ? "bg-white border-neutral-200" : "bg-neutral-900 border-neutral-800"}`}>
+        <div className="w-7 h-7 rounded-xl bg-purple-100 dark:bg-purple-900/40 text-purple-700 dark:text-purple-300 flex items-center justify-center text-[10px] font-bold">+</div>
+        <div className="w-5 h-5 rounded-full bg-purple-600 text-white flex items-center justify-center text-[8px]">●</div>
+        <div className="w-4 h-4 rounded-full bg-neutral-200 dark:bg-neutral-700" />
+      </div>
+    ),
+  },
+  {
+    id: "drawer",
+    name: "drawer",
+    label: "Panel Lateral / Drawer",
+    category: "Layout & Superficie",
+    icon: PanelLeft,
+    color: "from-blue-600 to-indigo-600",
+    snippet: `drawer title="Mi Aplicación" subtitle="usuario@empresa.com"\n  draweritem "Panel Principal" icon=layout active\n  draweritem "Clientes" icon=users badge="12"\n  section "Configuración"\n  draweritem "Ajustes" icon=settings`,
+    description: "Panel de navegación lateral / Navigation Drawer Material 3 con perfil y secciones.",
+    modifiers: ["title=...", "subtitle=...", "avatar=..."],
+    contextRules: {},
+    renderPreview: (isLight = false) => (
+      <div className={`p-2.5 rounded-2xl border w-full space-y-1.5 ${isLight ? "bg-white border-neutral-200" : "bg-neutral-900 border-neutral-800"}`}>
+        <div className="text-[10px] font-bold text-purple-700">Menú Drawer</div>
+        <div className="px-2 py-1 rounded-full bg-purple-100 text-purple-900 text-[9px] font-semibold flex items-center gap-1">● Inicio</div>
+        <div className="px-2 py-1 text-[9px] text-neutral-500 flex items-center gap-1">○ Ajustes</div>
+      </div>
+    ),
+  },
+  {
+    id: "sidesheet",
+    name: "sidesheet",
+    label: "Hoja Lateral (Side Sheet)",
+    category: "Layout & Superficie",
+    icon: PanelRight,
+    color: "from-teal-600 to-cyan-600",
+    snippet: `sidesheet title="Filtros Avanzados"\n  select categoria label="Categoría" options=["Todas", "Eventos", "Bodas"]\n  slider precio label="Presupuesto Máximo" min=500 max=20000 value=5000\n  button "Aplicar Filtros" filled`,
+    description: "Panel lateral emergente o embebido de Material 3 para filtros secundarios o detalles.",
+    modifiers: ["title=...", "variant=standard|modal", "position=right|left"],
+    contextRules: {},
+    renderPreview: (isLight = false) => (
+      <div className={`p-2.5 rounded-2xl border w-full space-y-1.5 ${isLight ? "bg-white border-neutral-200" : "bg-neutral-900 border-neutral-800"}`}>
+        <div className="text-[10px] font-bold text-teal-700 border-b pb-1">Side Sheet</div>
+        <div className="h-2 rounded bg-neutral-100" />
+        <div className="h-2 rounded bg-neutral-100 w-3/4" />
+      </div>
+    ),
+  },
+  {
+    id: "bottomsheet",
+    name: "bottomsheet",
+    label: "Hoja Inferior (Bottom Sheet)",
+    category: "Layout & Superficie",
+    icon: Rows,
+    color: "from-amber-600 to-orange-600",
+    snippet: `bottomsheet title="Acciones Rápidas"\n  button "Exportar a PDF" filled icon=download\n  button "Enviar por Correo" tonal icon=mail`,
+    description: "Hoja inferior emergente con tirador y contenedor de acciones o menús contextuales.",
+    modifiers: ["title=...", "variant=standard|modal"],
+    contextRules: {},
+    renderPreview: (isLight = false) => (
+      <div className={`p-2.5 rounded-t-2xl border-t border-x w-full space-y-1.5 ${isLight ? "bg-white border-neutral-200" : "bg-neutral-900 border-neutral-800"}`}>
+        <div className="w-8 h-1 rounded-full bg-neutral-300 mx-auto mb-1" />
+        <div className="text-[10px] font-bold text-amber-700">Bottom Sheet</div>
+      </div>
+    ),
+  },
+  {
+    id: "loading",
+    name: "loading",
+    label: "Carga / Progreso (Loading)",
+    category: "Feedback & Alertas",
+    icon: Loader2,
+    color: "from-indigo-500 to-purple-600",
+    snippet: `loading "Cargando datos del sistema..."`,
+    description: "Indicador de progreso circular o lineal Material 3.",
+    modifiers: ["variant=circular|linear", "value=...", "message=..."],
+    contextRules: {},
+    renderPreview: (isLight = false) => (
+      <div className={`p-2 rounded-2xl border flex items-center justify-center gap-2 ${isLight ? "bg-white border-neutral-200" : "bg-neutral-900 border-neutral-800"}`}>
+        <div className="w-4 h-4 rounded-full border-2 border-purple-200 border-t-purple-600 animate-spin" />
+        <span className="text-[9px] text-neutral-500">Cargando...</span>
+      </div>
+    ),
+  },
+  {
+    id: "linearprogress",
+    name: "linearprogress",
+    label: "Barra Lineal de Progreso",
+    category: "Feedback & Alertas",
+    icon: Sliders,
+    color: "from-blue-500 to-indigo-600",
+    snippet: `linearprogress value=65 message="Subiendo archivo..."`,
+    description: "Barra de progreso lineal continua o con porcentaje determinado.",
+    modifiers: ["value=...", "message=..."],
+    contextRules: {},
+    renderPreview: (isLight = false) => (
+      <div className={`p-2.5 rounded-2xl border space-y-1 w-full ${isLight ? "bg-white border-neutral-200" : "bg-neutral-900 border-neutral-800"}`}>
+        <div className="w-full h-1.5 rounded-full bg-neutral-100 overflow-hidden">
+          <div className="w-3/4 h-full bg-purple-600 rounded-full" />
+        </div>
+        <div className="text-[8px] text-neutral-500 text-right">75%</div>
+      </div>
+    ),
+  },
+  {
+    id: "tooltip",
+    name: "tooltip",
+    label: "Tooltip / Ayuda Flotante",
+    category: "Feedback & Alertas",
+    icon: HelpCircle,
+    color: "from-slate-600 to-zinc-700",
+    snippet: `tooltip "Copiar identificador al portapapeles"`,
+    description: "Píldora flotante con mensaje contextual rápido.",
+    modifiers: ["text=..."],
+    contextRules: {},
+    renderPreview: () => (
+      <div className="px-2 py-1 rounded-md bg-neutral-900 text-white text-[9px] shadow-sm inline-block">
+        Texto de ayuda
+      </div>
+    ),
+  },
+  {
+    id: "richtooltip",
+    name: "richtooltip",
+    label: "Rich Tooltip Enriquecido",
+    category: "Feedback & Alertas",
+    icon: Sparkles,
+    color: "from-purple-600 to-pink-600",
+    snippet: `richtooltip title="Permisos de Edición" text="Los administradores pueden modificar precios directamente." action="Saber más"`,
+    description: "Tarjeta flotante enriquecida con título, descripción y botón de acción.",
+    modifiers: ["title=...", "text=...", "action=...", "action_goto=..."],
+    contextRules: {},
+    renderPreview: (isLight = false) => (
+      <div className={`p-2 rounded-xl border text-[9px] space-y-1 ${isLight ? "bg-white border-neutral-200" : "bg-neutral-900 border-neutral-800"}`}>
+        <div className="font-bold text-purple-700">Rich Tooltip</div>
+        <div className="text-neutral-500 text-[8px]">Explicación detallada...</div>
+      </div>
+    ),
+  },
+  {
+    id: "carousel",
+    name: "carousel",
+    label: "Carrusel de Contenido",
+    category: "Layout & Superficie",
+    icon: Columns2,
+    color: "from-fuchsia-600 to-rose-600",
+    snippet: `carousel\n  card elevated\n    text "Tarjeta A" title\n  card elevated\n    text "Tarjeta B" title`,
+    description: "Carrusel deslizable horizontal con controles previa/siguiente y puntos de navegación.",
+    modifiers: ["carousel"],
+    contextRules: {},
+    renderPreview: (isLight = false) => (
+      <div className={`p-2 rounded-2xl border flex items-center justify-between gap-1 ${isLight ? "bg-white border-neutral-200" : "bg-neutral-900 border-neutral-800"}`}>
+        <span className="text-[8px] text-neutral-400">‹</span>
+        <div className="px-3 py-1 rounded-lg bg-purple-50 text-purple-800 text-[9px] font-bold">Slide 1</div>
+        <span className="text-[8px] text-neutral-400">›</span>
+      </div>
+    ),
+  },
+  {
+    id: "iconbutton",
+    name: "iconbutton",
+    label: "Botón de Ícono (IconButton)",
+    category: "Acciones & Controles",
+    icon: MousePointerClick,
+    color: "from-violet-600 to-purple-600",
+    snippet: `iconbutton icon=heart variant=tonal tooltip="Marcar como favorito"`,
+    description: "Botón circular compacto con ícono Material 3, variantes y badge.",
+    modifiers: ["icon=...", "variant=filled|tonal|outlined|standard", "tooltip=...", "badge=..."],
+    contextRules: {},
+    renderPreview: () => (
+      <div className="w-8 h-8 rounded-full bg-purple-100 text-purple-700 flex items-center justify-center text-xs font-bold shadow-xs">
+        ★
+      </div>
+    ),
+  },
+  {
+    id: "timepicker",
+    name: "timepicker",
+    label: "Selector de Hora (TimePicker)",
+    category: "Entradas & Formularios",
+    icon: Clock,
+    color: "from-cyan-600 to-blue-600",
+    snippet: `timepicker hora label="Hora del Evento" value="18:30"`,
+    description: "Control de selección horaria interactivo con selector de horas/minutos.",
+    modifiers: ["label=...", "value=...", "format=12h|24h"],
+    contextRules: {},
+    renderPreview: (isLight = false) => (
+      <div className={`p-2 rounded-xl border flex items-center justify-between ${isLight ? "bg-white border-neutral-200" : "bg-neutral-900 border-neutral-800"}`}>
+        <span className="text-[9px] font-bold text-neutral-700">18:30 PM</span>
+        <Clock className="w-3 h-3 text-neutral-400" />
+      </div>
+    ),
+  },
+  {
+    id: "menu",
+    name: "menu",
+    label: "Menú Desplegable (Menu)",
+    category: "Acciones & Controles",
+    icon: MoreHorizontal,
+    color: "from-zinc-600 to-neutral-700",
+    snippet: `menu "Acciones" icon=more-vertical\n  menuitem "Editar" icon=edit\n  menuitem "Duplicar" icon=copy\n  menuitem "Eliminar" icon=trash`,
+    description: "Menú desplegable flotante Material 3 con lista de acciones y atajos.",
+    modifiers: ["label=...", "icon=..."],
+    contextRules: {},
+    renderPreview: (isLight = false) => (
+      <div className={`p-2 rounded-xl border text-[9px] space-y-1 ${isLight ? "bg-white border-neutral-200" : "bg-neutral-900 border-neutral-800"}`}>
+        <div className="font-semibold text-neutral-700 flex items-center justify-between">Opciones ▾</div>
+      </div>
+    ),
+  },
+  {
+    id: "appbar",
+    name: "appbar",
+    label: "Barra Superior (Top App Bar)",
+    category: "Layout & Superficie",
+    icon: PanelLeft,
+    color: "from-purple-600 to-indigo-600",
+    snippet: `appbar "Título de Aplicación" icon=menu variant=center\n  button icon=bell text badge="3"\n  button icon=more-vertical text`,
+    description: "Barra de navegación superior Material 3 Expressive (Center-aligned, Small, Medium, Large, Bottom).",
+    modifiers: ["variant=center|small|medium|large|bottom", "icon=...", "title=..."],
+    contextRules: {},
+    renderPreview: (isLight = false) => (
+      <div className={`p-2 rounded-xl border flex items-center justify-between gap-2 w-full ${isLight ? "bg-white border-neutral-200" : "bg-neutral-900 border-neutral-800"}`}>
+        <div className="flex items-center gap-1.5">
+          <div className="w-3.5 h-3.5 rounded bg-purple-100 text-purple-700 flex items-center justify-center text-[8px]">☰</div>
+          <span className="text-[10px] font-bold text-purple-700">App Bar</span>
+        </div>
+        <div className="flex gap-1">
+          <div className="w-3 h-3 rounded-full bg-neutral-200" />
+          <div className="w-3 h-3 rounded-full bg-neutral-200" />
+        </div>
+      </div>
+    ),
+  },
+  {
+    id: "circularprogress",
+    name: "circularprogress",
+    label: "Progreso Circular",
+    category: "Feedback & Alertas",
+    icon: Loader2,
+    color: "from-blue-600 to-teal-600",
+    snippet: `circularprogress value=80 message="Optimizando recursos..."`,
+    description: "Indicador de progreso circular con soporte para porcentaje o animación continua.",
+    modifiers: ["value=...", "message=...", "size=sm|md|lg"],
+    contextRules: {},
+    renderPreview: (isLight = false) => (
+      <div className={`p-2 rounded-xl border flex items-center gap-2 ${isLight ? "bg-white border-neutral-200" : "bg-neutral-900 border-neutral-800"}`}>
+        <div className="w-4 h-4 rounded-full border-2 border-purple-600 border-t-transparent animate-spin" />
+        <span className="text-[9px] text-neutral-500 font-bold">80%</span>
       </div>
     ),
   },

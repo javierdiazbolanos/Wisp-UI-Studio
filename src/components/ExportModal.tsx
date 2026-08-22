@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { WispDocument } from "../wisp/types";
-import { exportToReactTSX, exportToHTML } from "../wisp/exporter";
-import { X, Copy, Check, Download, FileCode, Code, Layers } from "lucide-react";
+import { exportToReactTSX, exportToHTML, exportToJetpackCompose, exportToFlutterM3 } from "../wisp/exporter";
+import { X, Copy, Check, Download, FileCode, Code, Smartphone } from "lucide-react";
 
 interface ExportModalProps {
   isOpen: boolean;
@@ -14,24 +14,27 @@ export const ExportModal: React.FC<ExportModalProps> = ({
   onClose,
   document,
 }) => {
-  const [activeTab, setActiveTab] = useState<"react" | "html" | "ast" | "wisp">("react");
+  const [activeTab, setActiveTab] = useState<"compose" | "flutter" | "react" | "html" | "wisp">("compose");
   const [copied, setCopied] = useState(false);
 
   if (!isOpen) return null;
 
   let contentToDisplay = "";
-  let fileExtension = "tsx";
+  let fileExtension = "kt";
   let mimeType = "text/plain";
 
-  if (activeTab === "react") {
+  if (activeTab === "compose") {
+    contentToDisplay = exportToJetpackCompose(document);
+    fileExtension = "kt";
+  } else if (activeTab === "flutter") {
+    contentToDisplay = exportToFlutterM3(document);
+    fileExtension = "dart";
+  } else if (activeTab === "react") {
     contentToDisplay = exportToReactTSX(document);
     fileExtension = "tsx";
   } else if (activeTab === "html") {
     contentToDisplay = exportToHTML(document);
     fileExtension = "html";
-  } else if (activeTab === "ast") {
-    contentToDisplay = JSON.stringify(document.screens, null, 2);
-    fileExtension = "json";
   } else if (activeTab === "wisp") {
     contentToDisplay = document.rawCode;
     fileExtension = "wdsl";
@@ -48,22 +51,25 @@ export const ExportModal: React.FC<ExportModalProps> = ({
     const url = URL.createObjectURL(blob);
     const a = window.document.createElement("a");
     a.href = url;
-    a.download = activeTab === "wisp" ? `codigo.wdsl` : `wisp-prototype.${fileExtension}`;
+    a.download = activeTab === "wisp" ? `wisp_design.wdsl` : `wisp-prototype.${fileExtension}`;
     a.click();
     URL.revokeObjectURL(url);
   };
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-xs">
-      <div className="w-full max-w-3xl bg-white dark:bg-neutral-900 rounded-3xl p-6 md:p-8 shadow-2xl border border-neutral-200 dark:border-neutral-800 space-y-5 max-h-[90vh] flex flex-col">
+      <div className="w-full max-w-4xl bg-white dark:bg-neutral-900 rounded-3xl p-6 md:p-8 shadow-2xl border border-neutral-200 dark:border-neutral-800 space-y-5 max-h-[90vh] flex flex-col">
         {/* Header */}
         <div className="flex items-center justify-between border-b border-neutral-100 dark:border-neutral-800 pb-3">
           <div>
-            <h3 className="text-lg font-bold text-neutral-900 dark:text-white">
-              Exportar Prototipo Wisp
+            <h3 className="text-lg font-bold text-neutral-900 dark:text-white flex items-center gap-2">
+              <span>Exportar Prototipo Material 3</span>
+              <span className="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full bg-purple-100 dark:bg-purple-900/60 text-purple-700 dark:text-purple-300">
+                M3 Expressive
+              </span>
             </h3>
             <p className="text-xs text-neutral-500">
-              Genera código listo para desarrollo o comparte la especificación.
+              Exporta código nativo listo para producción en Jetpack Compose, Flutter, React o HTML interactivo.
             </p>
           </div>
           <button
@@ -75,56 +81,69 @@ export const ExportModal: React.FC<ExportModalProps> = ({
         </div>
 
         {/* Tab Switcher */}
-        <div className="flex gap-2 p-1 bg-neutral-100 dark:bg-neutral-800 rounded-2xl">
+        <div className="flex flex-wrap gap-1.5 p-1 bg-neutral-100 dark:bg-neutral-800 rounded-2xl">
+          <button
+            type="button"
+            onClick={() => setActiveTab("compose")}
+            className={`flex-1 min-w-[130px] py-2 px-3 text-xs font-semibold rounded-xl transition-all flex items-center justify-center gap-1.5 cursor-pointer ${
+              activeTab === "compose"
+                ? "bg-white dark:bg-neutral-700 shadow-sm text-purple-700 dark:text-purple-300"
+                : "text-neutral-500 hover:text-neutral-700"
+            }`}
+          >
+            <Smartphone className="w-3.5 h-3.5" />
+            <span>Jetpack Compose</span>
+          </button>
+
+          <button
+            type="button"
+            onClick={() => setActiveTab("flutter")}
+            className={`flex-1 min-w-[110px] py-2 px-3 text-xs font-semibold rounded-xl transition-all flex items-center justify-center gap-1.5 cursor-pointer ${
+              activeTab === "flutter"
+                ? "bg-white dark:bg-neutral-700 shadow-sm text-purple-700 dark:text-purple-300"
+                : "text-neutral-500 hover:text-neutral-700"
+            }`}
+          >
+            <Smartphone className="w-3.5 h-3.5 text-sky-500" />
+            <span>Flutter M3</span>
+          </button>
+
           <button
             type="button"
             onClick={() => setActiveTab("react")}
-            className={`flex-1 py-2 text-xs font-semibold rounded-xl transition-all flex items-center justify-center gap-1.5 ${
+            className={`flex-1 min-w-[110px] py-2 px-3 text-xs font-semibold rounded-xl transition-all flex items-center justify-center gap-1.5 cursor-pointer ${
               activeTab === "react"
                 ? "bg-white dark:bg-neutral-700 shadow-sm text-purple-700 dark:text-purple-300"
                 : "text-neutral-500 hover:text-neutral-700"
             }`}
           >
-            <Code className="w-3.5 h-3.5" />
-            <span>React (TSX + Tailwind)</span>
+            <Code className="w-3.5 h-3.5 text-cyan-500" />
+            <span>React (TSX)</span>
           </button>
 
           <button
             type="button"
             onClick={() => setActiveTab("html")}
-            className={`flex-1 py-2 text-xs font-semibold rounded-xl transition-all flex items-center justify-center gap-1.5 ${
+            className={`flex-1 min-w-[110px] py-2 px-3 text-xs font-semibold rounded-xl transition-all flex items-center justify-center gap-1.5 cursor-pointer ${
               activeTab === "html"
                 ? "bg-white dark:bg-neutral-700 shadow-sm text-purple-700 dark:text-purple-300"
                 : "text-neutral-500 hover:text-neutral-700"
             }`}
           >
-            <FileCode className="w-3.5 h-3.5" />
-            <span>HTML5 + CSS M3</span>
+            <FileCode className="w-3.5 h-3.5 text-emerald-500" />
+            <span>HTML5 Standalone</span>
           </button>
 
           <button
             type="button"
             onClick={() => setActiveTab("wisp")}
-            className={`flex-1 py-2 text-xs font-semibold rounded-xl transition-all flex items-center justify-center gap-1.5 ${
+            className={`flex-1 min-w-[90px] py-2 px-3 text-xs font-semibold rounded-xl transition-all flex items-center justify-center gap-1.5 cursor-pointer ${
               activeTab === "wisp"
                 ? "bg-white dark:bg-neutral-700 shadow-sm text-purple-700 dark:text-purple-300"
                 : "text-neutral-500 hover:text-neutral-700"
             }`}
           >
-            <span>Código WDSL (.wdsl)</span>
-          </button>
-
-          <button
-            type="button"
-            onClick={() => setActiveTab("ast")}
-            className={`flex-1 py-2 text-xs font-semibold rounded-xl transition-all flex items-center justify-center gap-1.5 ${
-              activeTab === "ast"
-                ? "bg-white dark:bg-neutral-700 shadow-sm text-purple-700 dark:text-purple-300"
-                : "text-neutral-500 hover:text-neutral-700"
-            }`}
-          >
-            <Layers className="w-3.5 h-3.5" />
-            <span>AST (JSON)</span>
+            <span>WDSL (.wdsl)</span>
           </button>
         </div>
 

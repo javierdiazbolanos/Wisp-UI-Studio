@@ -29,7 +29,7 @@ interface WispDocsModalProps {
 // Complete Formal WDL EBNF & Syntax Specification for Tab 2
 const FORMAL_WDL_SPECIFICATION = `# WDL (Wisp Design Language) — Formal Grammar & Specification
 
-## 1. Gramática Formal EBNF (Extended Backus-Naur Form)
+## 1. Formal Grammar EBNF (Extended Backus-Naur Form)
 
 \`\`\`ebnf
 Document        ::= { TopLevelDeclaration | BlankLine | Comment }
@@ -75,21 +75,21 @@ NumberLiteral       ::= [0-9]+ [ "." [0-9]+ ] [ "%" ]
 BooleanLiteral      ::= "true" | "false"
 \`\`\`
 
-## 2. Reglas Léxicas y de Tipado
-- **Indentación**: Estrictamente **2 espacios** por nivel. No se permiten tabuladores tab (\`\\t\`).
-- **Comentarios**: Tanto líneas con \`//\` como con \`#\` son ignoradas por el parser.
-- **Tipos de Columnas en Tablas**: 
-  - \`:code\` (código monoespaciado)
-  - \`:avatar\` (iniciales / círculo)
-  - \`:progress\` (barra de progreso porcentual)
-  - \`:status\` (badge de estado verde/ámbar/rojo)
-  - \`:currency\` (monto monetario formateado)
-  - \`:date\` (fecha legible)
-  - \`:checkbox\` (control booleano interactivo)
-  - \`:link\` (hipervínculo interactivo)
-  - \`:action\` (botón de acción rápida)
-  - \`:dropdown\` (menú de 3 puntos)
-  - \`:rating\` (estrellas de calificación)`;
+## 2. Lexical & Typing Rules
+- **Indentation**: Strictly **2 spaces** per level. Tabs (\`\\t\`) are not permitted.
+- **Comments**: Lines starting with either \`//\` or \`#\` are ignored by the parser.
+- **Table Column Types**: 
+  - \`:code\` (monospace code pill)
+  - \`:avatar\` (user initials / circular badge)
+  - \`:progress\` (percentage progress bar)
+  - \`:status\` (color-coded status badge)
+  - \`:currency\` (formatted currency amount)
+  - \`:date\` (formatted date string)
+  - \`:checkbox\` (interactive boolean checkbox)
+  - \`:link\` (interactive clickable hyperlink)
+  - \`:action\` (action button)
+  - \`:dropdown\` (3-dots kebab menu)
+  - \`:rating\` (star rating)`;
 
 // Comprehensive AI System Prompt with full component schema, params, and table column types
 const AI_SYSTEM_PROMPT_COMPREHENSIVE = `# WDL (WISP DESIGN LANGUAGE) — MASTER AI SPECIFICATION
@@ -99,7 +99,7 @@ You are the Lead UI Architect and Code Synthesizer for **Wisp UI Studio**. Your 
 ## 1. CORE SYNTAX & FORMATTING RULES
 1. **NO HTML/JSX/XML or curly braces \`{}\`**. Output pure WDL code only.
 2. **Indentation**: Exactly **2 spaces** per hierarchy level (no tabs).
-3. **Strings**: Any text containing spaces MUST be in double quotes (e.g. \`text "Mi Título" title\`, \`label="Correo Electrónico"\`).
+3. **Strings**: Any text containing spaces MUST be in double quotes (e.g. \`text "My Title" title\`, \`label="Email Address"\`).
 4. **Booleans & Numbers**: Unquoted (e.g. \`checked=true\`, \`cols=3\`, \`gap=16\`, \`padding=20\`, \`rows=3\`).
 5. **Top-Level Declarations**: Every screen or dialog starts at root (0 spaces):
    - \`@ScreenName:screen\` — Full application viewport.
@@ -107,7 +107,7 @@ You are the Lead UI Architect and Code Synthesizer for **Wisp UI Studio**. Your 
    - \`@ModalName:dialog\` — Centered modal popup with backdrop.
    - \`@WizardName:wizard\` — Step-by-step interactive assistant.
    - \`@SheetName:sheet\` — Mobile-friendly bottom sheet.
-   - \`@ToastName:snackbar "Mensaje..." snackbar-type=success\` — Standalone reusable toast.
+   - \`@ToastName:snackbar "Message..." snackbar-type=success\` — Standalone reusable toast.
 
 ---
 
@@ -117,9 +117,9 @@ You are the Lead UI Architect and Code Synthesizer for **Wisp UI Studio**. Your 
 - \`modal=@DialogName\` : Opens a modal dialog.
 - \`goto=back\` : Returns to previous screen.
 - \`goto=close\` : Dismisses the active dialog or bottom sheet.
-- \`snackbar="Mensaje"\` : Displays a Material 3 snackbar toast on click.
-- \`snackbar-action="Texto"\` : Button inside the snackbar.
-- \`snackbar-type=success|info|warning|error\` : Snack color palette.
+- \`snackbar="Message"\` : Displays a Material 3 snackbar toast on click.
+- \`snackbar-action="Label"\` : Button label inside the snackbar.
+- \`snackbar-type=success|info|warning|error\` : Snackbar color palette.
 
 ---
 
@@ -131,87 +131,87 @@ You are the Lead UI Architect and Code Synthesizer for **Wisp UI Studio**. Your 
   \`\`\`wdl
   split
     left
-      listitem "Menú 1" icon=home goto=@Home
-      listitem "Menú 2" icon=settings goto=@Settings
+      listitem "Menu 1" icon=home goto=@Home
+      listitem "Menu 2" icon=settings goto=@Settings
     right
       card elevated
-        text "Área de Trabajo" headline
+        text "Workspace" headline
   \`\`\`
 - \`grid [cols=1|2|3|4|5|6] [gap=8|12|16|20|24]\`
 - \`row [spacing=8|12|16|24] [align=start|center|end|stretch] [justify=start|center|end|between|around|evenly] [wrap=true|false]\`
 - \`column [spacing=8|12|16|24] [align=start|center|end|stretch]\`
 - \`divider\`
-- \`spacer [height=8|16|24|32]\`
+- \`spacer [size=8|16|24|32]\`
 
 ### B. Navigation & Structure
-- \`appbar "Título" [subtitle="..."] [icon=<lucide-icon>] [actionIcon=<lucide-icon>] [goto=@Screen|back]\`
-- \`breadcrumbs items=["Nivel 1", "Nivel 2", "Actual"] [separator=chevron|slash]\`
-- \`tabs items=["Pestaña 1", "Pestaña 2", "Pestaña 3"]\`
-- \`accordion "Título" [expanded=true|false] [icon=<icon>] [badge="..."]\`
-- \`wizard\` : Wizard container with nested \`step "Título":\`
+- \`appbar "Title" [subtitle="..."] [icon=<lucide-icon>] [actionIcon=<lucide-icon>] [goto=@Screen|back]\`
+- \`breadcrumbs items=["Level 1", "Level 2", "Current"] [separator=chevron|slash]\`
+- \`tabs items=["Tab 1", "Tab 2", "Tab 3"]\`
+- \`accordion "Title" [expanded=true|false] [icon=<icon>] [badge="..."]\`
+- \`wizard\` : Wizard container with nested \`step "Title":\`
   \`\`\`wdl
-  @AltaUsuario:wizard
+  @UserOnboarding:wizard
     steps: 3
-    step "1. Perfil"
+    step "1. Profile"
       card elevated
-        textfield nombre label="Nombre" icon=user
-        button "Siguiente" filled goto=@AltaUsuario(step=2)
-    step "2. Rol"
+        textfield name label="Full Name" icon=user
+        button "Next" filled goto=@UserOnboarding(step=2)
+    step "2. Role"
       card elevated
-        segmentedbutton options=["Admin", "Editor", "Lector"] selected="Editor"
+        segmentedbutton options=["Admin", "Editor", "Viewer"] selected="Editor"
         row spacing=12
-          button "Atrás" text goto=@AltaUsuario(step=1)
-          button "Continuar" filled goto=@AltaUsuario(step=3)
-    step "3. Confirmar"
-      alert "Listo para crear cuenta" type=success
-      button "Crear Usuario" filled goto=@Dashboard snackbar="Usuario creado"
+          button "Back" text goto=@UserOnboarding(step=1)
+          button "Continue" filled goto=@UserOnboarding(step=3)
+    step "3. Confirmation"
+      alert "Ready to create account" type=success
+      button "Create Account" filled goto=@Dashboard snackbar="Account created successfully"
   \`\`\`
 
 ### C. Inputs & Form Controls
 - \`textfield <id> label="..." [placeholder="..."] [type=text|email|password|number] [icon=<icon>] [helper="..."] [required=true|false] [value="..."] [disabled=true|false]\`
 - \`textarea <id> label="..." [rows=2|3|4|5] [placeholder="..."] [helper="..."] [required=true|false]\`
-- \`select <id> label="..." [value="..."]\` with nested \`option "Nombre" [icon=<icon>]\`
-- \`autocomplete <id> label="..." [placeholder="..."]\` with nested \`option "Nombre"\`
+- \`select <id> label="..." [value="..."]\` with nested \`option "Name" [icon=<icon>]\`
+- \`autocomplete <id> label="..." [placeholder="..."]\` with nested \`option "Name"\`
 - \`datepicker <id> label="..." [value="YYYY-MM-DD"] [placeholder="..."]\`
 - \`checkbox <id> label="..." [checked=true|false] [disabled=true|false]\`
 - \`radio <id> label="..." group="..." [checked=true|false]\`
 - \`switch <id> label="..." [checked=true|false] [disabled=true|false]\`
 - \`slider <id> label="..." [min=0] [max=100] [value=50] [step=1]\`
 - \`rating <id> label="..." [value=4] [max=5]\`
-- \`searchbar [placeholder="Buscar..."] [icon=search]\`
+- \`searchbar [placeholder="Search..."] [icon=search]\`
 
 ### D. Actions & Buttons
-- \`button "Texto" [filled | tonal | outlined | elevated | text] [icon=<icon>] [goto=@Screen] [snackbar="..."] [disabled=true|false]\`
-- \`fab "Texto" [icon=<icon>] [extended=true|false] [goto=@Screen]\`
-- \`segmentedbutton options=["Opción A", "Opción B", "Opción C"] [selected="Opción A"]\`
-- \`chip "Texto" [icon=<icon>] [selected=true|false]\`
+- \`button "Text" [filled | tonal | outlined | elevated | text] [icon=<icon>] [goto=@Screen] [snackbar="..."] [disabled=true|false]\`
+- \`fab "Text" [icon=<icon>] [extended=true|false] [goto=@Screen]\`
+- \`segmentedbutton options=["Option A", "Option B", "Option C"] [selected="Option A"]\`
+- \`chip "Text" [icon=<icon>] [selected=true|false]\`
 
 ### E. Data & Tables
-- \`table [title="..."] columns=["Col1:tipo", "Col2:tipo", ...] [striped=true|false] [searchable=true|false] [pageSize=5|10|20]\`
+- \`table [title="..."] columns=["Col1:type", "Col2:type", ...] [striped=true|false] [searchable=true|false] [pageSize=5|10|20]\`
   - Column Types:
     * \`:code\` -> Monospace pill
     * \`:avatar\` -> Name with initial badge
     * \`:progress\` -> Progress bar (value e.g. "75%")
-    * \`:status\` -> Color-coded status badge ("Activo", "Pendiente", "Error", "Cancelado")
+    * \`:status\` -> Color-coded status badge ("Active", "Pending", "Error", "Cancelled")
     * \`:currency\` -> Formatted price e.g. "$1,250.00"
     * \`:date\` -> Formatted date
-    * \`:action\` -> Clickable button e.g. "Editar", "Ver"
+    * \`:action\` -> Clickable action button e.g. "Edit", "View"
     * \`:dropdown\` -> 3-dots kebab menu
     * \`:checkbox\` -> Interactive selection
     * \`:rating\` -> Star rating (1-5)
   - Row declaration:
-    \`row ["#101", "Javier Díaz", "85%", "$3,400.00", "Activo", "Editar", ""]\`
-    or markdown pipes: \`| #102 | Ana Soto | 40% | $850.00 | Pendiente | Ver | |\`
+    \`row ["#101", "Jane Cooper", "85%", "$3,400.00", "Active", "Edit", ""]\`
+    or markdown pipes: \`| #102 | Alex Morgan | 40% | $850.00 | Pending | View | |\`
 - \`metric label="..." value="..." [delta="+12%"] [icon=<icon>]\` (or \`stat\`)
-- \`listitem "Título" [subtitle="..."] [icon=<icon>] [badge="..."] [goto=@Screen]\`
+- \`listitem "Title" [subtitle="..."] [icon=<icon>] [badge="..."] [goto=@Screen]\`
 - \`progress [value=0..100] [label="..."]\`
-- \`avatar [name="Nombre"] [src="url"] [size=small|medium|large]\`
+- \`avatar [name="Name"] [src="url"] [size=small|medium|large]\`
 - \`badge [value="..."] [color=primary|error|warning|success]\`
-- \`tag "Texto" [color=primary|secondary|error|warning|info|success]\`
+- \`tag "Text" [color=primary|secondary|error|warning|info|success]\`
 
 ### F. Typography & Feedback
-- \`text "Mensaje" [display | headline | title | body | label | caption] [bold=true] [color=primary|secondary|tertiary|error|warning|success|muted]\`
-- \`alert "Mensaje" [title="..."] [type=info|success|warning|error]\`
+- \`text "Message" [display | headline | title | body | label | caption] [bold=true] [color=primary|secondary|tertiary|error|warning|success|muted]\`
+- \`alert "Message" [title="..."] [type=info|success|warning|error]\`
 - \`image [src="url"] [alt="..."] [height=200]\`
 - \`icon <lucide-name> [size=16|20|24|32] [color=primary|...]\`
 
@@ -220,51 +220,51 @@ You are the Lead UI Architect and Code Synthesizer for **Wisp UI Studio**. Your 
 ## 4. EXAMPLE COMPLETE SCREEN GENERATION
 
 \`\`\`wdl
-@Facturacion:screen
-  appbar "Facturación Express" icon=receipt-text goto=@Dashboard
-  breadcrumbs items=["Inicio", "Finanzas", "Nueva Factura"]
+@Billing:screen
+  appbar "Billing & Invoicing" icon=receipt-text goto=@Dashboard
+  breadcrumbs items=["Home", "Finance", "New Invoice"]
 
   grid cols=3 gap=16
-    metric label="Facturado Este Mes" value="$38,900" delta="+18%" icon=dollar-sign
-    metric label="Facturas Emitidas" value="142" delta="+9%" icon=file-text
-    metric label="Pendientes de Pago" value="12" delta="Requiere Atención" icon=clock
+    metric label="Billed This Month" value="$38,900" delta="+18%" icon=dollar-sign
+    metric label="Invoices Issued" value="142" delta="+9%" icon=file-text
+    metric label="Pending Payments" value="12" delta="Requires Action" icon=clock
 
   card elevated padding=20
-    text "Emitir Nueva Factura Fiscal" headline color=primary
-    text "Completa la información del receptor y concepto" body color=muted
+    text "Issue New Tax Invoice" headline color=primary
+    text "Fill in recipient details and line item concept" body color=muted
 
     grid cols=2 gap=16
-      textfield rfc label="RFC / Tax ID" placeholder="XAXX010101000" icon=building required=true
-      textfield razon label="Razón Social" placeholder="Empresa S.A. de C.V." icon=user required=true
+      textfield rfc label="Tax ID / EIN" placeholder="12-3456789" icon=building required=true
+      textfield company label="Company Name" placeholder="Acme Global Inc." icon=user required=true
 
     grid cols=2 gap=16
-      textfield email label="Correo de Envío" type=email placeholder="facturacion@cliente.com" icon=mail required=true
-      autocomplete regimen label="Régimen Fiscal" placeholder="Buscar régimen..."
-        option "601 - General de Ley Personas Morales"
-        option "612 - Personas Físicas con Actividades Empresariales"
-        option "626 - Régimen Simplificado de Confianza (RESICO)"
+      textfield email label="Billing Email" type=email placeholder="billing@client.com" icon=mail required=true
+      autocomplete taxRegime label="Tax Classification" placeholder="Search classification..."
+        option "General Corporate Entity"
+        option "Sole Proprietorship / Freelancer"
+        option "Simplified Trust Entity"
 
-    datepicker fechaEmision label="Fecha de Emisión"
-    textarea concepto label="Descripción del Servicio" rows=2 placeholder="Servicios de consultoría y desarrollo..."
+    datepicker issueDate label="Issue Date"
+    textarea description label="Service Description" rows=2 placeholder="Consulting and software development services..."
 
-    text "Forma de Pago:" label bold
+    text "Payment Method:" label bold
     row spacing=16
-      radio spei label="Transferencia Electrónica (SPEI)" group="pago" checked=true
-      radio tarjeta label="Tarjeta Corporativa" group="pago"
+      radio ach label="ACH / Wire Transfer" group="payment" checked=true
+      radio card label="Corporate Credit Card" group="payment"
 
     row spacing=12
-      chip "Desglose IVA (16%)" selected=true
-      chip "Retención ISR"
-      switch timbradoAutomatico label="Timbrado SAT Automático" checked=true
+      chip "Include Sales Tax" selected=true
+      chip "Withholding Tax"
+      switch autoFiling label="Automated Tax Filing" checked=true
 
-    accordion "Archivos Adjuntos & Opciones Avanzadas" expanded=false icon=paperclip
-      textfield ordenCompra label="Orden de Compra (PO)" placeholder="PO-2026-089"
-      checkbox enviarCopia label="Enviar copia oculta al contador" checked=true
+    accordion "Attachments & Advanced Options" expanded=false icon=paperclip
+      textfield poNumber label="Purchase Order (PO)" placeholder="PO-2026-089"
+      checkbox sendCopy label="Send blind copy to accounting" checked=true
 
     row spacing=12
-      button "Emitir Factura" filled icon=send snackbar="Factura emitida exitosamente" goto=@Dashboard
-      button "Guardar Borrador" tonal icon=save snackbar="Borrador guardado en la nube"
-      button "Cancelar" text goto=back
+      button "Issue Invoice" filled icon=send snackbar="Invoice issued successfully" goto=@Dashboard
+      button "Save Draft" tonal icon=save snackbar="Draft saved to cloud"
+      button "Cancel" text goto=back
 \`\`\``;
 
 export const WispDocsModal: React.FC<WispDocsModalProps> = ({
@@ -319,14 +319,14 @@ export const WispDocsModal: React.FC<WispDocsModalProps> = ({
             <div>
               <div className="flex items-center gap-2">
                 <h2 className="text-base sm:text-lg font-bold text-neutral-900 dark:text-white flex items-center gap-2">
-                  <span>Documentación & Especificación WDL</span>
+                  <span>Documentation & WDL Specification</span>
                 </h2>
                 <span className="text-[10px] uppercase font-bold tracking-wider px-2 py-0.5 rounded-full bg-purple-100 dark:bg-purple-950/80 text-purple-800 dark:text-purple-300 border border-purple-200 dark:border-purple-800/60">
                   Wisp UI Studio
                 </span>
               </div>
               <p className="text-xs text-neutral-500 dark:text-neutral-400">
-                Guía interactiva de componentes con colores del editor, especificación formal EBNF y System Prompt AI.
+                Interactive component guide with syntax highlighting, formal EBNF specification, and AI System Prompt.
               </p>
             </div>
           </div>
@@ -351,7 +351,7 @@ export const WispDocsModal: React.FC<WispDocsModalProps> = ({
             }`}
           >
             <FileCode className="w-3.5 h-3.5 text-purple-500" />
-            <span>Guía de Sintaxis (+35 Componentes)</span>
+            <span>Syntax Guide (+35 Components)</span>
           </button>
 
           <button
@@ -364,7 +364,7 @@ export const WispDocsModal: React.FC<WispDocsModalProps> = ({
             }`}
           >
             <Code2 className="w-3.5 h-3.5 text-indigo-400" />
-            <span>Especificación Formal WDL</span>
+            <span>Formal WDL Specification</span>
           </button>
 
           <button
@@ -377,7 +377,7 @@ export const WispDocsModal: React.FC<WispDocsModalProps> = ({
             }`}
           >
             <Bot className="w-3.5 h-3.5 text-pink-400" />
-            <span>Prompt Completo para LLM</span>
+            <span>Master AI Prompt</span>
           </button>
         </div>
 
@@ -390,7 +390,7 @@ export const WispDocsModal: React.FC<WispDocsModalProps> = ({
                 <Search className="w-3.5 h-3.5 absolute left-3 top-1/2 -translate-y-1/2 text-neutral-400" />
                 <input
                   type="text"
-                  placeholder="Buscar componente, parámetro o modificador..."
+                  placeholder="Search components, parameters, or modifiers..."
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                   className="w-full pl-8 pr-3 py-1.5 text-xs rounded-xl bg-neutral-50 dark:bg-neutral-900/80 border border-neutral-200 dark:border-neutral-800 text-neutral-900 dark:text-neutral-100 placeholder-neutral-400 focus:outline-none focus:ring-1 focus:ring-purple-500"
@@ -409,7 +409,7 @@ export const WispDocsModal: React.FC<WispDocsModalProps> = ({
                         : "bg-neutral-100 dark:bg-neutral-800/80 text-neutral-600 dark:text-neutral-400 hover:text-neutral-900 dark:hover:text-neutral-200"
                     }`}
                   >
-                    {cat === "all" ? "Todos (+35)" : cat}
+                    {cat === "all" ? "All (+35)" : cat}
                   </button>
                 ))}
               </div>
@@ -446,7 +446,7 @@ export const WispDocsModal: React.FC<WispDocsModalProps> = ({
                       type="button"
                       onClick={() => handleCopy(doc.signature, `sig-${doc.name}`)}
                       className="absolute right-2 top-2 p-1.5 rounded-lg bg-neutral-800/80 hover:bg-neutral-700 text-neutral-300 transition-colors opacity-0 group-hover:opacity-100 cursor-pointer text-[10px] flex items-center gap-1"
-                      title="Copiar firma"
+                      title="Copy signature"
                     >
                       {copiedText === `sig-${doc.name}` ? (
                         <Check className="w-3.5 h-3.5 text-emerald-400" />
@@ -461,7 +461,7 @@ export const WispDocsModal: React.FC<WispDocsModalProps> = ({
                     {doc.modifiers && doc.modifiers.length > 0 && (
                       <div className="p-2.5 rounded-xl bg-white/60 dark:bg-[#110F1A] border border-neutral-200/60 dark:border-neutral-800/60 space-y-1.5">
                         <div className="font-bold text-teal-400 flex items-center gap-1">
-                          <span>Modificadores:</span>
+                          <span>Modifiers:</span>
                         </div>
                         <div className="space-y-1">
                           {doc.modifiers.map((m) => (
@@ -481,7 +481,7 @@ export const WispDocsModal: React.FC<WispDocsModalProps> = ({
                     {doc.parameters && doc.parameters.length > 0 && (
                       <div className="p-2.5 rounded-xl bg-white/60 dark:bg-[#110F1A] border border-neutral-200/60 dark:border-neutral-800/60 space-y-1.5">
                         <div className="font-bold text-sky-400 flex items-center gap-1">
-                          <span>Parámetros & Atributos:</span>
+                          <span>Parameters & Attributes:</span>
                         </div>
                         <div className="space-y-1 max-h-32 overflow-y-auto no-scrollbar">
                           {doc.parameters.map((p) => (
@@ -508,7 +508,7 @@ export const WispDocsModal: React.FC<WispDocsModalProps> = ({
                   {doc.examples && doc.examples.length > 0 && (
                     <div className="space-y-1.5">
                       <div className="text-[10px] font-bold uppercase tracking-wider text-neutral-400 dark:text-neutral-500">
-                        Ejemplo de uso en WDL:
+                        WDL Usage Example:
                       </div>
                       <div className="p-2.5 bg-[#0C0A14] text-neutral-100 rounded-xl font-mono text-[11px] overflow-x-auto border border-neutral-800/80 leading-relaxed shadow-inner">
                         {doc.examples.map((ex, i) => (
@@ -534,10 +534,10 @@ export const WispDocsModal: React.FC<WispDocsModalProps> = ({
               <div className="space-y-0.5">
                 <p className="font-bold text-indigo-900 dark:text-indigo-200 text-xs flex items-center gap-1.5">
                   <Code2 className="w-3.5 h-3.5 text-indigo-500" />
-                  Especificación Formal EBNF & Gramática de WDL
+                  Formal EBNF Specification & WDL Grammar
                 </p>
                 <p className="text-[11px] text-indigo-800/80 dark:text-indigo-300">
-                  Estructura canónica de tokens, declaraciones raíz, componentes, bloques anidados y reglas de tipado.
+                  Canonical token structure, root declarations, components, nested blocks, and typing rules.
                 </p>
               </div>
 
@@ -549,12 +549,12 @@ export const WispDocsModal: React.FC<WispDocsModalProps> = ({
                 {copiedText === "spec" ? (
                   <>
                     <Check className="w-3.5 h-3.5" />
-                    <span>¡Copiado!</span>
+                    <span>Copied!</span>
                   </>
                 ) : (
                   <>
                     <Copy className="w-3.5 h-3.5" />
-                    <span>Copiar EBNF</span>
+                    <span>Copy EBNF</span>
                   </>
                 )}
               </button>
@@ -573,10 +573,10 @@ export const WispDocsModal: React.FC<WispDocsModalProps> = ({
               <div className="space-y-0.5">
                 <p className="font-bold text-purple-900 dark:text-purple-200 text-xs flex items-center gap-1.5">
                   <Bot className="w-3.5 h-3.5 text-purple-500" />
-                  Prompt Maestro para LLMs (Claude, ChatGPT, Gemini, Cursor)
+                  Master AI System Prompt (Claude, ChatGPT, Gemini, Cursor)
                 </p>
                 <p className="text-[11px] text-purple-800/80 dark:text-purple-300">
-                  Instrucción exhaustiva con todos los componentes (+35), variantes, tipos de columnas de tabla y directivas de navegación.
+                  Comprehensive prompt containing all components (+35), variants, table column types, and navigation directives.
                 </p>
               </div>
 
@@ -588,12 +588,12 @@ export const WispDocsModal: React.FC<WispDocsModalProps> = ({
                 {copiedText === "ai-full" ? (
                   <>
                     <Check className="w-3.5 h-3.5" />
-                    <span>¡Copiado!</span>
+                    <span>Copied!</span>
                   </>
                 ) : (
                   <>
                     <Copy className="w-3.5 h-3.5" />
-                    <span>Copiar Prompt Maestro</span>
+                    <span>Copy Master Prompt</span>
                   </>
                 )}
               </button>

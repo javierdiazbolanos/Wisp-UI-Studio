@@ -30,18 +30,19 @@ export interface WispComponentPaletteProps {
   cursorContext: WispCursorContext;
   onInsert: (snippet: string) => void;
   isLight?: boolean;
+  previewIsDark?: boolean;
 }
 
 const CATEGORIES: { id: string; label: string; countBadge?: number }[] = [
-  { id: "sugeridos", label: "⭐ Sugeridos" },
-  { id: "todos", label: "Todos" },
-  { id: "Vistas & Raíz", label: "Vistas" },
+  { id: "sugeridos", label: "⭐ Suggested" },
+  { id: "todos", label: "All" },
+  { id: "Vistas & Raíz", label: "Views" },
   { id: "Layout & Superficie", label: "Layout" },
-  { id: "Entradas & Formularios", label: "Entradas" },
-  { id: "Acciones & Controles", label: "Acciones" },
-  { id: "Datos & Tablas", label: "Datos" },
+  { id: "Entradas & Formularios", label: "Inputs" },
+  { id: "Acciones & Controles", label: "Actions" },
+  { id: "Datos & Tablas", label: "Data" },
   { id: "Feedback & Alertas", label: "Feedback" },
-  { id: "Lógica & Flujo", label: "Lógica" },
+  { id: "Lógica & Flujo", label: "Logic" },
 ];
 
 export const WispComponentPalette: React.FC<WispComponentPaletteProps> = ({
@@ -50,6 +51,7 @@ export const WispComponentPalette: React.FC<WispComponentPaletteProps> = ({
   cursorContext,
   onInsert,
   isLight = false,
+  previewIsDark = false,
 }) => {
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedCategory, setSelectedCategory] = useState<string>("sugeridos");
@@ -131,7 +133,7 @@ export const WispComponentPalette: React.FC<WispComponentPaletteProps> = ({
 
   return (
     <aside
-      aria-label="Paleta de Componentes Wisp"
+      aria-label="Wisp Component Palette"
       className={`absolute top-0 right-0 bottom-0 w-84 sm:w-96 z-40 flex flex-col shadow-2xl border-l backdrop-blur-xl transition-all duration-200 select-none ${
         isLight
           ? "bg-white/95 border-neutral-300 text-neutral-800"
@@ -150,12 +152,12 @@ export const WispComponentPalette: React.FC<WispComponentPaletteProps> = ({
           </div>
           <div>
             <h2 className="font-bold text-xs tracking-tight flex items-center gap-1.5">
-              <span>Paleta de Componentes</span>
+              <span>Component Palette</span>
               <span className="text-[10px] font-mono px-1.5 py-0.2 rounded-full bg-purple-900/40 text-purple-300 border border-purple-700/50">
                 {WISP_PALETTE_CATALOG.length}
               </span>
             </h2>
-            <p className="text-[10px] text-neutral-400">Inserta elementos Material 3 con 1 clic</p>
+            <p className="text-[10px] text-neutral-400">Insert Material 3 elements with 1 click</p>
           </div>
         </div>
 
@@ -167,7 +169,7 @@ export const WispComponentPalette: React.FC<WispComponentPaletteProps> = ({
               ? "hover:bg-neutral-200 border-neutral-300 text-neutral-600"
               : "hover:bg-neutral-800 border-neutral-700/60 text-neutral-400 hover:text-white"
           }`}
-          title="Cerrar paleta flotante"
+          title="Close component palette"
         >
           <X className="w-4 h-4" />
         </button>
@@ -190,7 +192,7 @@ export const WispComponentPalette: React.FC<WispComponentPaletteProps> = ({
         <div className="flex items-center gap-1.5 overflow-hidden">
           <Compass className="w-3.5 h-3.5 shrink-0 text-purple-400" />
           <div className="truncate">
-            <span className="font-semibold">Línea {cursorContext.lineNum}: </span>
+            <span className="font-semibold">Line {cursorContext.lineNum}: </span>
             <span className="font-mono text-[10px]">
               {cursorContext.parentPath.length > 0
                 ? cursorContext.parentPath.map((p) => p.label).join(" > ")
@@ -207,9 +209,9 @@ export const WispComponentPalette: React.FC<WispComponentPaletteProps> = ({
               ? "bg-purple-600 text-white border-purple-500"
               : "bg-neutral-800/80 text-neutral-400 border-neutral-700 hover:text-neutral-200"
           }`}
-          title="Alternar filtro estricto de compatibilidad"
+          title="Toggle contextual compatibility filter"
         >
-          {onlyContextual ? "Solo válidos" : "Todos"}
+          {onlyContextual ? "Valid Only" : "All"}
         </button>
       </div>
 
@@ -227,7 +229,7 @@ export const WispComponentPalette: React.FC<WispComponentPaletteProps> = ({
             type="text"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            placeholder="Buscar por nombre, tipo o atributo..."
+            placeholder="Search by name, type, or attribute..."
             className="w-full bg-transparent text-xs outline-none placeholder:text-neutral-500"
           />
           {searchQuery && (
@@ -283,7 +285,7 @@ export const WispComponentPalette: React.FC<WispComponentPaletteProps> = ({
         {filteredItems.length === 0 ? (
           <div className="text-center py-10 px-4 text-neutral-400 space-y-2">
             <Info className="w-6 h-6 mx-auto text-neutral-500 opacity-60" />
-            <p className="text-xs">No se encontraron componentes para este filtro.</p>
+            <p className="text-xs">No components found for this filter.</p>
             <button
               type="button"
               onClick={() => {
@@ -293,7 +295,7 @@ export const WispComponentPalette: React.FC<WispComponentPaletteProps> = ({
               }}
               className="text-[11px] text-purple-400 font-semibold hover:underline cursor-pointer"
             >
-              Restablecer filtros
+              Reset filters
             </button>
           </div>
         ) : (
@@ -334,7 +336,7 @@ export const WispComponentPalette: React.FC<WispComponentPaletteProps> = ({
                         </span>
                         {isRec && (
                           <span className="text-[9px] px-1.5 py-0.2 rounded-md bg-purple-600 text-white font-semibold shadow-xs">
-                            Sugerido
+                            Suggested
                           </span>
                         )}
                       </div>
@@ -354,7 +356,7 @@ export const WispComponentPalette: React.FC<WispComponentPaletteProps> = ({
                           ? "bg-emerald-950 text-emerald-400 border-emerald-800"
                           : "bg-neutral-800/80 hover:bg-neutral-700 text-neutral-400 hover:text-white border-neutral-700/60"
                       }`}
-                      title="Copiar snippet de sintaxis"
+                      title="Copy syntax snippet"
                     >
                       {copiedSnippetId === item.id ? (
                         <Check className="w-3 h-3 text-emerald-400" />
@@ -370,10 +372,10 @@ export const WispComponentPalette: React.FC<WispComponentPaletteProps> = ({
                         onInsert(item.snippet);
                       }}
                       className="flex items-center gap-1 px-2 py-1 rounded-lg bg-purple-600 hover:bg-purple-500 text-white text-[10px] font-semibold shadow-xs transition-colors cursor-pointer"
-                      title="Insertar en la posición del cursor"
+                      title="Insert at cursor position"
                     >
                       <Plus className="w-3 h-3" />
-                      <span>Insertar</span>
+                      <span>Insert</span>
                     </button>
                   </div>
                 </div>
@@ -431,16 +433,18 @@ export const WispComponentPalette: React.FC<WispComponentPaletteProps> = ({
           {/* Live Visual Preview */}
           <div className="my-2.5">
             <div className="text-[9px] font-semibold text-neutral-400 uppercase tracking-wider mb-1.5 flex items-center justify-between">
-              <span>Vista previa en vivo:</span>
-              <span className="text-purple-400 text-[8px] font-mono">Render M3</span>
+              <span>Live Preview:</span>
+              <span className="text-purple-400 text-[8px] font-mono">
+                M3 Render ({previewIsDark ? "Dark" : "Light"})
+              </span>
             </div>
-            {hoveredItem.renderPreview()}
+            {hoveredItem.renderPreview(!previewIsDark)}
           </div>
 
           {/* Syntax Code Box */}
           <div className="mt-2.5 bg-[#0C0B10] p-2.5 rounded-2xl border border-neutral-800 font-mono text-[10px] text-neutral-300 overflow-x-auto whitespace-pre no-scrollbar">
             <div className="text-[9px] text-purple-400 font-bold uppercase tracking-wider mb-1">
-              Sintaxis Wisp:
+              Wisp Syntax:
             </div>
             <code>{hoveredItem.snippet}</code>
           </div>
@@ -448,7 +452,7 @@ export const WispComponentPalette: React.FC<WispComponentPaletteProps> = ({
           {/* Modifiers List */}
           <div className="mt-2.5 pt-2 border-t border-neutral-800 flex flex-wrap gap-1 items-center">
             <span className="text-[9px] text-neutral-500 uppercase font-semibold mr-1">
-              Atributos:
+              Modifiers:
             </span>
             {hoveredItem.modifiers.slice(0, 4).map((mod, idx) => (
               <span
@@ -462,7 +466,7 @@ export const WispComponentPalette: React.FC<WispComponentPaletteProps> = ({
 
           {/* Quick Insert Action Footer */}
           <div className="mt-3 pt-2 border-t border-neutral-800 flex items-center justify-between">
-            <span className="text-[10px] text-neutral-400 italic">Clic en la tarjeta para insertar</span>
+            <span className="text-[10px] text-neutral-400 italic">Click card to insert into editor</span>
             <button
               type="button"
               onClick={() => {
@@ -472,7 +476,7 @@ export const WispComponentPalette: React.FC<WispComponentPaletteProps> = ({
               className="flex items-center gap-1 px-3 py-1 rounded-xl bg-purple-600 hover:bg-purple-500 text-white text-[10px] font-bold shadow-md cursor-pointer"
             >
               <Plus className="w-3 h-3" />
-              <span>Insertar ahora</span>
+              <span>Insert Now</span>
             </button>
           </div>
         </div>
