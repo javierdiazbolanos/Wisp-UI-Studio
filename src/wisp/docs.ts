@@ -137,8 +137,8 @@ export const WISP_DOCS_DATABASE: Record<string, WispDocEntry> = {
     ],
     examples: [
       'button "Save Changes" filled icon=save goto=@Home',
-      'button "Issue Invoice" filled icon=send snackbar="Invoice #1024 created" snackbar-action="Undo" goto=@Dashboard',
-      'button "Delete Account" outlined icon=trash snackbar-type=error',
+      'button "Issue Invoice" filled icon=send snackbar="Invoice #1024 created" snackbar-action="Undo" goto=@Home',
+      'button "Delete Account" outlined icon=trash snackbar-type=error goto=@Home',
     ],
   },
 

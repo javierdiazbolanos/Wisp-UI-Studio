@@ -26,6 +26,7 @@ import {
   LayoutGrid,
   PanelRightOpen,
   PanelRightClose,
+  Plus,
 } from "lucide-react";
 
 export interface WispCodeEditorProps {
@@ -38,6 +39,7 @@ export interface WispCodeEditorProps {
   inspectMode?: boolean;
   onSelectSnippet?: (snippet: string) => void;
   onOpenDocs?: () => void;
+  onNewCode?: () => void;
   isMaximized?: boolean;
   onToggleMaximize?: () => void;
   previewIsDark?: boolean;
@@ -98,6 +100,7 @@ export const WispCodeEditor: React.FC<WispCodeEditorProps> = ({
   highlightBlock = null,
   onCursorLineChange,
   onOpenDocs,
+  onNewCode,
   isMaximized = false,
   onToggleMaximize,
   previewIsDark = false,
@@ -413,6 +416,18 @@ export const WispCodeEditor: React.FC<WispCodeEditorProps> = ({
           >
             Monaco
           </span>
+
+          {onNewCode && (
+            <button
+              type="button"
+              onClick={onNewCode}
+              className="flex items-center gap-1 px-2.5 py-0.5 rounded-lg bg-purple-600 hover:bg-purple-700 text-white text-[11px] font-bold shadow-xs transition-all cursor-pointer"
+              title="Crear nuevo documento (@Home:screen)"
+            >
+              <Plus className="w-3 h-3 stroke-[2.5]" />
+              <span>Nuevo</span>
+            </button>
+          )}
         </div>
 
         <div className="flex items-center gap-2">

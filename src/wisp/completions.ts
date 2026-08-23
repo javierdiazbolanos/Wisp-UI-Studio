@@ -233,25 +233,25 @@ export const TOP_LEVEL_COMPLETIONS: WispCompletionItem[] = [
     insertText: `button "Acción" filled icon=save goto=@Home`,
     documentation:
       "Botón interactivo Material 3 estándar con soporte de variantes (filled, outlined, tonal, elevated, text), íconos y navegación.",
-    example: `button "Guardar Cambios" filled icon=save goto=@Config`,
+    example: `button "Guardar Cambios" filled icon=save goto=@Home`,
   },
   {
     label: "button (con Snackbar y Goto)",
     kind: "keyword",
     detail: 'button "Facturar" filled icon=send snackbar="Mensaje" snackbar-action="Deshacer" goto=@Screen',
-    insertText: `button "Facturar" filled icon=send snackbar="Factura #1024 enviada" snackbar-action="Deshacer" goto=@KiroSetup`,
+    insertText: `button "Facturar" filled icon=send snackbar="Factura #1024 enviada" snackbar-action="Deshacer" goto=@Home`,
     documentation:
       "Botón interactivo que ejecuta simultáneamente una notificación emergente (Snackbar / Toast) y la navegación fluida a otra pantalla de destino.",
-    example: `button "Facturar" filled icon=send snackbar="Factura #1024 enviada" snackbar-action="Deshacer" goto=@KiroSetup`,
+    example: `button "Facturar" filled icon=send snackbar="Factura #1024 enviada" snackbar-action="Deshacer" goto=@Home`,
   },
   {
     label: "button (con Toast Template @Nombre)",
     kind: "keyword",
     detail: 'button "Guardar" filled icon=save goto=@Destino snackbar=@PlantillaToast',
-    insertText: `button "Guardar" filled icon=save goto=@ListaClientes snackbar=@FacturaToast`,
+    insertText: `button "Guardar" filled icon=save goto=@Home snackbar=@FacturaToast`,
     documentation:
       "Botón que dispara una plantilla de notificación @Toast declarada previamente en el documento y navega al destino indicado.",
-    example: `@FacturaToast:snackbar "Factura procesada con éxito" snackbar-action="Ver PDF" snackbar-type=success\n\nbutton "Guardar" filled icon=save goto=@ListaClientes snackbar=@FacturaToast`,
+    example: `@FacturaToast:snackbar "Factura procesada con éxito" snackbar-action="Ver PDF" snackbar-type=success\n\nbutton "Guardar" filled icon=save goto=@Home snackbar=@FacturaToast`,
   },
   {
     label: "textfield",
@@ -666,10 +666,19 @@ export const TOP_LEVEL_COMPLETIONS: WispCompletionItem[] = [
     label: "@Screen:screen",
     kind: "screen",
     detail: "@Nombre:screen [theme=material3]",
-    insertText: `@NuevaPantalla:screen\n  appbar "Título de Pantalla" icon=arrow-left\n  `,
+    insertText: `@Home:screen\n  card elevated\n    text "Título" title\n    text "Descripción" body\n    textfield nombre label="Nombre"\n    button "Continuar" filled icon=arrow-right goto=@Home\n`,
     documentation:
-      "Declara una nueva pantalla independiente en el documento Wisp. Cada pantalla actúa como una vista navegable.",
-    example: `@Dashboard:screen\n  appbar "Panel Principal" icon=menu\n  card elevated\n    text "Bienvenido" title`,
+      "Declara una nueva pantalla independiente en el documento Wisp con una card básica que incluye título, texto, input y botón de acción.",
+    example: `@Home:screen\n  card elevated\n    text "Bienvenido a Wisp" title\n    text "Diseña interfaces interactivas con Material 3." body\n    spacer height=8\n    textfield nombre label="Nombre completo"\n    spacer height=12\n    button "Continuar" filled icon=arrow-right goto=@Home`,
+  },
+  {
+    label: "@Home:screen",
+    kind: "screen",
+    detail: "@Home:screen (Pantalla Inicial Básica)",
+    insertText: `@Home:screen\n  card elevated\n    text "Bienvenido a Wisp" title\n    text "Diseña interfaces interactivas con Material 3." body\n    spacer height=8\n    textfield nombre label="Nombre completo" placeholder="Ingresa tu nombre" icon=user\n    spacer height=12\n    button "Continuar" filled icon=arrow-right goto=@Home\n`,
+    documentation:
+      "Declara la pantalla inicial @Home:screen con una tarjeta que contiene título, texto, input de texto y botón interactivo.",
+    example: `@Home:screen\n  card elevated\n    text "Bienvenido" title\n    text "Contenido inicial" body\n    textfield input1 label="Campo"\n    button "Acción" filled goto=@Home`,
   },
   {
     label: "@Wizard:wizard",

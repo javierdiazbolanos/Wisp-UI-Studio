@@ -613,11 +613,11 @@ export const WISP_PALETTE_CATALOG: PaletteComponentItem[] = [
   {
     id: "screen",
     name: "@Screen:screen",
-    label: "Pantalla Estándar",
+    label: "Pantalla Estándar (@Home)",
     category: "Vistas & Raíz",
     icon: Milestone,
     color: "from-purple-500 to-indigo-500",
-    snippet: `@NuevaPantalla:screen\n  card elevated\n    text "Título de Pantalla" title\n    text "Contenido principal..." body`,
+    snippet: `@Home:screen\n  card elevated\n    text "Título" title\n    text "Descripción" body\n    spacer height=8\n    textfield nombre label="Nombre"\n    spacer height=12\n    button "Continuar" filled icon=arrow-right goto=@Home`,
     description: "Declara una vista o pantalla principal con soporte para transiciones y navegación.",
     modifiers: ["@Nombre:screen", "theme=material3", "padding=16"],
     contextRules: { rootOnly: true },

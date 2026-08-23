@@ -18,7 +18,7 @@ import { UnsavedChangesModal } from "./components/UnsavedChangesModal";
 import { M3ThemeStudioModal } from "./components/M3ThemeStudioModal";
 import { WispLogo } from "./components/WispLogo";
 import { ScreenNavigatorDropdown } from "./components/ScreenNavigatorDropdown";
-import { WISP_TEMPLATES, WispTemplate } from "./data/templates";
+import { WISP_TEMPLATES, WispTemplate, BASIC_HOME_TEMPLATE } from "./data/templates";
 import { DynamicIcon } from "./components/DynamicIcon";
 import { motion, AnimatePresence } from "motion/react";
 import {
@@ -53,6 +53,7 @@ import {
   AlertCircle,
   Info,
   X,
+  Plus,
 } from "lucide-react";
 
 export default function App() {
@@ -374,6 +375,18 @@ export default function App() {
     }
   };
 
+  // Start fresh with basic @Home template
+  const handleNewProject = () => {
+    const newTmpl: WispTemplate = {
+      id: "basic-home",
+      title: "Nuevo Documento • @Home",
+      category: "Form",
+      description: "Pantalla inicial limpia",
+      code: BASIC_HOME_TEMPLATE,
+    };
+    handleSelectTemplate(newTmpl);
+  };
+
   const handleConfirmDiscardTemplate = () => {
     if (pendingTemplate) {
       setWispCode(pendingTemplate.code);
@@ -477,6 +490,17 @@ export default function App() {
 
           {/* Right Action Tools Bar */}
           <div className="flex items-center gap-1.5 sm:gap-2">
+            {/* New Document Button */}
+            <button
+              type="button"
+              onClick={handleNewProject}
+              className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold rounded-xl bg-purple-600 hover:bg-purple-700 text-white shadow-sm transition-all cursor-pointer hover:shadow-purple-500/20"
+              title="Crear nuevo documento (@Home:screen)"
+            >
+              <Plus className="w-3.5 h-3.5 stroke-[2.5]" />
+              <span className="font-bold">Nuevo</span>
+            </button>
+
             {/* Template Library Dropdown */}
             <div className="relative">
               <button
@@ -642,6 +666,7 @@ export default function App() {
               onCursorLineChange={handleCursorLineChange}
               inspectMode={inspectMode}
               onOpenDocs={() => setIsDocsOpen(true)}
+              onNewCode={handleNewProject}
               isMaximized={isEditorMaximized}
               onToggleMaximize={() => setIsEditorMaximized(!isEditorMaximized)}
               previewIsDark={isDark}

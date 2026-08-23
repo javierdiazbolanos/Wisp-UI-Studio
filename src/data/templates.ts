@@ -6,7 +6,26 @@ export interface WispTemplate {
   code: string;
 }
 
+export const BASIC_HOME_TEMPLATE = `@theme material3
+
+@Home:screen
+  card elevated
+    text "Bienvenido a Wisp" title
+    text "Diseña interfaces interactivas con Material 3 de forma rápida y sencilla." body
+    spacer height=8
+    textfield nombre label="Nombre completo" placeholder="Ingresa tu nombre" icon=user
+    spacer height=12
+    button "Continuar" filled icon=arrow-right goto=@Home
+`;
+
 export const WISP_TEMPLATES: WispTemplate[] = [
+  {
+    id: "basic-home",
+    title: "Plantilla Básica • @Home",
+    category: "Form",
+    description: "Plantilla inicial limpia con @Home:screen, card, título, texto explicativo, input y botón de acción.",
+    code: BASIC_HOME_TEMPLATE,
+  },
   {
     id: "m3-expressive-gallery",
     title: "Material 3 Expressive UI • Master Design System",
