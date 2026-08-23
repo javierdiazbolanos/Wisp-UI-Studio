@@ -202,9 +202,12 @@ export const WispComponentPalette: React.FC<WispComponentPaletteProps> = ({
       >
         <div className="flex items-center gap-1.5 overflow-hidden">
           <Compass className="w-3.5 h-3.5 shrink-0 text-purple-400" />
-          <div className="truncate">
-            <span className="font-semibold">Line {cursorContext.lineNum}: </span>
-            <span className="font-mono text-[10px]">
+          <div className="truncate text-[11px]">
+            <span className="font-semibold">
+              Ln {cursorContext.lineNum}, Col {cursorContext.column}
+              <span className="text-purple-400 font-normal ml-1">(Nivel {cursorContext.indent})</span>:{" "}
+            </span>
+            <span className="font-mono text-[10px] text-purple-300">
               {cursorContext.parentPath.length > 0
                 ? cursorContext.parentPath.map((p) => p.label).join(" > ")
                 : cursorContext.enclosingContainerLabel}
@@ -220,9 +223,9 @@ export const WispComponentPalette: React.FC<WispComponentPaletteProps> = ({
               ? "bg-purple-600 text-white border-purple-500"
               : "bg-neutral-800/80 text-neutral-400 border-neutral-700 hover:text-neutral-200"
           }`}
-          title="Toggle contextual compatibility filter"
+          title="Alternar filtro de compatibilidad contextual estricto"
         >
-          {onlyContextual ? "Valid Only" : "All"}
+          {onlyContextual ? "Solo Válidos" : "Todos"}
         </button>
       </div>
 

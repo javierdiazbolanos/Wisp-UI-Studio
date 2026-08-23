@@ -109,7 +109,7 @@ export const WispCodeEditor: React.FC<WispCodeEditorProps> = ({
   const [isIconPickerOpen, setIsIconPickerOpen] = useState(false);
   const [isPaletteOpen, setIsPaletteOpen] = useState(false);
   const [fontSize, setFontSize] = useState<number>(13); // 12, 13, 14, 16
-  const [activeCursorLine, setActiveCursorLine] = useState<number>(1);
+  const [cursorPos, setCursorPos] = useState<{ line: number; column: number }>({ line: 1, column: 1 });
   const [editorViewMode, setEditorViewMode] = useState<"monaco" | "plain" | "readonly">("monaco");
 
   // Monokai Dark as default, with option to switch to Light or Material Dark
@@ -127,16 +127,16 @@ export const WispCodeEditor: React.FC<WispCodeEditorProps> = ({
 
   const lines = code.split("\n");
 
-  // Dynamic context analysis based on active cursor line
+  // Dynamic context analysis based on active cursor position (line + column for accurate indent level)
   const cursorContext = useMemo(
-    () => analyzeWispCursorContext(code, activeCursorLine),
-    [code, activeCursorLine]
+    () => analyzeWispCursorContext(code, cursorPos.line, cursorPos.column),
+    [code, cursorPos.line, cursorPos.column]
   );
 
-  const handleCursorChange = (lineNum: number) => {
-    setActiveCursorLine(lineNum);
+  const handleCursorChange = useCallback((lineNum: number, column: number = 1) => {
+    setCursorPos({ line: lineNum, column });
     onCursorLineChange?.(lineNum);
-  };
+  }, [onCursorLineChange]);
 
   // Insert snippet or text respecting current cursor line indentation
   const insertSnippet = useCallback(
@@ -668,7 +668,7 @@ export const WispCodeEditor: React.FC<WispCodeEditorProps> = ({
             theme={monacoTheme}
             highlightLine={highlightLine}
             highlightBlock={highlightBlock}
-            onCursorLineChange={handleCursorChange}
+            onCursorChange={handleCursorChange}
             onEditorReady={(editor) => {
               monacoEditorRef.current = editor;
             }}
@@ -683,8 +683,29 @@ export const WispCodeEditor: React.FC<WispCodeEditorProps> = ({
               onChange={(e) => {
                 onChange(e.target.value);
                 const pos = e.target.selectionStart;
-                const line = e.target.value.substring(0, pos).split("\n").length;
-                handleCursorChange(line);
+                const textBefore = e.target.value.substring(0, pos);
+                const line = textBefore.split("\n").length;
+                const lastNewline = textBefore.lastIndexOf("\n");
+                const col = lastNewline === -1 ? pos + 1 : pos - lastNewline;
+                handleCursorChange(line, col);
+              }}
+              onKeyUp={(e) => {
+                const target = e.currentTarget;
+                const pos = target.selectionStart;
+                const textBefore = target.value.substring(0, pos);
+                const line = textBefore.split("\n").length;
+                const lastNewline = textBefore.lastIndexOf("\n");
+                const col = lastNewline === -1 ? pos + 1 : pos - lastNewline;
+                handleCursorChange(line, col);
+              }}
+              onClick={(e) => {
+                const target = e.currentTarget;
+                const pos = target.selectionStart;
+                const textBefore = target.value.substring(0, pos);
+                const line = textBefore.split("\n").length;
+                const lastNewline = textBefore.lastIndexOf("\n");
+                const col = lastNewline === -1 ? pos + 1 : pos - lastNewline;
+                handleCursorChange(line, col);
               }}
               className={`w-full h-full font-mono outline-none resize-none selection:bg-purple-600/40 ${
                 isLight ? "text-neutral-900" : "text-[#F8F8F2]"
@@ -737,12 +758,12 @@ export const WispCodeEditor: React.FC<WispCodeEditorProps> = ({
                 ? "bg-white/95 hover:bg-purple-50 text-purple-900 border-neutral-300 hover:border-purple-400"
                 : "bg-[#1B1A24]/95 hover:bg-[#262338] text-purple-300 border-neutral-700/80 hover:border-purple-500"
             }`}
-            title="Open side component palette (categories, previews, and suggestions)"
+            title="Abrir paleta contextual de componentes Wisp"
           >
             <div className="flex flex-col items-center gap-1.5">
               <Sparkles className="w-3.5 h-3.5 text-purple-400 group-hover:scale-110 transition-transform" />
               <span className="text-[10px] font-bold uppercase tracking-wider [writing-mode:vertical-lr] rotate-180">
-                Components
+                Componentes
               </span>
               <PanelRightOpen className="w-3 h-3 text-neutral-400" />
             </div>
@@ -762,20 +783,20 @@ export const WispCodeEditor: React.FC<WispCodeEditorProps> = ({
           {errorCount === 0 && warningCount === 0 ? (
             <div className="flex items-center gap-1.5 text-emerald-500 font-medium">
               <CheckCircle2 className="w-3.5 h-3.5" />
-              <span>100% valid Wisp syntax</span>
+              <span>Sintaxis Wisp 100% válida</span>
             </div>
           ) : (
             <div className="flex items-center gap-3">
               {errorCount > 0 && (
                 <div className="flex items-center gap-1 text-red-400 font-medium">
                   <AlertCircle className="w-3.5 h-3.5" />
-                  <span>{errorCount} error(s) detected</span>
+                  <span>{errorCount} error(es)</span>
                 </div>
               )}
               {warningCount > 0 && (
                 <div className="flex items-center gap-1 text-amber-400 font-medium">
                   <AlertTriangle className="w-3.5 h-3.5" />
-                  <span>{warningCount} warning(s)</span>
+                  <span>{warningCount} advertencia(s)</span>
                 </div>
               )}
             </div>
@@ -783,9 +804,13 @@ export const WispCodeEditor: React.FC<WispCodeEditorProps> = ({
         </div>
 
         <div className="flex items-center gap-2.5 text-[11px] font-mono">
-          <span>Line {activeCursorLine} of {lines.length}</span>
+          <span>Ln {cursorPos.line}, Col {cursorPos.column} (Indent {cursorContext.indent})</span>
           <span>•</span>
-          <span className="hidden sm:inline text-purple-400 font-medium">Ctrl+Space: Autocomplete</span>
+          <span className="text-purple-400 font-medium truncate max-w-[220px]" title={cursorContext.enclosingContainerLabel || "Contexto activo"}>
+            {cursorContext.enclosingContainerLabel || "Nivel Raíz"}
+          </span>
+          <span>•</span>
+          <span className="hidden sm:inline text-neutral-400">Ctrl+Espacio</span>
           <span>•</span>
           <span className="capitalize">{monacoTheme.replace("-", " ")}</span>
           <span>•</span>

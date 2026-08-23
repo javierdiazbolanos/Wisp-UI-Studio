@@ -14,6 +14,7 @@ export interface MonacoEditorProps {
   highlightLine?: number | null;
   highlightBlock?: { start: number; end: number } | null;
   onCursorLineChange?: (lineNum: number) => void;
+  onCursorChange?: (lineNum: number, column: number) => void;
   onEditorReady?: (editor: any) => void;
 }
 
@@ -26,17 +27,21 @@ export const MonacoWispEditor: React.FC<MonacoEditorProps> = ({
   highlightLine = null,
   highlightBlock = null,
   onCursorLineChange,
+  onCursorChange,
   onEditorReady,
 }) => {
+  const containerRef = useRef<HTMLDivElement>(null);
   const editorRef = useRef<any>(null);
   const monacoRef = useRef<Monaco | null>(null);
   const decorationsRef = useRef<string[]>([]);
   const onCursorLineChangeRef = useRef(onCursorLineChange);
+  const onCursorChangeRef = useRef(onCursorChange);
 
   // Keep callback reference up to date to prevent stale closures
   useEffect(() => {
     onCursorLineChangeRef.current = onCursorLineChange;
-  }, [onCursorLineChange]);
+    onCursorChangeRef.current = onCursorChange;
+  }, [onCursorLineChange, onCursorChange]);
 
   const handleEditorDidMount: OnMount = (editor, monacoInstance) => {
     editorRef.current = editor;
@@ -48,17 +53,53 @@ export const MonacoWispEditor: React.FC<MonacoEditorProps> = ({
     // Ensure initial theme is applied
     monacoInstance.editor.setTheme(theme);
 
-    // Track cursor position changes (arrow keys, jumps)
+    // Track cursor position changes (both line number and exact column)
     editor.onDidChangeCursorPosition((e: any) => {
-      onCursorLineChangeRef.current?.(e.position.lineNumber);
+      const line = e.position.lineNumber;
+      const col = e.position.column;
+      onCursorLineChangeRef.current?.(line);
+      onCursorChangeRef.current?.(line, col);
     });
 
-    // Track mouse clicks / line clicks for instant bidirectional inspect
+    // Track mouse clicks / selections
     editor.onMouseDown((e: any) => {
       if (e.target && e.target.position) {
-        onCursorLineChangeRef.current?.(e.target.position.lineNumber);
+        const line = e.target.position.lineNumber;
+        const col = e.target.position.column;
+        onCursorLineChangeRef.current?.(line);
+        onCursorChangeRef.current?.(line, col);
       }
     });
+
+    // Remeasure fonts on text focus to prevent caret offset
+    editor.onDidFocusEditorText(() => {
+      monacoInstance.editor.remeasureFonts();
+      editor.layout();
+    });
+
+    // Ensure fonts are properly remeasured after web fonts load
+    if (typeof document !== "undefined" && (document as any).fonts) {
+      (document as any).fonts.ready.then(() => {
+        monacoInstance.editor.remeasureFonts();
+        editor.layout();
+      });
+    }
+
+    // Additional timed remeasure passes to guard against font loading latency
+    setTimeout(() => {
+      monacoInstance.editor.remeasureFonts();
+      editor.layout();
+    }, 150);
+
+    setTimeout(() => {
+      monacoInstance.editor.remeasureFonts();
+      editor.layout();
+    }, 600);
+
+    setTimeout(() => {
+      monacoInstance.editor.remeasureFonts();
+      editor.layout();
+    }, 1500);
 
     onEditorReady?.(editor);
   };
@@ -69,6 +110,33 @@ export const MonacoWispEditor: React.FC<MonacoEditorProps> = ({
       monacoRef.current.editor.setTheme(theme);
     }
   }, [theme]);
+
+  // Sync Font Size changes and remeasure
+  useEffect(() => {
+    if (editorRef.current && monacoRef.current) {
+      editorRef.current.updateOptions({
+        fontSize,
+        lineHeight: Math.round(fontSize * 1.6),
+      });
+      monacoRef.current.editor.remeasureFonts();
+      editorRef.current.layout();
+    }
+  }, [fontSize]);
+
+  // Auto-resize and remeasure when container size changes (palette toggle, window resize)
+  useEffect(() => {
+    if (!containerRef.current) return;
+    const observer = new ResizeObserver(() => {
+      if (editorRef.current) {
+        editorRef.current.layout();
+        if (monacoRef.current) {
+          monacoRef.current.editor.remeasureFonts();
+        }
+      }
+    });
+    observer.observe(containerRef.current);
+    return () => observer.disconnect();
+  }, []);
 
   // Sync Diagnostics / Errors as Monaco Markers (Squiggly underlines)
   useEffect(() => {
@@ -149,7 +217,7 @@ export const MonacoWispEditor: React.FC<MonacoEditorProps> = ({
   }, [highlightLine, highlightBlock]);
 
   return (
-    <div className="w-full h-full relative">
+    <div ref={containerRef} className="w-full h-full relative">
       <Editor
         height="100%"
         defaultLanguage={WISP_LANGUAGE_ID}
@@ -168,7 +236,9 @@ export const MonacoWispEditor: React.FC<MonacoEditorProps> = ({
           lineHeight: Math.round(fontSize * 1.6),
           fontFamily:
             "'JetBrains Mono', 'Fira Code', 'Roboto Mono', 'Cascadia Code', Menlo, Monaco, Consolas, monospace",
+          letterSpacing: 0,
           fontLigatures: false,
+          disableMonospaceOptimizations: false,
           tabSize: 2,
           minimap: { enabled: false },
           scrollBeyondLastLine: false,
@@ -177,6 +247,7 @@ export const MonacoWispEditor: React.FC<MonacoEditorProps> = ({
           renderLineHighlight: "all",
           cursorBlinking: "smooth",
           cursorSmoothCaretAnimation: "on",
+          cursorWidth: 2,
           smoothScrolling: true,
           suggest: {
             showKeywords: true,

@@ -99,6 +99,7 @@ export interface PaletteComponentItem {
 
 export interface WispCursorContext {
   lineNum: number;
+  column: number;
   indent: number;
   currentLineText: string;
   enclosingScreenName: string | null;
@@ -167,51 +168,52 @@ export const CONTAINER_ELEMENT_TYPES = new Set([
 ]);
 
 /**
- * Analyzes the Wisp DSL code and cursor line position to detect the active hierarchical context.
- * Accurately skips leaf elements (e.g. spacer, text, button) when resolving the true parent container.
+ * Analyzes the Wisp DSL code and cursor position (line + column) to detect the exact hierarchical context.
+ * Accurately handles indent levels (e.g., dedenting 1 or 2 levels less, root level, or child nesting),
+ * and skips leaf elements when resolving the true parent container.
  */
 export function analyzeWispCursorContext(
   code: string,
-  lineNum: number
+  lineNum: number,
+  column: number = 1
 ): WispCursorContext {
   const lines = code.split("\n");
   const targetLineIdx = Math.max(0, Math.min(lineNum - 1, lines.length - 1));
-  const currentLineText = lines[targetLineIdx] || "";
+  const currentLineText = lines[targetLineIdx] ?? "";
   const currentTrimmed = currentLineText.trim();
-  
-  // Calculate indent of cursor line
+  const currentLeadingSpaces = currentLineText.match(/^\s*/)?.[0] || "";
+  const lineWhitespaceCount = currentLeadingSpaces.replace(/\t/g, "  ").length;
+  const lineNaturalIndent = Math.floor(lineWhitespaceCount / 2);
+
+  // Calculate the active indent level at the cursor position
   let currentIndent = 0;
-  if (currentTrimmed.length > 0) {
-    const currentLeadingSpaces = currentLineText.match(/^\s*/)?.[0] || "";
-    currentIndent = Math.floor(currentLeadingSpaces.replace(/\t/g, "  ").length / 2);
-  } else {
-    // If empty line, deduce context indent from the previous non-empty line
-    let prevNonEmptyIdx = -1;
-    for (let j = targetLineIdx - 1; j >= 0; j--) {
-      const lineTrim = lines[j]?.trim() || "";
-      if (lineTrim.length > 0 && !lineTrim.startsWith("//") && !lineTrim.startsWith("#")) {
-        prevNonEmptyIdx = j;
-        break;
-      }
-    }
 
-    if (prevNonEmptyIdx >= 0) {
-      const prevLine = lines[prevNonEmptyIdx];
-      const prevTrim = prevLine.trim();
-      const prevLeading = prevLine.match(/^\s*/)?.[0] || "";
-      const prevIndent = Math.floor(prevLeading.replace(/\t/g, "  ").length / 2);
+  if (column > 1) {
+    // Cursor is specifically positioned at column (1-based index)
+    // col 1: 0 chars (indent 0)
+    // col 3: 2 chars (indent 1)
+    // col 5: 4 chars (indent 2)
+    // col 7: 6 chars (indent 3)
+    const cursorIndentFromCol = Math.floor((column - 1) / 2);
 
-      if (prevTrim.startsWith("@")) {
-        currentIndent = prevIndent + 1;
+    if (currentTrimmed.length > 0) {
+      if (column <= currentLeadingSpaces.length + 1) {
+        currentIndent = cursorIndentFromCol;
       } else {
-        const firstWord = prevTrim.split(/[\s(=:]/)[0].toLowerCase();
-        if (CONTAINER_ELEMENT_TYPES.has(firstWord)) {
-          currentIndent = prevIndent + 1;
-        } else {
-          currentIndent = prevIndent; // Sibling of leaf element like spacer, text, textfield, button
-        }
+        currentIndent = lineNaturalIndent;
       }
     } else {
+      // Empty or whitespace-only line: prefer column if cursor moved, or line's whitespace
+      currentIndent = Math.max(cursorIndentFromCol, lineNaturalIndent);
+    }
+  } else {
+    // Column 1 (or default)
+    if (currentTrimmed.length > 0) {
+      currentIndent = lineNaturalIndent;
+    } else if (lineWhitespaceCount > 0) {
+      currentIndent = lineNaturalIndent;
+    } else {
+      // Completely empty line (0 chars) at column 1 -> indent 0 (Root Level)
       currentIndent = 0;
     }
   }
@@ -283,8 +285,23 @@ export function analyzeWispCursorContext(
     }
   }
 
+  // Also check if we are below a screen declaration anywhere above us (for screen name context)
+  if (!screenName) {
+    for (let i = targetLineIdx; i >= 0; i--) {
+      const trimmed = lines[i]?.trim() || "";
+      if (trimmed.startsWith("@")) {
+        const screenMatch = trimmed.match(/^@([a-zA-Z0-9_-]+)(?::([a-zA-Z0-9_-]+))?/);
+        if (screenMatch) {
+          screenName = screenMatch[1];
+          screenType = (screenMatch[2] || "screen").toLowerCase();
+          break;
+        }
+      }
+    }
+  }
+
   const directParent = parentPath.length > 0 ? parentPath[parentPath.length - 1] : null;
-  const isAtRoot = parentPath.length === 0 && (currentIndent === 0 || !screenName);
+  const isAtRoot = currentIndent === 0;
 
   const isInsideTable = parentPath.some((p) => ["table", "datatable"].includes(p.type));
   const isInsideSelect = parentPath.some((p) => ["select", "autocomplete"].includes(p.type));
@@ -292,14 +309,26 @@ export function analyzeWispCursorContext(
   const isInsideTabs = parentPath.some((p) => ["tabs"].includes(p.type)) && !parentPath.some((p) => p.type === "tab");
   const isInsideSplit = parentPath.some((p) => ["split"].includes(p.type)) && !parentPath.some((p) => ["left", "right"].includes(p.type));
 
+  let enclosingLabel = "Nivel Raíz (Declaraciones @Screen, @Modal)";
+  if (!isAtRoot) {
+    if (directParent) {
+      enclosingLabel = directParent.label;
+    } else if (screenName) {
+      enclosingLabel = `@${screenName} (Hijo de Pantalla)`;
+    } else {
+      enclosingLabel = "Pantalla";
+    }
+  }
+
   return {
     lineNum,
+    column,
     indent: currentIndent,
     currentLineText,
     enclosingScreenName: screenName,
     enclosingScreenType: screenType,
     enclosingContainerType: directParent?.type || (isAtRoot ? "root" : screenType || "screen"),
-    enclosingContainerLabel: directParent?.label || (isAtRoot ? "Nivel Raíz (Documento)" : screenName ? `@${screenName}` : "Pantalla"),
+    enclosingContainerLabel: enclosingLabel,
     parentPath,
     isAtRoot,
     isInsideTable,
