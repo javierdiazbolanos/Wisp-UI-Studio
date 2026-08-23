@@ -56,6 +56,13 @@ import {
 } from "lucide-react";
 
 export type PaletteCategory =
+  | "Views & Root"
+  | "Layout & Surfaces"
+  | "Inputs & Forms"
+  | "Actions & Controls"
+  | "Data & Tables"
+  | "Feedback & Alerts"
+  | "Logic & Flow"
   | "Vistas & Raíz"
   | "Layout & Superficie"
   | "Entradas & Formularios"
@@ -149,6 +156,14 @@ export const CONTAINER_ELEMENT_TYPES = new Set([
   "dropdown",
   "dropdownmenu",
   "list",
+  "fabmenu",
+  "fab-menu",
+  "speeddial",
+  "splitbutton",
+  "split-button",
+  "buttongroup",
+  "button-group",
+  "connectedbuttons",
 ]);
 
 /**
@@ -1751,6 +1766,108 @@ export const WISP_PALETTE_CATALOG: PaletteComponentItem[] = [
         <div className="px-3 py-1.5 rounded-full bg-purple-600 text-white text-[10px] font-bold flex items-center gap-1 shadow-lg">
           <Plus className="w-3 h-3" />
           <span>Nuevo</span>
+        </div>
+      </div>
+    ),
+  },
+  {
+    id: "splitbutton",
+    name: "splitbutton",
+    label: "Split Button (M3E)",
+    category: "Actions & Controls",
+    icon: Split,
+    color: "from-purple-600 to-indigo-600",
+    snippet: `splitbutton "Quick Export" icon=download goto=@ExportModal\n  menuitem "Export as PDF" icon=file-text goto=@ExportPDF\n  menuitem "Export as CSV" icon=table goto=@ExportCSV`,
+    description: "Material 3 Expressive split button pairing a primary trigger action with a dropdown submenu.",
+    modifiers: ["label=\"...\"", "icon=download", "goto=@Screen", "menuitem \"...\""],
+    contextRules: { containerOnly: true },
+    renderPreview: (isLight = false) => (
+      <div
+        className={`p-3 rounded-2xl border flex items-center gap-2 transition-colors ${
+          isLight ? "bg-neutral-100/90 border-neutral-200" : "bg-neutral-900/95 border-neutral-800"
+        }`}
+      >
+        <div className="inline-flex rounded-full bg-purple-600 text-white text-[10px] font-semibold overflow-hidden divide-x divide-purple-700 shadow-md">
+          <span className="px-2.5 py-1">Quick Action</span>
+          <span className="px-1.5 py-1 flex items-center"><ChevronDown className="w-3 h-3" /></span>
+        </div>
+      </div>
+    ),
+  },
+  {
+    id: "buttongroup",
+    name: "buttongroup",
+    label: "Connected Buttons (M3E)",
+    category: "Actions & Controls",
+    icon: Layers,
+    color: "from-blue-600 to-indigo-600",
+    snippet: `buttongroup\n  button "Overview" active=true\n  button "Analytics"\n  button "Settings"`,
+    description: "Material 3 Expressive grouped connected buttons with unified borders and segment states.",
+    modifiers: ["variant=outlined|filled", "button \"...\""],
+    contextRules: { containerOnly: true },
+    renderPreview: (isLight = false) => (
+      <div
+        className={`p-3 rounded-2xl border flex items-center gap-2 transition-colors ${
+          isLight ? "bg-neutral-100/90 border-neutral-200" : "bg-neutral-900/95 border-neutral-800"
+        }`}
+      >
+        <div className="inline-flex rounded-xl border border-neutral-300 dark:border-neutral-700 overflow-hidden divide-x divide-neutral-200 dark:divide-neutral-700 text-[9px] font-semibold">
+          <span className="px-2 py-0.5 bg-purple-100 dark:bg-purple-950 text-purple-900 dark:text-purple-200 font-bold">First</span>
+          <span className="px-2 py-0.5 bg-white dark:bg-neutral-800 text-neutral-600 dark:text-neutral-300">Second</span>
+        </div>
+      </div>
+    ),
+  },
+  {
+    id: "fabmenu",
+    name: "fabmenu",
+    label: "FAB Speed Dial Menu (M3E)",
+    category: "Actions & Controls",
+    icon: Sparkles,
+    color: "from-fuchsia-600 to-purple-600",
+    snippet: `fabmenu "Actions" icon=plus\n  fabitem "New User" icon=user-plus goto=@CreateUser\n  fabitem "Send Report" icon=send goto=@SendReport`,
+    description: "Material 3 Expressive floating speed-dial action menu with animated expansion triggers.",
+    modifiers: ["label=\"...\"", "icon=plus", "fabitem \"...\""],
+    contextRules: { containerOnly: true },
+    renderPreview: (isLight = false) => (
+      <div
+        className={`p-3 rounded-2xl border flex flex-col items-end gap-1 transition-colors ${
+          isLight ? "bg-neutral-100/90 border-neutral-200" : "bg-neutral-900/95 border-neutral-800"
+        }`}
+      >
+        <div className="flex items-center gap-1.5">
+          <span className="text-[8px] bg-neutral-900 text-white px-1.5 py-0.5 rounded-full font-bold">New Item</span>
+          <span className="w-5 h-5 rounded-full bg-white dark:bg-neutral-800 border flex items-center justify-center text-purple-600 text-[9px] shadow-xs"><Sparkles className="w-2.5 h-2.5" /></span>
+        </div>
+        <div className="px-2.5 py-1 rounded-full bg-purple-600 text-white text-[9px] font-bold flex items-center gap-1 shadow-md">
+          <Plus className="w-2.5 h-2.5" /> <span>Actions</span>
+        </div>
+      </div>
+    ),
+  },
+  {
+    id: "wavyprogress",
+    name: "wavyprogress",
+    label: "Expressive Progress Indicator (M3E)",
+    category: "Feedback & Alerts",
+    icon: Activity,
+    color: "from-purple-500 to-pink-500",
+    snippet: `wavyprogress label="Syncing Cloud Data..." value=65 variant=linear`,
+    description: "Material 3 Expressive organic linear and circular rosette progress indicators.",
+    modifiers: ["value=65", "label=\"...\"", "variant=linear|circular"],
+    contextRules: { containerOnly: true },
+    renderPreview: (isLight = false) => (
+      <div
+        className={`p-3 rounded-2xl border space-y-1.5 transition-colors ${
+          isLight ? "bg-neutral-100/90 border-neutral-200" : "bg-neutral-900/95 border-neutral-800"
+        }`}
+      >
+        <div className="flex justify-between text-[9px] font-semibold text-purple-900 dark:text-purple-300">
+          <span>Processing</span>
+          <span>72%</span>
+        </div>
+        <div className="h-2 rounded-full overflow-hidden bg-purple-100 dark:bg-purple-950 p-0.5">
+          <div className="h-full bg-purple-600 rounded-full w-[72%]" />
         </div>
       </div>
     ),

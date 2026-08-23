@@ -22,9 +22,11 @@ export interface HighlightToken {
 const COMPONENT_KEYWORDS = new Set([
   "component", "include", "use",
   "card", "text", "button", "textfield", "textarea", "select", "option", "autocomplete", "datepicker", "timepicker", "time-picker",
-  "segmentedbutton", "chip", "switch", "checkbox", "slider",
+  "segmentedbutton", "chip", "filterchip", "switch", "checkbox", "slider",
   "list", "listitem", "list-item", "listgroup", "avatar", "badge", "icon", "image", "progress",
-  "loading", "spinner", "circularprogress", "linearprogress",
+  "loading", "spinner", "circularprogress", "linearprogress", "wavyprogress", "wavy-progress", "progressindicator",
+  "splitbutton", "split-button", "split-btn", "buttongroup", "button-group", "connectedbuttons", "connected-buttons",
+  "fabmenu", "fab-menu", "speeddial", "fabitem", "fab-item",
   "metric", "stat", "divider", "spacer", "alert", "tabs", "tab", "panel", "tabitem", "table",
   "radio", "fab", "accordion", "snackbar", "toast", "breadcrumbs", "rating", "searchbar", "search", "appbar", "topappbar", "navbar", "topbar", "bottomnav", "bottombar", "navitem",
   "navigationrail", "apprail", "navrail", "rail", "railitem", "rail-item", "destination",

@@ -11,42 +11,115 @@ export const WISP_TEMPLATES: WispTemplate[] = [
     id: "m3-expressive-gallery",
     title: "Material 3 Expressive UI • Master Design System",
     category: "Design System",
-    description: "Exhaustive showcase of every Material 3 Expressive component: Navigation Rail, Drawers, Sheets, Buttons, Typed Tables, Inputs, Feedback, and Surfaces.",
+    description: "Exhaustive showcase of every Material 3 Expressive component: Split Button, Button Group, FAB Speed-Dial Menu, Wavy Progress, Navigation Rail, Drawers, Sheets, Typed Tables, Inputs, and Surfaces.",
     code: `@theme material3
 
 @M3Gallery:screen
-  appbar "Material 3 Expressive Design System" icon=palette
-    button icon=bell text badge="3"
-    button icon=share-2 text
+  appbar "Material 3 Expressive Master Gallery" icon=palette
+    button icon=bell text badge="5" snackbar="5 design system updates available"
+    button icon=share-2 text snackbar="Gallery share link copied"
+    button "Export Specs" tonal icon=download goto=@M3DialogPreview
 
-  breadcrumbs items=["Design System", "Material 3 Baseline", "Component Showcase"] separator=chevron
+  breadcrumbs items=["Design System", "Material 3 Expressive", "Master Component Catalog"] separator=chevron
 
-  snackbar "Material 3 Baseline (#6750A4) loaded successfully" action="Explore" icon=sparkles type=info goto=@M3DialogPreview
+  snackbar "Material 3 Expressive baseline loaded with 100% token coverage" action="Specs" icon=sparkles type=info goto=@M3DialogPreview
 
-  row spacing=16 justify=between
+  row spacing=16 justify=between align=center
     column spacing=4
-      text "Google Material Design 3 Master Component Catalog" display color=primary
-      text "Complete visual and functional specification: dynamic HCT tokens, spring physics, fluid typography, and responsive interactive states."
+      text "Google Material Design 3 Expressive Master Catalog" display color=primary
+      text "Comprehensive visual and interactive specification: Split Buttons, Connected Groups, Speed-Dial FABs, Wavy Indicators, Typed Tables, and Spring Motion."
     row spacing=12
       button "Open Modal Dialog" filled icon=layers goto=@M3DialogPreview
-      button "Bottom Sheet" tonal icon=arrow-up-right goto=@M3SheetPreview
+      button "View Side Sheet" tonal icon=sidebar goto=@M3SideSheetPreview
+      button "Bottom Sheet" outlined icon=arrow-up-right goto=@M3SheetPreview
 
   spacer height=8
 
   grid cols=4 gap=16
     metric label="M3 Tokens" value="48 Tokens" delta="100% HCT Coverage" icon=palette
-    metric label="Components" value="36 Widgets" delta="Baseline + Expressive" icon=box
+    metric label="Widgets & Specs" value="42 Components" delta="Baseline + Expressive" icon=box
     metric label="Accessibility" value="WCAG AAA" delta="4.5:1 Contrast Ratio" icon=shield-check
     metric label="Architecture" value="TSX + WDSL" delta="Production Ready" icon=code
 
   spacer height=12
 
-  tabs items=["Inputs & Forms", "Actions & Buttons", "Structure & Tables", "Surfaces & Feedback", "Navigation & M3 Advanced"]
+  tabs items=["Actions & M3E Buttons", "Inputs & Forms", "Wavy Progress & Feedback", "Structure & Typed Tables", "Surfaces & Navigation"]
+    tab "Actions & M3E Buttons"
+      split
+        left
+          card elevated
+            text "Material 3 Expressive: Split Buttons & Button Groups" title
+            text "Conjoined multi-action controls that combine a primary trigger with contextual dropdowns or unified segmented units." body
+            spacer height=8
+            text "Split Button (Primary Action + Submenu):" label
+            row spacing=12
+              splitbutton "Publish Release" icon=send filled goto=@M3DialogPreview
+                menuitem "Save as draft" icon=save shortcut="Ctrl+S"
+                menuitem "Schedule publication" icon=clock
+                menuitem "Export as JSON" icon=download
+              splitbutton "Export Data" icon=download tonal
+                menuitem "Download PDF Report" icon=file-text
+                menuitem "Export CSV Table" icon=table
+                menuitem "Copy to Clipboard" icon=copy
+            spacer height=12
+            text "Connected Button Group (Unified Segmented Borders):" label
+            buttongroup outlined
+              button "Daily" active=true
+              button "Weekly"
+              button "Monthly"
+              button "Quarterly"
+            spacer height=12
+            text "Standard Button Hierarchy:" label
+            row spacing=10
+              button "Filled" filled icon=check badge="New"
+              button "Tonal" tonal icon=sparkles
+              button "Outlined" outlined icon=edit-3
+              button "Elevated" elevated icon=arrow-up
+              button "Text" text icon=chevron-right
+            spacer height=12
+            text "Interactive Icon Buttons with Tooltips:" label
+            row spacing=12
+              iconbutton icon=heart variant=filled tooltip="Favorite item"
+              iconbutton icon=bookmark variant=tonal tooltip="Bookmark for later"
+              iconbutton icon=share-2 variant=outlined tooltip="Share with team"
+              iconbutton icon=more-vertical variant=standard tooltip="More options"
+
+        right
+          card elevated
+            text "Speed-Dial FAB Menu & Segmented Controls" title
+            text "High-emphasis floating action speed-dial menu and discrete filter controls:" body
+            spacer height=8
+            text "M3 Expressive FAB Menu (Floating Speed Dial):" label
+            row spacing=16 align=center
+              fabmenu "Quick Actions" icon=plus variant=primary
+                fabitem "Create Event" icon=calendar goto=@M3DialogPreview
+                fabitem "New Contact" icon=user-plus snackbar="Contact dialog opened"
+                fabitem "Upload Assets" icon=upload snackbar="Asset uploaded"
+                fabitem "Share Catalog" icon=share-2 snackbar="Share link copied"
+              text "Click '+' to toggle the animated speed-dial stack." body color=muted
+            spacer height=12
+            text "Segmented Button & Categorical Chips:" label
+            segmentedbutton device options=["Desktop", "Tablet", "Mobile"] selected="Desktop"
+            spacer height=10
+            row spacing=8
+              chip "Active Filter" variant=filter selected=true icon=check
+              chip "Assist Suggestion" icon=help-circle
+              chip "High Priority" icon=alert-circle selected=true
+              chip "Cloud Native" icon=cloud
+            spacer height=12
+            text "Contextual Dropdown Menu:" label
+            row spacing=12 align=center
+              menu "Manage Resource" icon=more-vertical
+                menuitem "Edit Profile" icon=edit shortcut="Ctrl+E"
+                menuitem "Duplicate Configuration" icon=copy shortcut="Ctrl+D"
+                menuitem "Delete Resource" icon=trash goto=@M3DialogPreview
+              button "Trigger Snackbar" filled icon=send snackbar="Synced successfully" snackbar-action="Undo" snackbar-type=success
+
     tab "Inputs & Forms"
       split
         left
           card elevated
-            text "Text Fields & Search Inputs" title
+            text "Text Fields, Search & Large Inputs" title
             textfield username label="Username" placeholder="alex.morgan" icon=user required=true helper="Enter your unique handle"
             textfield email label="Work Email" placeholder="alex@company.com" icon=mail required=true
             textfield password label="Secure Password" placeholder="••••••••••••" icon=lock type=password
@@ -55,7 +128,7 @@ export const WISP_TEMPLATES: WispTemplate[] = [
 
         right
           card elevated
-            text "Selectors, Sliders & Precision Controls" title
+            text "Pickers, Selectors, Sliders & Precision Controls" title
             grid cols=2 gap=12
               select role label="System Role" value="Tech Lead"
                 option "Tech Lead"
@@ -84,98 +157,60 @@ export const WISP_TEMPLATES: WispTemplate[] = [
               switch darkMode label="Dark Theme Active" checked=false
               checkbox terms label="I agree to M3 Terms of Service" checked=true
 
-    tab "Actions & Buttons"
-      split
-        left
-          card elevated
-            text "Material 3 Button Hierarchy" title
-            text "Visual emphasis tiers: Filled (primary), Tonal (secondary), Outlined (medium), Elevated (surface shadow), Text (tertiary)." body
-            spacer height=8
-            row spacing=12
-              button "Filled Button" filled icon=check badge="New"
-              button "Tonal Button" tonal icon=sparkles
-              button "Outlined Button" outlined icon=edit-3
-            row spacing=12
-              button "Elevated Button" elevated icon=arrow-up
-              button "Text Button" text icon=chevron-right
-            spacer height=12
-            text "Interactive Icon Buttons with Tooltips:" label
-            row spacing=12
-              iconbutton icon=heart variant=filled tooltip="Favorite item"
-              iconbutton icon=bookmark variant=tonal tooltip="Bookmark for later"
-              iconbutton icon=share-2 variant=outlined tooltip="Share with team"
-              iconbutton icon=more-vertical variant=standard tooltip="More options"
-            spacer height=8
-            text "Button with Triggered Snackbar:" label
-            row spacing=12
-              button "Trigger Notification" filled icon=send snackbar="Changes synced to cloud successfully" snackbar-action="Undo" snackbar-type=success
-
-        right
-          card elevated
-            text "Segmented Buttons, Chips & Floating Action" title
-            text "Segmented controls for discrete switching and contextual filter chips:" body
-            spacer height=8
-            segmentedbutton device options=["Desktop", "Tablet", "Mobile"] selected="Desktop"
-            spacer height=12
-            text "Interactive Filter & Assist Chips:" label
-            row spacing=8
-              chip "Active Filter" variant=filter selected=true icon=check
-              chip "Assist Suggestion" icon=help-circle
-              chip "High Priority" icon=alert-circle selected=true
-              chip "Cloud Native" icon=cloud
-            spacer height=12
-            text "Contextual Menu & Floating Action:" label
-            row spacing=12 align=center
-              menu "Quick Actions Menu" icon=more-vertical
-                menuitem "Edit Profile" icon=edit shortcut="Ctrl+E"
-                menuitem "Duplicate Preset" icon=copy shortcut="Ctrl+D"
-                menuitem "Delete Resource" icon=trash goto=@M3DialogPreview
-              tooltip text="Floating action button positioned for primary actions"
-                button "Hover for Tooltip" outlined icon=info
-
-    tab "Structure & Tables"
-      card elevated
-        row spacing=16 justify=between
-          column spacing=2
-            text "Typed Data Table with Real-Time Filtering" title
-            text "Supports custom column formatters: avatars, status pills, progress bars, dates, currency, and row actions." body
-          button "New Member" filled icon=plus
-        table title="Engineering Team Directory" columns=["Member:avatar", "Email:text", "Role:status", "Progress:progress", "Last Active:date", "Salary:currency", "Action:action"] striped=true searchable=true pageSize=4
-          row ["Alex Morgan", "alex@google.com", "Super Admin", "95%", "2026-08-20", "$14,500.00", "Manage"]
-          row ["Elena Rostova", "elena@company.com", "DevOps Lead", "88%", "2026-08-19", "$12,800.00", "Manage"]
-          row ["Carlos Mendez", "carlos@company.com", "QA Architect", "72%", "2026-08-18", "$11,200.00", "Manage"]
-          row ["Sofia Castro", "sofia@company.com", "Product Designer", "100%", "2026-08-20", "$13,400.00", "Manage"]
-          row ["Javier Díaz Bolaños", "javier@goldeneventos.com", "Principal Architect", "98%", "2026-08-22", "$16,500.00", "Manage"]
-        divider
-        text "Structured Master List Items:" label
-        list
-          listitem "Master Design Tokens" subtitle="Synchronized with @material/material-color-utilities" icon=palette badge="v3.2" switch=true
-          listitem "Zero-Trust Security Policies" subtitle="Enforcing mTLS and identity certificates" icon=shield-check badge="Active" checkbox=true
-
-    tab "Surfaces & Feedback"
+    tab "Wavy Progress & Feedback"
       grid cols=2 gap=16
         card elevated
-          text "Feedback Alerts & Rich Tooltips" title
+          text "Material 3 Expressive: Wavy Progress Indicators" title
+          text "Google's organic harmonic sine wave tracks and multi-petal circular rosette oscillators:" body
+          spacer height=8
+          text "Linear Sinusoidal Harmonic Wave (84%):" label
+          wavyprogress value=84 message="Harmonizing M3 expressive tokens (84%)" variant=linear
+          spacer height=8
+          text "Circular Rosette Petal Oscillator (92%):" label
+          wavyprogress variant=circular value=92 message="Rosette Multi-Petal Sync (92%)"
+          spacer height=8
+          text "Continuous Harmonic Wave (Indeterminate):" label
+          wavyprogress color=tertiary size=lg message="Real-time event streaming active..."
+          spacer height=12
+          text "Standard Linear & Circular Indicators:" label
+          linearprogress value=75 message="Compiling AST nodes (75%)"
+          spacer height=6
+          grid cols=2 gap=12
+            circularprogress value=85 message="Health (85%)"
+            circularprogress value=100 message="Optimized (100%)"
+
+        card outlined
+          text "Feedback Alerts, Rich Tooltips & Spinners" title
           alert "Cloud database synchronization completed successfully with zero schema conflicts." type=success title="Operation Successful"
           alert "Review and verify TLS certificates prior to staging deployment." type=warning title="Security Notice"
           alert "Failed to reach fallback microservices cluster in region us-east4." type=error title="Connection Timeout"
           alert "Material 3 Expressive dynamically harmonizes secondary and tertiary hues." type=info title="Design System Note"
           spacer height=8
           richtooltip title="Material 3 Expressive Guide" text="Learn how HCT color space and dynamic tonal curves elevate your interfaces." action="View Documentation" action_goto=@M3DialogPreview
+          spacer height=8
+          loading "Synchronizing design system tokens with cloud backend..."
 
-        card outlined
-          text "Collapsible Accordions & Containers" title
-          accordion "1. Infrastructure & Deployment Parameters" expanded=true icon=server
-            text "Configure Kubernetes cluster topologies, load balancers, and ingress routers." body
-            row spacing=12
-              switch autoScale label="HPA Autoscaling" checked=true
-              switch ddosProtect label="Cloud Armor DDoS Defense" checked=true
-          accordion "2. Zero-Trust Access & Identity Verification" expanded=false icon=shield-check
-            text "Context-aware authentication, granular RBAC policies, and real-time audit logging." body
-          accordion "3. Performance Profiling & Metrics" expanded=false icon=activity
-            text "Continuous tracing with OpenTelemetry and automated regression benchmarks." body
+    tab "Structure & Typed Tables"
+      card elevated
+        row spacing=16 justify=between
+          column spacing=2
+            text "Typed Data Table with Real-Time Filtering & Custom Formats" title
+            text "Supports custom column formatters: avatars, status pills, progress tracks, dates, currency, ratings, and row actions." body
+          button "New Member" filled icon=plus
+        table title="Engineering Team Directory" columns=["Member:avatar", "Email:text", "Role:status", "Progress:progress", "Rating:rating", "Last Active:date", "Salary:currency", "Action:action", "Options:dropdown"] striped=true searchable=true pageSize=5
+          row ["Alex Morgan", "alex@google.com", "Super Admin", "95%", "5", "2026-08-20", "$14,500.00", "Manage", ""]
+          row ["Elena Rostova", "elena@company.com", "DevOps Lead", "88%", "5", "2026-08-19", "$12,800.00", "Manage", ""]
+          row ["Carlos Mendez", "carlos@company.com", "QA Architect", "72%", "4", "2026-08-18", "$11,200.00", "Manage", ""]
+          row ["Sofia Castro", "sofia@company.com", "Product Designer", "100%", "5", "2026-08-20", "$13,400.00", "Manage", ""]
+          row ["Javier Díaz Bolaños", "javier@goldeneventos.com", "Principal Architect", "98%", "5", "2026-08-22", "$16,500.00", "Manage", ""]
+        divider
+        text "Structured Master List Items with Integrated Controls:" label
+        list
+          listitem "Master Design Tokens" subtitle="Synchronized with @material/material-color-utilities" icon=palette badge="v3.2" switch=true
+          listitem "Zero-Trust Security Policies" subtitle="Enforcing mTLS and identity certificates" icon=shield-check badge="Active" checkbox=true
+          listitem "Speed-Dial Action Listeners" subtitle="Triggering contextual micro-interactions" icon=zap badge="Expressive"
 
-    tab "Navigation & M3 Advanced"
+    tab "Surfaces & Navigation"
       split
         left
           navigationrail title="Studio" fab=plus
@@ -186,24 +221,9 @@ export const WISP_TEMPLATES: WispTemplate[] = [
         right
           column spacing=16
             card elevated
-              row spacing=12 justify=between align=center
-                column spacing=2
-                  text "Material 3 Progress & Activity Indicators" title
-                  text "Continuous linear tracks, determinate progress with stop indicators, and spinning rings." body
-                menu "Actions" icon=more-vertical
-                  menuitem "Reload Pipeline" icon=refresh-cw
-                  menuitem "Export TSX Code" icon=download
-                  menuitem "Configure Tokens" icon=settings
-              spacer height=4
-              loading "Synchronizing design tokens with cloud backend..."
-              spacer height=4
-              linearprogress value=75 message="Compiling AST AST nodes (75%)"
-              spacer height=4
-              grid cols=2 gap=12
-                circularprogress value=85 message="System Health (85%)"
-                circularprogress value=100 message="Optimizations (100%)"
-            card elevated
               text "Interactive Card Carousel" title
+              text "Horizontal sliding deck with smooth snap scrolling and edge padding:" body
+              spacer height=6
               carousel
                 card outlined
                   text "Grand Emerald Ballroom" title
@@ -214,6 +234,17 @@ export const WISP_TEMPLATES: WispTemplate[] = [
                 card outlined
                   text "Executive Innovation Auditorium" title
                   text "Equipped with ultra-wide 4K projection and enterprise videoconferencing suites." body
+            card outlined
+              text "Collapsible Accordions & Settings" title
+              accordion "1. Infrastructure & Deployment Parameters" expanded=true icon=server
+                text "Configure Kubernetes cluster topologies, load balancers, and ingress routers." body
+                row spacing=12
+                  switch autoScale label="HPA Autoscaling" checked=true
+                  switch ddosProtect label="Cloud Armor DDoS Defense" checked=true
+              accordion "2. Zero-Trust Access & Identity Verification" expanded=false icon=shield-check
+                text "Context-aware authentication, granular RBAC policies, and real-time audit logging." body
+              accordion "3. Performance Profiling & Metrics" expanded=false icon=activity
+                text "Continuous tracing with OpenTelemetry and automated regression benchmarks." body
             row spacing=12
               button "Open Navigation Drawer" filled icon=menu goto=@M3DrawerPreview
               button "Open Side Sheet" tonal icon=sidebar goto=@M3SideSheetPreview
@@ -338,10 +369,13 @@ export const WISP_TEMPLATES: WispTemplate[] = [
       button "" text icon=x goto=close
     text "Secondary contextual details and actions presented without losing main screen state." body
     spacer height=12
-    listitem "Technical Documentation" subtitle="Material 3 Expressive migration guide" icon=book-open
-    listitem "Design Token Downloads" subtitle="Export format JSON / TSX" icon=download
+    list
+      listitem "Share via Secure Link" icon=share-2
+      listitem "Export PDF Specifications" icon=file-text
+      listitem "Download Jetpack Theme" icon=download
     spacer height=16
-    button "Dismiss Sheet" filled goto=close
+    row spacing=12 justify=end
+      button "Dismiss Sheet" filled goto=close
 `,
   },
   {

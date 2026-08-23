@@ -947,6 +947,93 @@ export const WISP_DOCS_DATABASE: Record<string, WispDocEntry> = {
     ],
   },
 
+  wavyprogress: {
+    name: "wavyprogress",
+    category: "Feedback & Status",
+    signature: 'wavyprogress [value=75] [variant=linear|circular] [message="..."] [color=primary|secondary|tertiary|error] [size=sm|md|lg]',
+    summary: "Material 3 Expressive organic wavy progress indicator (Sinusoidal or Rosette).",
+    description: "Renders Google's new expressive wavy progress with harmonic sine wave tracks or 8-petal circular rosette loops with animated phase shifts and stop dots.",
+    parameters: [
+      { name: "value", type: "number", description: "0-100 percentage for determinate progress (omit for continuous harmonic wave)" },
+      { name: "variant", type: "string", default: "linear", values: ["linear", "circular"], description: "Wave geometry shape (linear horizontal sine wave or circular rosette petals)" },
+      { name: "message", type: "string", description: "Supporting label text" },
+      { name: "color", type: "string", default: "primary", values: ["primary", "secondary", "tertiary", "error"], description: "Material 3 tonal palette" },
+      { name: "size", type: "string", default: "md", values: ["sm", "md", "lg"], description: "Indicator dimensions and amplitude" },
+    ],
+    examples: [
+      'wavyprogress value=84 message="Harmonizing M3 tokens (84%)"',
+      'wavyprogress variant=circular value=92 message="Syncing Cluster"',
+      'wavyprogress color=tertiary size=lg message="Connecting to real-time feed..."',
+    ],
+  },
+
+  fabmenu: {
+    name: "fabmenu",
+    category: "Actions",
+    signature: 'fabmenu [label="..."] [icon=plus] [variant=primary|secondary|tertiary|surface] [position=inline|bottom-right|bottom-left]\n  fabitem "Item 1" icon=edit-3 goto=@Screen\n  fabitem "Item 2" icon=share-2 snackbar="..."',
+    summary: "Material 3 Expressive Floating Action Menu (Speed Dial).",
+    description: "High-emphasis floating action trigger that rotates to expand an animated cascading stack of mini FAB speed dial actions with pill capsules.",
+    parameters: [
+      { name: "label", type: "string", description: "Optional extended FAB label" },
+      { name: "icon", type: "string", default: "plus", description: "Center icon name that rotates on expand" },
+      { name: "variant", type: "string", default: "primary", values: ["primary", "secondary", "tertiary", "surface"], description: "Color palette emphasis" },
+      { name: "position", type: "string", default: "inline", values: ["inline", "bottom-right", "bottom-left"], description: "Placement layout" },
+    ],
+    examples: [
+      'fabmenu icon=plus\n  fabitem "Create Proposal" icon=file-text goto=@NewProposal\n  fabitem "Quick Note" icon=edit-3 snackbar="Note drafted"\n  fabitem "Share Workspace" icon=share-2 snackbar="Link copied"',
+    ],
+  },
+
+  fabitem: {
+    name: "fabitem",
+    category: "Actions",
+    signature: 'fabitem "Label" [icon=...] [goto=@Screen] [snackbar="..."] [variant=surface|primary|secondary]',
+    summary: "Speed dial action item inside a 'fabmenu'.",
+    description: "Renders a circular mini FAB paired with a high-contrast label capsule and animated spring transition.",
+    parameters: [
+      { name: "label", type: "string", description: "Capsule text label" },
+      { name: "icon", type: "string", description: "Action icon name" },
+      { name: "goto", type: "string", description: "Target screen for navigation" },
+      { name: "snackbar", type: "string", description: "Toast notification on click" },
+    ],
+    examples: [
+      'fabitem "Export PDF" icon=download snackbar="Document generated"',
+    ],
+  },
+
+  splitbutton: {
+    name: "splitbutton",
+    category: "Actions",
+    signature: 'splitbutton "Primary Action" [icon=...] [variant=filled|tonal|outlined|elevated] [goto=@Screen]\n  menuitem "Action 2" icon=...\n  menuitem "Action 3" icon=...',
+    summary: "Material 3 Expressive Split Button (Conjoined dual-action control with dropdown menu).",
+    description: "Combines a primary direct action button on the leading edge with a conjoined chevron toggle that reveals a contextual action menu.",
+    parameters: [
+      { name: "label", type: "string", description: "Primary action label text" },
+      { name: "icon", type: "string", description: "Leading icon for primary action" },
+      { name: "variant", type: "string", default: "filled", values: ["filled", "tonal", "outlined", "elevated"], description: "Visual emphasis tier" },
+      { name: "goto", type: "string", description: "Screen target for primary click" },
+      { name: "snackbar", type: "string", description: "Toast triggered on primary click" },
+    ],
+    examples: [
+      'splitbutton "Publish Event" icon=send filled goto=@Overview\n  menuitem "Save Draft" icon=save shortcut="Ctrl+S"\n  menuitem "Schedule Release" icon=clock\n  menuitem "Export JSON" icon=download',
+    ],
+  },
+
+  buttongroup: {
+    name: "buttongroup",
+    category: "Actions",
+    signature: 'buttongroup [variant=outlined|tonal|filled] [orientation=horizontal|vertical]\n  button "Option 1" icon=...\n  button "Option 2" icon=...\n  button "Option 3" icon=...',
+    summary: "Material 3 Expressive Connected Button Group.",
+    description: "Groups multiple related buttons into a seamless conjoined segmented unit with continuous shared borders and corner radii.",
+    parameters: [
+      { name: "variant", type: "string", default: "outlined", values: ["outlined", "tonal", "filled"], description: "Group container style" },
+      { name: "orientation", type: "string", default: "horizontal", values: ["horizontal", "vertical"], description: "Layout orientation" },
+    ],
+    examples: [
+      'buttongroup outlined\n  button "Day" active\n  button "Week"\n  button "Month"\n  button "Year"',
+    ],
+  },
+
   tooltip: {
     name: "tooltip",
     category: "Feedback & Status",

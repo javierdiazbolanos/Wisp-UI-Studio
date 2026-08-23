@@ -315,6 +315,16 @@ export function parseWispDSL(dslText: string): WispDocument {
       "sidesheet",
       "sheet",
       "bottomsheet",
+      "fabmenu",
+      "fab-menu",
+      "speeddial",
+      "splitbutton",
+      "split-button",
+      "split-btn",
+      "buttongroup",
+      "button-group",
+      "connectedbuttons",
+      "connected-buttons",
       "form",
       "dialog",
       "modal",
@@ -756,6 +766,29 @@ function parseComponentLine(
         node.props.variant = token.toLowerCase();
       }
       positionalIndex++;
+    } else if (rawType === "fabmenu" || rawType === "fab-menu" || rawType === "speeddial") {
+      if (positionalIndex === 0) {
+        node.props.label = unquote(token);
+      } else if (["primary", "secondary", "tertiary", "surface"].includes(token.toLowerCase())) {
+        node.props.variant = token.toLowerCase();
+      } else if (["bottom-right", "bottom-left", "top-right", "top-left", "inline"].includes(token.toLowerCase())) {
+        node.props.position = token.toLowerCase();
+      }
+      positionalIndex++;
+    } else if (rawType === "splitbutton" || rawType === "split-button" || rawType === "split-btn") {
+      if (positionalIndex === 0) {
+        node.props.label = unquote(token);
+      } else if (["filled", "tonal", "outlined", "elevated"].includes(token.toLowerCase())) {
+        node.props.variant = token.toLowerCase();
+      }
+      positionalIndex++;
+    } else if (rawType === "buttongroup" || rawType === "button-group" || rawType === "connectedbuttons" || rawType === "connected-buttons") {
+      if (["horizontal", "vertical"].includes(token.toLowerCase())) {
+        node.props.orientation = token.toLowerCase();
+      } else if (["filled", "tonal", "outlined", "elevated"].includes(token.toLowerCase())) {
+        node.props.variant = token.toLowerCase();
+      }
+      positionalIndex++;
     } else if (rawType === "snackbar") {
       if (positionalIndex === 0) {
         node.props.message = unquote(token);
@@ -777,7 +810,17 @@ function parseComponentLine(
         }
       }
       positionalIndex++;
-    } else if (rawType === "loading" || rawType === "spinner" || rawType === "circularprogress" || rawType === "linearprogress") {
+    } else if (
+      rawType === "loading" ||
+      rawType === "spinner" ||
+      rawType === "circularprogress" ||
+      rawType === "linearprogress" ||
+      rawType === "progress" ||
+      rawType === "wavyprogress" ||
+      rawType === "wavy-progress" ||
+      rawType === "progressindicator" ||
+      rawType === "progress-indicator"
+    ) {
       if (positionalIndex === 0) {
         if (!isNaN(Number(unquote(token)))) {
           node.props.value = Number(unquote(token));
@@ -785,10 +828,13 @@ function parseComponentLine(
           node.props.message = unquote(token);
           node.props.label = unquote(token);
         }
-      } else if (["circular", "linear", "spinner"].includes(token.toLowerCase())) {
+      } else if (["circular", "linear", "spinner", "wavy", "wave"].includes(token.toLowerCase())) {
         node.props.variant = token.toLowerCase();
       } else if (["sm", "md", "lg"].includes(token.toLowerCase())) {
         node.props.size = token.toLowerCase();
+      }
+      if (rawType.includes("wavy") || rawType.includes("wave")) {
+        node.props.wavy = true;
       }
       positionalIndex++;
     } else if (rawType === "navigationrail" || rawType === "apprail" || rawType === "navrail" || rawType === "rail") {
@@ -859,6 +905,8 @@ function parseComponentLine(
       rawType === "destination" ||
       rawType === "rail-item" ||
       rawType === "nav-item" ||
+      rawType === "fabitem" ||
+      rawType === "fab-item" ||
       rawType === "panel" ||
       rawType === "tab" ||
       rawType === "tabitem" ||
@@ -897,8 +945,35 @@ function applyDefaults(node: WispNode) {
     case "spinner":
     case "circularprogress":
     case "linearprogress":
-      node.props.variant = node.props.variant || (node.type === "linearprogress" ? "linear" : "circular");
+    case "progress":
+    case "wavyprogress":
+    case "wavy-progress":
+    case "progressindicator":
+    case "progress-indicator":
+      if (node.type.includes("wavy") || node.type.includes("wave")) {
+        node.props.wavy = true;
+      }
+      node.props.variant = node.props.variant || (node.type === "linearprogress" ? "linear" : (node.props.wavy ? "wavy" : "circular"));
       node.props.size = node.props.size || "md";
+      break;
+    case "fabmenu":
+    case "fab-menu":
+    case "speeddial":
+      node.props.icon = node.props.icon || "plus";
+      node.props.position = node.props.position || "bottom-right";
+      node.props.variant = node.props.variant || "primary";
+      break;
+    case "splitbutton":
+    case "split-button":
+    case "split-btn":
+      node.props.variant = node.props.variant || "filled";
+      break;
+    case "buttongroup":
+    case "button-group":
+    case "connectedbuttons":
+    case "connected-buttons":
+      node.props.orientation = node.props.orientation || "horizontal";
+      node.props.variant = node.props.variant || "outlined";
       break;
     case "navigationrail":
     case "apprail":

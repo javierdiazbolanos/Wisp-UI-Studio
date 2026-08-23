@@ -115,6 +115,23 @@ WISP DSL (WDL) SYNTAX AND SPECIFICATION:
    - ACTIONS & MENUS:
      * button "Text" (variant=filled|tonal|outlined|text|elevated, icon=..., goto=@Target, disabled=false, badge="...", snackbar="Message", snackbar-action="Undo", snackbar-type=success|info|warning|error)
      * iconbutton (icon=star|heart|bell|settings, variant=standard|filled|tonal|outlined, tooltip="...", badge="...", goto=@Screen)
+     * splitbutton "Primary Action" (icon=..., variant=filled|tonal|outlined|elevated, goto=@Screen) -> Conjoined primary action button with dropdown submenu.
+       Example:
+       splitbutton "Publish" icon=send goto=@Publish
+         menuitem "Save as draft" icon=save
+         menuitem "Export JSON" icon=download
+     * buttongroup (variant=outlined|filled|tonal) -> Connected button group with shared borders.
+       Example:
+       buttongroup
+         button "Day" active=true
+         button "Week"
+         button "Month"
+     * fab "Text" (icon=plus, extended=true, goto=@Target, snackbar="...")
+     * fabmenu "Actions" (icon=plus, variant=primary|secondary|tertiary|surface) -> Speed dial floating action menu.
+       Example:
+       fabmenu "Quick Actions" icon=plus
+         fabitem "Create Event" icon=calendar goto=@NewEvent
+         fabitem "New Contact" icon=user-plus goto=@NewContact
      * menu "Actions" (icon=more-vertical) -> Contextual dropdown menu.
        Example:
        menu "Options" icon=more-vertical
@@ -122,9 +139,9 @@ WISP DSL (WDL) SYNTAX AND SPECIFICATION:
          menuitem "Duplicate" icon=copy
          menuitem "Delete" icon=trash goto=@ConfirmDelete
      * menuitem "Text" (icon=..., shortcut="...", goto=@Screen)
-     * fab "Text" (icon=plus, extended=true, goto=@Target, snackbar="...")
 
    - FEEDBACK, PROGRESS & TOOLTIPS:
+     * wavyprogress (value=75, variant=linear|circular, message="...", color=primary|secondary|tertiary|error) -> M3 Expressive harmonic sine wave or circular rosette progress.
      * loading "Message..." (variant=circular|linear, value=75)
      * circularprogress (value=80, message="...", size=40)
      * linearprogress (value=65, message="Uploading file...", height=8)

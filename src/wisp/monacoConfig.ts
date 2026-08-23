@@ -28,13 +28,15 @@ export function registerWispLanguage(monacoInstance: Monaco) {
       "screen", "wizard", "dialog", "sheet", "modal", "toast", "component", "include", "use",
       "drawer", "navigationdrawer", "appdrawer", "navdrawer", "draweritem",
       "sidesheet", "bottomsheet", "navigationrail", "apprail", "navrail", "rail", "railitem", "rail-item", "destination",
-      "loading", "spinner", "circularprogress", "linearprogress",
+      "loading", "spinner", "circularprogress", "linearprogress", "wavyprogress", "wavy-progress", "progressindicator",
+      "splitbutton", "split-button", "split-btn", "buttongroup", "button-group", "connectedbuttons", "connected-buttons",
+      "fabmenu", "fab-menu", "speeddial", "fabitem", "fab-item",
       "tooltip", "richtooltip", "carousel",
       "iconbutton", "timepicker", "menu", "dropdown", "dropdownmenu", "menuitem", "section", "list",
       "button", "textfield", "textarea", "searchbar", "search", "card", "text",
       "select", "option", "autocomplete", "datepicker", "radio",
       "switch", "checkbox", "slider",
-      "chip", "segmentedbutton", "listitem", "avatar", "badge",
+      "chip", "filterchip", "segmentedbutton", "listitem", "avatar", "badge",
       "icon", "image", "progress", "metric", "stat", "alert",
       "divider", "spacer", "row", "column", "grid", "split", "sidebar", "container",
       "tabs", "tab", "panel", "table", "appbar", "bottomnav", "navitem", "fab",
@@ -46,13 +48,13 @@ export function registerWispLanguage(monacoInstance: Monaco) {
       "filled", "outlined", "tonal", "elevated", "text",
       "title", "headline", "display", "body", "label", "caption",
       "active", "checked", "selected", "striped", "hover", "dismissible",
-      "indeterminate", "interactive", "bold"
+      "indeterminate", "interactive", "bold", "expressive", "rosette", "harmonic", "continuous"
     ],
 
     typeKeywords: [
       "primary", "secondary", "tertiary", "surface", "error", "success", "warning", "info", "muted",
       "center", "left", "right", "between", "around", "evenly",
-      "linear", "circular", "material3", "ios", "compact"
+      "linear", "circular", "material3", "ios", "compact", "standard", "modal"
     ],
 
     tokenizer: {

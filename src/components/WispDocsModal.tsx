@@ -54,16 +54,18 @@ LeftRightBlock      ::= ( "left" | "right" ) "\\n" { IndentedBlock }
 
 ComponentName       ::= "appbar" | "breadcrumbs" | "tabs" | "accordion" | "wizard" | "card" 
                       | "split" | "grid" | "row" | "column" | "divider" | "spacer"
-                      | "textfield" | "textarea" | "select" | "autocomplete" | "datepicker"
+                      | "textfield" | "textarea" | "select" | "autocomplete" | "datepicker" | "timepicker"
                       | "checkbox" | "radio" | "switch" | "slider" | "rating" | "searchbar"
-                      | "button" | "fab" | "segmentedbutton" | "chip"
-                      | "metric" | "table" | "listitem" | "progress" | "avatar" | "badge" | "tag"
-                      | "alert" | "snackbar" | "text" | "image" | "icon"
+                      | "button" | "iconbutton" | "splitbutton" | "buttongroup" | "fab" | "fabmenu" | "fabitem" | "segmentedbutton" | "chip"
+                      | "metric" | "table" | "listitem" | "progress" | "wavyprogress" | "loading" | "circularprogress" | "linearprogress"
+                      | "navigationrail" | "railitem" | "drawer" | "draweritem" | "sidesheet" | "bottomsheet" | "carousel"
+                      | "menu" | "menuitem" | "tooltip" | "richtooltip"
+                      | "avatar" | "badge" | "tag" | "alert" | "snackbar" | "text" | "image" | "icon"
 
 Modifier            ::= "elevated" | "outlined" | "filled" | "tonal" | "text"
                       | "display" | "headline" | "title" | "body" | "label" | "caption"
                       | "bold" | "striped" | "searchable" | "bordered" | "compact"
-                      | "extended" | "expanded"
+                      | "extended" | "expanded" | "expressive" | "rosette" | "harmonic"
 
 Attribute           ::= AttrName "=" ( StringLiteral | NumberLiteral | BooleanLiteral | ArrayLiteral | TargetRef )
 AttrName            ::= [a-zA-Z0-9_-]+
@@ -144,7 +146,12 @@ You are the Lead UI Architect and Code Synthesizer for **Wisp UI Studio**. Your 
 - \`spacer [size=8|16|24|32]\`
 
 ### B. Navigation & Structure
+- \`navigationrail [title="..."] [subtitle="..."] [fab=plus] [fabLabel="..."] [user="..."] [role="..."]\` with nested \`railitem "Name" icon=<icon> active\` panels.
+- \`drawer [title="..."] [subtitle="..."] [avatar="..."]\` with nested \`draweritem "Name" icon=<icon> badge="..."\` and \`section "Category"\`.
+- \`sidesheet [title="..."] [position=right|left] [variant=standard|modal]\`
+- \`bottomsheet [title="..."] [variant=standard|modal]\`
 - \`appbar "Title" [subtitle="..."] [icon=<lucide-icon>] [actionIcon=<lucide-icon>] [goto=@Screen|back]\`
+- \`bottomnav\` with nested \`navitem "Title" icon=<icon> active=true goto=@Screen\`
 - \`breadcrumbs items=["Level 1", "Level 2", "Current"] [separator=chevron|slash]\`
 - \`tabs items=["Tab 1", "Tab 2", "Tab 3"]\`
 - \`accordion "Title" [expanded=true|false] [icon=<icon>] [badge="..."]\`
@@ -173,20 +180,27 @@ You are the Lead UI Architect and Code Synthesizer for **Wisp UI Studio**. Your 
 - \`select <id> label="..." [value="..."]\` with nested \`option "Name" [icon=<icon>]\`
 - \`autocomplete <id> label="..." [placeholder="..."]\` with nested \`option "Name"\`
 - \`datepicker <id> label="..." [value="YYYY-MM-DD"] [placeholder="..."]\`
+- \`timepicker <id> label="..." [value="14:30"] [format=12h|24h]\`
 - \`checkbox <id> label="..." [checked=true|false] [disabled=true|false]\`
 - \`radio <id> label="..." group="..." [checked=true|false]\`
 - \`switch <id> label="..." [checked=true|false] [disabled=true|false]\`
 - \`slider <id> label="..." [min=0] [max=100] [value=50] [step=1]\`
-- \`rating <id> label="..." [value=4] [max=5]\`
+- \`rating <id> label="..." [value=4] [max=5] [readonly=false]\`
 - \`searchbar [placeholder="Search..."] [icon=search]\`
 
-### D. Actions & Buttons
-- \`button "Text" [filled | tonal | outlined | elevated | text] [icon=<icon>] [goto=@Screen] [snackbar="..."] [disabled=true|false]\`
+### D. Actions, Menus & M3 Expressive Buttons
+- \`button "Text" [filled | tonal | outlined | elevated | text] [icon=<icon>] [goto=@Screen] [snackbar="..."] [badge="..."] [disabled=true|false]\`
+- \`iconbutton icon=<icon> [variant=standard|filled|tonal|outlined] [tooltip="..."] [badge="..."] [goto=@Screen]\`
+- \`splitbutton "Primary Action" [icon=<icon>] [variant=filled|tonal|outlined|elevated] [goto=@Screen]\` with nested \`menuitem "Secondary" icon=<icon> goto=@Screen\`
+- \`buttongroup [variant=outlined|tonal|filled]\` with nested connected \`button "Name" active\`
 - \`fab "Text" [icon=<icon>] [extended=true|false] [goto=@Screen]\`
+- \`fabmenu [label="..."] [icon=plus]\` with nested \`fabitem "Label" icon=<icon> goto=@Screen snackbar="..."\`
+- \`menu "Menu Title" [icon=more-vertical]\` with nested \`menuitem "Action" icon=<icon> shortcut="Ctrl+S" goto=@Screen\`
 - \`segmentedbutton options=["Option A", "Option B", "Option C"] [selected="Option A"]\`
 - \`chip "Text" [icon=<icon>] [selected=true|false]\`
 
-### E. Data & Tables
+### E. Data, Surfaces & Tables
+- \`carousel\` with nested \`card\` items for horizontal sliding presentation.
 - \`table [title="..."] columns=["Col1:type", "Col2:type", ...] [striped=true|false] [searchable=true|false] [pageSize=5|10|20]\`
   - Column Types:
     * \`:code\` -> Monospace pill
@@ -199,19 +213,25 @@ You are the Lead UI Architect and Code Synthesizer for **Wisp UI Studio**. Your 
     * \`:dropdown\` -> 3-dots kebab menu
     * \`:checkbox\` -> Interactive selection
     * \`:rating\` -> Star rating (1-5)
+    * \`:link\` -> Clickable hyperlink
   - Row declaration:
     \`row ["#101", "Jane Cooper", "85%", "$3,400.00", "Active", "Edit", ""]\`
     or markdown pipes: \`| #102 | Alex Morgan | 40% | $850.00 | Pending | View | |\`
 - \`metric label="..." value="..." [delta="+12%"] [icon=<icon>]\` (or \`stat\`)
-- \`listitem "Title" [subtitle="..."] [icon=<icon>] [badge="..."] [goto=@Screen]\`
-- \`progress [value=0..100] [label="..."]\`
+- \`list\` container with nested \`listitem "Title" [subtitle="..."] [icon=<icon>] [badge="..."] [goto=@Screen]\`
 - \`avatar [name="Name"] [src="url"] [size=small|medium|large]\`
 - \`badge [value="..."] [color=primary|error|warning|success]\`
 - \`tag "Text" [color=primary|secondary|error|warning|info|success]\`
 
-### F. Typography & Feedback
-- \`text "Message" [display | headline | title | body | label | caption] [bold=true] [color=primary|secondary|tertiary|error|warning|success|muted]\`
+### F. Feedback, Progress & Tooltips
+- \`wavyprogress [value=75] [variant=linear|circular] [message="..."] [color=primary|secondary|tertiary|error]\`
+- \`loading "Message..." [variant=circular|linear] [value=75]\`
+- \`circularprogress [value=80] [message="..."] [size=40]\`
+- \`linearprogress [value=65] [message="..."] [height=8]\`
+- \`tooltip "Quick text on hover"\`
+- \`richtooltip [title="..."] [text="..."] [action="..."] [action_goto=@Screen]\`
 - \`alert "Message" [title="..."] [type=info|success|warning|error]\`
+- \`text "Message" [display | headline | title | body | label | caption] [bold=true] [color=primary|secondary|tertiary|error|warning|success|muted]\`
 - \`image [src="url"] [alt="..."] [height=200]\`
 - \`icon <lucide-name> [size=16|20|24|32] [color=primary|...]\`
 

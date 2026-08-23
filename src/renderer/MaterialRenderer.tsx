@@ -113,6 +113,9 @@ export const MaterialRenderer: React.FC<MaterialRendererProps> = ({
   const [timePickerValues, setTimePickerValues] = useState<Record<string, string>>({});
   const [activeRailItems, setActiveRailItems] = useState<Record<string, number>>({});
   const [expandedRails, setExpandedRails] = useState<Record<string, boolean>>({});
+  const [openFabMenus, setOpenFabMenus] = useState<Record<string, boolean>>({});
+  const [openSplitButtons, setOpenSplitButtons] = useState<Record<string, boolean>>({});
+  const [buttonGroupValues, setButtonGroupValues] = useState<Record<string, any>>({});
 
   // Active snackbar / toast triggered from buttons or actions (when not controlled by parent)
   const [localActiveToast, setLocalActiveToast] = useState<ActiveToastData | null>(null);
@@ -556,6 +559,27 @@ export const MaterialRenderer: React.FC<MaterialRendererProps> = ({
       case "circularprogress":
       case "linearprogress":
         return wrapInspectable(node, renderLoading(node));
+      case "wavyprogress":
+      case "wavy-progress":
+      case "progressindicator":
+      case "progress-indicator":
+        return wrapInspectable(node, renderWavyProgress(node));
+      case "fabmenu":
+      case "fab-menu":
+      case "speeddial":
+        return wrapInspectable(node, renderFabMenu(node));
+      case "fabitem":
+      case "fab-item":
+        return wrapInspectable(node, renderFab(node));
+      case "splitbutton":
+      case "split-button":
+      case "split-btn":
+        return wrapInspectable(node, renderSplitButton(node));
+      case "buttongroup":
+      case "button-group":
+      case "connectedbuttons":
+      case "connected-buttons":
+        return wrapInspectable(node, renderButtonGroup(node));
       case "metric":
       case "stat":
         return wrapInspectable(node, renderMetric(node));
@@ -4590,6 +4614,540 @@ export const MaterialRenderer: React.FC<MaterialRendererProps> = ({
         }}
       >
         {node.children.map(renderNode)}
+      </div>
+    );
+  };
+
+  // 16. Wavy Progress Indicator (M3 Expressive Spec with Organic Sinusoidal Wave and Rosette Petals)
+  const renderWavyProgress = (node: WispNode) => {
+    const rawVal = node.props.value;
+    const isDeterminate = rawVal !== undefined && !isNaN(Number(rawVal));
+    const value = isDeterminate ? Math.min(100, Math.max(0, Number(rawVal))) : 0;
+    const message = node.props.message || node.props.label || node.props.title || node.props.text || "";
+    const variant = node.props.variant || "linear";
+    const color = node.props.color || "primary";
+    const size = node.props.size || "md";
+
+    let strokeColor = colorScheme.primary;
+    if (color === "secondary") strokeColor = colorScheme.secondary;
+    else if (color === "tertiary") strokeColor = colorScheme.tertiary;
+    else if (color === "error") strokeColor = colorScheme.error;
+
+    if (variant === "circular") {
+      const radius = size === "sm" ? 18 : size === "lg" ? 36 : 26;
+      const amplitude = size === "sm" ? 3 : size === "lg" ? 6 : 4.5;
+      const strokeWidth = size === "sm" ? 3 : size === "lg" ? 5 : 4;
+      const numPetals = 8;
+      const svgSize = (radius + amplitude + strokeWidth) * 2 + 10;
+      const cx = svgSize / 2;
+      const cy = svgSize / 2;
+
+      const numPoints = 120;
+      const pathPoints: string[] = [];
+      for (let i = 0; i <= numPoints; i++) {
+        const theta = (i / numPoints) * 2 * Math.PI - Math.PI / 2;
+        const r = radius + amplitude * Math.sin(numPetals * theta);
+        const x = cx + r * Math.cos(theta);
+        const y = cy + r * Math.sin(theta);
+        pathPoints.push(`${i === 0 ? "M" : "L"} ${x.toFixed(2)} ${y.toFixed(2)}`);
+      }
+      const dPath = pathPoints.join(" ") + " Z";
+      const perimeter = 2 * Math.PI * radius * 1.15;
+      const strokeDashoffset = perimeter - (value / 100) * perimeter;
+
+      return (
+        <div className="flex flex-col items-center justify-center gap-2.5 p-3 text-center w-full">
+          <div className="relative flex items-center justify-center">
+            {isDeterminate ? (
+              <div className="relative inline-flex items-center justify-center">
+                <svg width={svgSize} height={svgSize} className="overflow-visible">
+                  <path
+                    d={dPath}
+                    stroke={colorScheme.surfaceContainerHighest}
+                    strokeWidth={strokeWidth}
+                    fill="transparent"
+                    strokeLinecap="round"
+                  />
+                  <path
+                    d={dPath}
+                    stroke={strokeColor}
+                    strokeWidth={strokeWidth}
+                    strokeDasharray={perimeter}
+                    strokeDashoffset={strokeDashoffset}
+                    strokeLinecap="round"
+                    fill="transparent"
+                    className="transition-all duration-400 ease-out"
+                  />
+                </svg>
+                <span
+                  className={`absolute font-bold font-mono ${
+                    size === "sm" ? "text-[9px]" : size === "lg" ? "text-xs" : "text-[10px]"
+                  }`}
+                  style={{ color: colorScheme.onSurface }}
+                >
+                  {value}%
+                </span>
+              </div>
+            ) : (
+              <motion.div
+                animate={{ rotate: 360 }}
+                transition={{ repeat: Infinity, duration: 2.2, ease: "linear" }}
+                className="inline-flex items-center justify-center"
+              >
+                <svg width={svgSize} height={svgSize} className="overflow-visible">
+                  <path
+                    d={dPath}
+                    stroke={colorScheme.surfaceContainerHighest}
+                    strokeWidth={strokeWidth}
+                    fill="transparent"
+                  />
+                  <path
+                    d={dPath}
+                    stroke={strokeColor}
+                    strokeWidth={strokeWidth}
+                    strokeDasharray={`${perimeter * 0.4} ${perimeter * 0.6}`}
+                    strokeLinecap="round"
+                    fill="transparent"
+                  />
+                </svg>
+              </motion.div>
+            )}
+          </div>
+          {message && (
+            <p className="text-xs font-semibold leading-relaxed max-w-xs" style={{ color: colorScheme.onSurface }}>
+              {message}
+            </p>
+          )}
+        </div>
+      );
+    }
+
+    // Linear Wavy Progress
+    const waveHeight = size === "sm" ? 18 : size === "lg" ? 28 : 22;
+    const amplitude = size === "sm" ? 3 : size === "lg" ? 5.5 : 4;
+    const strokeWidth = size === "sm" ? 2.5 : size === "lg" ? 4.5 : 3.5;
+    const wavelength = 28;
+    const totalLength = 400;
+    const midY = waveHeight / 2;
+
+    const numPoints = 80;
+    const trackPoints: string[] = [];
+    for (let i = 0; i <= numPoints; i++) {
+      const x = (i / numPoints) * totalLength;
+      const y = midY + amplitude * Math.sin((x / wavelength) * 2 * Math.PI);
+      trackPoints.push(`${i === 0 ? "M" : "L"} ${x.toFixed(2)} ${y.toFixed(2)}`);
+    }
+    const fullWaveD = trackPoints.join(" ");
+
+    const activePointsCount = Math.max(2, Math.round((value / 100) * numPoints));
+    const activePoints: string[] = [];
+    for (let i = 0; i <= activePointsCount; i++) {
+      const x = (i / numPoints) * totalLength;
+      const y = midY + amplitude * Math.sin((x / wavelength) * 2 * Math.PI);
+      activePoints.push(`${i === 0 ? "M" : "L"} ${x.toFixed(2)} ${y.toFixed(2)}`);
+    }
+    const activeWaveD = activePoints.join(" ");
+    const stopX = (activePointsCount / numPoints) * totalLength;
+    const stopY = midY + amplitude * Math.sin((stopX / wavelength) * 2 * Math.PI);
+
+    return (
+      <div className="w-full space-y-1.5 py-1.5">
+        {message && (
+          <div className="flex items-center justify-between text-xs font-semibold" style={{ color: colorScheme.onSurface }}>
+            <span className="truncate">{message}</span>
+            {isDeterminate && (
+              <span
+                className="font-mono text-[11px] font-bold px-1.5 py-0.5 rounded-md"
+                style={{
+                  backgroundColor: colorScheme.surfaceContainerHighest,
+                  color: colorScheme.onSurfaceVariant,
+                }}
+              >
+                {value}%
+              </span>
+            )}
+          </div>
+        )}
+        <div className="relative w-full overflow-hidden flex items-center">
+          <svg
+            viewBox={`0 0 ${totalLength} ${waveHeight}`}
+            className="w-full overflow-visible"
+            style={{ height: `${waveHeight}px` }}
+          >
+            <path
+              d={fullWaveD}
+              stroke={colorScheme.surfaceContainerHighest}
+              strokeWidth={strokeWidth}
+              strokeLinecap="round"
+              fill="none"
+            />
+            {isDeterminate ? (
+              <>
+                <motion.path
+                  initial={{ pathLength: 0 }}
+                  animate={{ pathLength: 1 }}
+                  transition={{ duration: 0.45, ease: "easeOut" }}
+                  d={activeWaveD}
+                  stroke={strokeColor}
+                  strokeWidth={strokeWidth}
+                  strokeLinecap="round"
+                  fill="none"
+                />
+                {value > 0 && value < 100 && (
+                  <circle
+                    cx={stopX}
+                    cy={stopY}
+                    r={strokeWidth * 0.9}
+                    fill={strokeColor}
+                  />
+                )}
+              </>
+            ) : (
+              <motion.g
+                animate={{ x: [-wavelength, 0] }}
+                transition={{ repeat: Infinity, duration: 0.8, ease: "linear" }}
+              >
+                <path
+                  d={fullWaveD}
+                  stroke={strokeColor}
+                  strokeWidth={strokeWidth}
+                  strokeLinecap="round"
+                  strokeDasharray="60 30"
+                  fill="none"
+                />
+              </motion.g>
+            )}
+          </svg>
+        </div>
+      </div>
+    );
+  };
+
+  // 17. FAB Menu / Speed Dial (Material 3 Expressive Speed Dial & Floating Cascade)
+  const renderFabMenu = (node: WispNode) => {
+    const isOpen = openFabMenus[node.id] || false;
+    const label = node.props.label || "";
+    const mainIcon = node.props.icon || "plus";
+    const variant = node.props.variant || "primary";
+    const position = node.props.position || "inline";
+
+    const items = (node.children || []).filter(
+      (c) => c.type === "fabitem" || c.type === "fab-item" || c.type === "button" || c.type === "iconbutton"
+    );
+
+    let bg = colorScheme.primary;
+    let text = colorScheme.onPrimary;
+    if (variant === "secondary") {
+      bg = colorScheme.secondaryContainer;
+      text = colorScheme.onSecondaryContainer;
+    } else if (variant === "tertiary") {
+      bg = colorScheme.tertiaryContainer;
+      text = colorScheme.onTertiaryContainer;
+    } else if (variant === "surface") {
+      bg = colorScheme.surfaceContainerHigh;
+      text = colorScheme.primary;
+    }
+
+    const toggleOpen = () => {
+      setOpenFabMenus((p) => ({ ...p, [node.id]: !isOpen }));
+    };
+
+    return (
+      <div className={`relative flex flex-col items-end gap-2.5 ${position.includes("inline") ? "w-full py-1 justify-end" : ""}`}>
+        {isOpen && (
+          <div
+            className="fixed inset-0 z-40 bg-black/20 backdrop-blur-[1px]"
+            onClick={() => setOpenFabMenus((p) => ({ ...p, [node.id]: false }))}
+          />
+        )}
+
+        <AnimatePresence>
+          {isOpen && (
+            <motion.div
+              initial={{ opacity: 0, y: 12 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: 12 }}
+              transition={{ duration: 0.18, staggerChildren: 0.04 }}
+              className="flex flex-col items-end gap-2.5 z-50 mb-1"
+            >
+              {items.map((item, idx) => {
+                const itemLabel = item.props.label || item.props.title || item.props.value || "";
+                const itemIcon = item.props.icon || (idx === 0 ? "edit-3" : idx === 1 ? "share-2" : "file-text");
+                const itemGoto = item.props.goto;
+                const hasSnackbar = Boolean(item.props.snackbar || item.props.toast);
+                const itemVariant = item.props.variant || "surface";
+
+                let itemBg = colorScheme.surfaceContainerHigh;
+                let itemText = colorScheme.onSurface;
+                if (itemVariant === "primary") {
+                  itemBg = colorScheme.primary;
+                  itemText = colorScheme.onPrimary;
+                } else if (itemVariant === "secondary") {
+                  itemBg = colorScheme.secondaryContainer;
+                  itemText = colorScheme.onSecondaryContainer;
+                }
+
+                return (
+                  <motion.div
+                    key={item.id || idx}
+                    initial={{ opacity: 0, scale: 0.8, y: 8 }}
+                    animate={{ opacity: 1, scale: 1, y: 0 }}
+                    exit={{ opacity: 0, scale: 0.8, y: 8 }}
+                    className="flex items-center gap-2.5 cursor-pointer group"
+                    onClick={() => {
+                      if (hasSnackbar) triggerSnackbar(item.props);
+                      if (itemGoto) handleNavigateAction(itemGoto);
+                      setOpenFabMenus((p) => ({ ...p, [node.id]: false }));
+                    }}
+                  >
+                    {itemLabel && (
+                      <span
+                        className="px-3 py-1.5 rounded-full text-xs font-semibold shadow-md whitespace-nowrap transition-transform group-hover:scale-105 select-none"
+                        style={{
+                          backgroundColor: colorScheme.surfaceContainerHighest,
+                          color: colorScheme.onSurface,
+                          borderColor: colorScheme.outlineVariant,
+                        }}
+                      >
+                        {itemLabel}
+                      </span>
+                    )}
+                    <button
+                      type="button"
+                      className="w-10 h-10 rounded-2xl md:rounded-3xl flex items-center justify-center shadow-md transition-all group-hover:scale-110 active:scale-95 cursor-pointer shrink-0"
+                      style={{
+                        backgroundColor: itemBg,
+                        color: itemText,
+                        boxShadow: "0 4px 10px rgba(0,0,0,0.15)",
+                      }}
+                    >
+                      <DynamicIcon name={itemIcon} className="w-4 h-4" />
+                    </button>
+                  </motion.div>
+                );
+              })}
+            </motion.div>
+          )}
+        </AnimatePresence>
+
+        <div className="z-50">
+          <button
+            type="button"
+            onClick={toggleOpen}
+            className={`inline-flex items-center justify-center gap-2.5 font-medium text-sm transition-all hover:scale-105 active:scale-95 cursor-pointer shadow-lg hover:shadow-xl select-none ${
+              label ? "px-5 py-3.5 rounded-2xl md:rounded-3xl" : "w-14 h-14 rounded-2xl md:rounded-3xl"
+            }`}
+            style={{
+              backgroundColor: bg,
+              color: text,
+              boxShadow: "0 6px 16px -2px rgba(0,0,0,0.18), 0 2px 6px -1px rgba(0,0,0,0.12)",
+            }}
+          >
+            <motion.div
+              animate={{ rotate: isOpen ? 45 : 0 }}
+              transition={{ duration: 0.2, ease: "easeInOut" }}
+              className="flex items-center justify-center shrink-0"
+            >
+              <DynamicIcon name={mainIcon} className="w-5 h-5" />
+            </motion.div>
+            {label && !isOpen && <span className="font-semibold tracking-wide">{label}</span>}
+          </button>
+        </div>
+      </div>
+    );
+  };
+
+  // 18. Split Button (Material 3 Expressive Dual Segment Button + Menu)
+  const renderSplitButton = (node: WispNode) => {
+    const label = node.props.label || node.props.title || "Action";
+    const icon = node.props.icon;
+    const variant = node.props.variant || "filled";
+    const goto = node.props.goto;
+    const hasSnackbar = Boolean(node.props.snackbar || node.props.toast);
+    const isOpen = openSplitButtons[node.id] || false;
+
+    let menuItems = (node.children || []).filter(
+      (c) => c.type === "menuitem" || c.type === "button" || c.type === "option"
+    );
+
+    let bg = colorScheme.primary;
+    let text = colorScheme.onPrimary;
+    let border = "transparent";
+    let dividerColor = "rgba(255,255,255,0.25)";
+
+    if (variant === "tonal") {
+      bg = colorScheme.secondaryContainer;
+      text = colorScheme.onSecondaryContainer;
+      dividerColor = colorScheme.outlineVariant;
+    } else if (variant === "outlined") {
+      bg = "transparent";
+      text = colorScheme.onSurface;
+      border = colorScheme.outlineVariant;
+      dividerColor = colorScheme.outlineVariant;
+    } else if (variant === "elevated") {
+      bg = colorScheme.surfaceContainerLow;
+      text = colorScheme.primary;
+      border = colorScheme.outlineVariant;
+      dividerColor = colorScheme.outlineVariant;
+    }
+
+    return (
+      <div className="relative inline-flex items-center">
+        <div
+          className="inline-flex items-stretch rounded-full overflow-hidden shadow-sm transition-all"
+          style={{
+            backgroundColor: bg,
+            color: text,
+            border: `1px solid ${border}`,
+          }}
+        >
+          <button
+            type="button"
+            onClick={() => {
+              if (hasSnackbar) triggerSnackbar(node.props);
+              if (goto) handleNavigateAction(goto);
+            }}
+            className="inline-flex items-center gap-2 pl-4 pr-3 py-2 text-xs font-bold uppercase tracking-wider hover:bg-black/10 dark:hover:bg-white/10 active:scale-98 transition-all cursor-pointer select-none"
+          >
+            {icon && <DynamicIcon name={icon} className="w-4 h-4 shrink-0" />}
+            <span>{label}</span>
+          </button>
+
+          <div className="w-[1px] my-1" style={{ backgroundColor: dividerColor }} />
+
+          <button
+            type="button"
+            onClick={() => setOpenSplitButtons((p) => ({ ...p, [node.id]: !isOpen }))}
+            className="inline-flex items-center justify-center px-2.5 py-2 hover:bg-black/10 dark:hover:bg-white/10 active:scale-98 transition-all cursor-pointer select-none"
+            title="More actions"
+          >
+            <motion.div
+              animate={{ rotate: isOpen ? 180 : 0 }}
+              transition={{ duration: 0.15 }}
+            >
+              <ChevronDown className="w-4 h-4" />
+            </motion.div>
+          </button>
+        </div>
+
+        <AnimatePresence>
+          {isOpen && (
+            <>
+              <div
+                className="fixed inset-0 z-40"
+                onClick={() => setOpenSplitButtons((p) => ({ ...p, [node.id]: false }))}
+              />
+              <motion.div
+                initial={{ opacity: 0, scale: 0.95, y: -4 }}
+                animate={{ opacity: 1, scale: 1, y: 0 }}
+                exit={{ opacity: 0, scale: 0.95, y: -4 }}
+                transition={{ duration: 0.12 }}
+                className="absolute left-0 top-full mt-1.5 min-w-44 rounded-2xl border shadow-xl z-50 p-1.5 space-y-1 overflow-hidden"
+                style={{
+                  backgroundColor: colorScheme.surfaceContainerHigh,
+                  borderColor: colorScheme.outlineVariant,
+                }}
+              >
+                {menuItems.length > 0 ? (
+                  menuItems.map((child) => (
+                    <div
+                      key={child.id}
+                      onClick={() => setOpenSplitButtons((p) => ({ ...p, [node.id]: false }))}
+                    >
+                      {renderNode(child)}
+                    </div>
+                  ))
+                ) : (
+                  <>
+                    <button
+                      type="button"
+                      onClick={() => setOpenSplitButtons((p) => ({ ...p, [node.id]: false }))}
+                      className="w-full px-3 py-2 rounded-xl text-xs font-semibold hover:bg-neutral-500/10 transition-all text-left"
+                      style={{ color: colorScheme.onSurface }}
+                    >
+                      Save & Continue
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setOpenSplitButtons((p) => ({ ...p, [node.id]: false }))}
+                      className="w-full px-3 py-2 rounded-xl text-xs font-semibold hover:bg-neutral-500/10 transition-all text-left"
+                      style={{ color: colorScheme.onSurface }}
+                    >
+                      Export Data
+                    </button>
+                  </>
+                )}
+              </motion.div>
+            </>
+          )}
+        </AnimatePresence>
+      </div>
+    );
+  };
+
+  // 19. Button Group / Connected Buttons (Material 3 Expressive Seamless Conjoined Buttons)
+  const renderButtonGroup = (node: WispNode) => {
+    const orientation = node.props.orientation || "horizontal";
+    const variant = node.props.variant || "outlined";
+    const name = node.props.name || `buttongroup_${node.id}`;
+    const selectedVal = buttonGroupValues[node.id] || node.props.value || "";
+
+    const children = (node.children || []).filter(
+      (c) => c.type === "button" || c.type === "iconbutton" || c.type === "tab" || c.type === "option"
+    );
+
+    return (
+      <div
+        className={`inline-flex ${orientation === "vertical" ? "flex-col" : "flex-row"} rounded-2xl overflow-hidden border shadow-xs`}
+        style={{ borderColor: colorScheme.outlineVariant }}
+      >
+        {children.map((child, idx) => {
+          const btnLabel = child.props.label || child.props.title || child.props.value || `Btn ${idx + 1}`;
+          const btnIcon = child.props.icon;
+          const isSelected = selectedVal === btnLabel || child.props.selected === true || child.props.active === true;
+          const btnGoto = child.props.goto;
+          const hasSnackbar = Boolean(child.props.snackbar || child.props.toast);
+
+          let itemBg = "transparent";
+          let itemText = colorScheme.onSurface;
+
+          if (isSelected) {
+            itemBg = colorScheme.secondaryContainer;
+            itemText = colorScheme.onSecondaryContainer;
+          } else if (variant === "filled") {
+            itemBg = colorScheme.surfaceContainerHigh;
+          } else if (variant === "tonal") {
+            itemBg = colorScheme.surfaceContainerLow;
+          }
+
+          return (
+            <button
+              key={child.id || idx}
+              type="button"
+              onClick={() => {
+                setButtonGroupValues((p) => ({ ...p, [node.id]: btnLabel }));
+                handleInputChange(name, btnLabel);
+                if (hasSnackbar) triggerSnackbar(child.props);
+                if (btnGoto) handleNavigateAction(btnGoto);
+              }}
+              className={`px-4 py-2 text-xs font-semibold transition-all flex items-center justify-center gap-1.5 cursor-pointer select-none hover:bg-neutral-500/10 active:scale-98 ${
+                idx > 0
+                  ? orientation === "vertical"
+                    ? "border-t"
+                    : "border-l"
+                  : ""
+              }`}
+              style={{
+                backgroundColor: itemBg,
+                color: itemText,
+                borderColor: colorScheme.outlineVariant,
+              }}
+            >
+              {btnIcon && <DynamicIcon name={btnIcon} className="w-3.5 h-3.5" />}
+              <span>{btnLabel}</span>
+            </button>
+          );
+        })}
       </div>
     );
   };

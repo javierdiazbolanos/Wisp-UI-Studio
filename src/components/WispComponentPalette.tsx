@@ -34,15 +34,15 @@ export interface WispComponentPaletteProps {
 }
 
 const CATEGORIES: { id: string; label: string; countBadge?: number }[] = [
-  { id: "sugeridos", label: "⭐ Suggested" },
-  { id: "todos", label: "All" },
-  { id: "Vistas & Raíz", label: "Views" },
-  { id: "Layout & Superficie", label: "Layout" },
-  { id: "Entradas & Formularios", label: "Inputs" },
-  { id: "Acciones & Controles", label: "Actions" },
-  { id: "Datos & Tablas", label: "Data" },
-  { id: "Feedback & Alertas", label: "Feedback" },
-  { id: "Lógica & Flujo", label: "Logic" },
+  { id: "suggested", label: "⭐ Suggested" },
+  { id: "all", label: "All" },
+  { id: "Views & Root", label: "Views" },
+  { id: "Layout & Surfaces", label: "Layout" },
+  { id: "Inputs & Forms", label: "Inputs" },
+  { id: "Actions & Controls", label: "Actions" },
+  { id: "Data & Tables", label: "Data" },
+  { id: "Feedback & Alerts", label: "Feedback" },
+  { id: "Logic & Flow", label: "Logic" },
 ];
 
 export const WispComponentPalette: React.FC<WispComponentPaletteProps> = ({
@@ -54,7 +54,7 @@ export const WispComponentPalette: React.FC<WispComponentPaletteProps> = ({
   previewIsDark = false,
 }) => {
   const [searchQuery, setSearchQuery] = useState("");
-  const [selectedCategory, setSelectedCategory] = useState<string>("sugeridos");
+  const [selectedCategory, setSelectedCategory] = useState<string>("suggested");
   const [onlyContextual, setOnlyContextual] = useState(false);
   const [hoveredItem, setHoveredItem] = useState<PaletteComponentItem | null>(null);
   const [hoverPosition, setHoverPosition] = useState<{ top: number }>({ top: 100 });
@@ -94,14 +94,25 @@ export const WispComponentPalette: React.FC<WispComponentPaletteProps> = ({
     }
 
     // Category filter
-    if (selectedCategory === "sugeridos") {
+    if (selectedCategory === "suggested" || selectedCategory === "sugeridos") {
       list = list.filter((item) => item.evaluation.isRecommended);
-    } else if (selectedCategory !== "todos") {
-      list = list.filter((item) => item.category === selectedCategory);
+    } else if (selectedCategory !== "all" && selectedCategory !== "todos") {
+      list = list.filter((item) => {
+        if (item.category === selectedCategory) return true;
+        // Category mapping fallback
+        if (selectedCategory === "Views & Root" && (item.category === "Views & Root" || item.category === ("Vistas & Raíz" as any))) return true;
+        if (selectedCategory === "Layout & Surfaces" && (item.category === "Layout & Surfaces" || item.category === ("Layout & Superficie" as any))) return true;
+        if (selectedCategory === "Inputs & Forms" && (item.category === "Inputs & Forms" || item.category === ("Entradas & Formularios" as any))) return true;
+        if (selectedCategory === "Actions & Controls" && (item.category === "Actions & Controls" || item.category === ("Acciones & Controles" as any))) return true;
+        if (selectedCategory === "Data & Tables" && (item.category === "Data & Tables" || item.category === ("Datos & Tablas" as any))) return true;
+        if (selectedCategory === "Feedback & Alerts" && (item.category === "Feedback & Alerts" || item.category === ("Feedback & Alertas" as any))) return true;
+        if (selectedCategory === "Logic & Flow" && (item.category === "Logic & Flow" || item.category === ("Lógica & Flujo" as any))) return true;
+        return false;
+      });
     }
 
     // Strict contextual mode
-    if (onlyContextual && selectedCategory !== "sugeridos") {
+    if (onlyContextual && selectedCategory !== "suggested" && selectedCategory !== "sugeridos") {
       list = list.filter((item) => item.evaluation.isAllowed);
     }
 
@@ -266,7 +277,7 @@ export const WispComponentPalette: React.FC<WispComponentPaletteProps> = ({
               }`}
             >
               <span>{cat.label}</span>
-              {cat.id === "sugeridos" && (
+              {(cat.id === "suggested" || cat.id === "sugeridos") && (
                 <span
                   className={`text-[9px] px-1 rounded-full font-mono ${
                     isSelected ? "bg-white/20 text-white" : "bg-purple-950 text-purple-300"

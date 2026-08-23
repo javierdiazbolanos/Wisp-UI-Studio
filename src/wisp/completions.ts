@@ -586,6 +586,71 @@ export const TOP_LEVEL_COMPLETIONS: WispCompletionItem[] = [
     ],
     example: `rating satisfaccion label="Califica tu experiencia" value=4 max=5 readonly=false`,
   },
+  {
+    label: "splitbutton",
+    kind: "keyword",
+    detail: 'splitbutton "Acción Principal" icon=download goto=@Target',
+    insertText: `splitbutton "Exportar" icon=download goto=@ExportModal\n  menuitem "Descargar PDF" icon=file-text goto=@ExportPDF\n  menuitem "Exportar CSV" icon=table goto=@ExportCSV`,
+    documentation: "Botón dividido Material 3 Expressive (Split Button) que combina un gatillo de acción principal con un menú desplegable de acciones secundarias.",
+    parameters: [
+      { name: "label", type: "string", description: "Texto del botón de acción principal" },
+      { name: "icon", type: "string", description: "Ícono Lucide del botón principal" },
+      { name: "goto", type: "string", description: "Destino al pulsar el botón principal" },
+      { name: "variant", type: "string", description: "Variante cromática", values: ["filled", "tonal", "outlined", "elevated"] },
+    ],
+    example: `splitbutton "Guardar" icon=save goto=@Save\n  menuitem "Guardar como borrador" icon=file-text\n  menuitem "Publicar inmediatamente" icon=send`,
+  },
+  {
+    label: "buttongroup",
+    kind: "keyword",
+    detail: 'buttongroup [variant=outlined|filled]',
+    insertText: `buttongroup\n  button "Vista 1" active=true\n  button "Vista 2"\n  button "Vista 3"`,
+    documentation: "Grupo de botones conectados Material 3 Expressive con bordes unificados, división integrada y soporte para estados activos/segmentados.",
+    parameters: [
+      { name: "variant", type: "string", description: "Variante visual del grupo", values: ["outlined", "filled", "tonal"] },
+    ],
+    example: `buttongroup\n  button "Mensual" active=true\n  button "Anual"\n  button "Vitalicio"`,
+  },
+  {
+    label: "fabmenu",
+    kind: "keyword",
+    detail: 'fabmenu "Acciones" icon=plus',
+    insertText: `fabmenu "Crear" icon=plus\n  fabitem "Nuevo Usuario" icon=user-plus goto=@CreateUser\n  fabitem "Subir Archivo" icon=upload goto=@UploadModal`,
+    documentation: "Menú flotante Speed-Dial Material 3 Expressive (FAB Menu) con gatillo central y botones de acción secundaria expandibles con etiquetas animadas.",
+    parameters: [
+      { name: "label", type: "string", description: "Etiqueta opcional para el gatillo FAB principal" },
+      { name: "icon", type: "string", description: "Ícono principal del FAB (ej. plus, sparkles, layers)" },
+      { name: "variant", type: "string", description: "Variante cromática", values: ["primary", "secondary", "tertiary", "surface"] },
+    ],
+    example: `fabmenu "Acciones" icon=plus\n  fabitem "Crear Evento" icon=calendar goto=@NewEvent\n  fabitem "Enviar Mensaje" icon=mail goto=@NewMsg`,
+  },
+  {
+    label: "fabitem",
+    kind: "keyword",
+    detail: 'fabitem "Título" icon=plus goto=@Target',
+    insertText: `fabitem "Nueva Tarea" icon=check-square goto=@NewTask`,
+    documentation: "Elemento de acción secundaria dentro de un contenedor 'fabmenu' flotante.",
+    parameters: [
+      { name: "label", type: "string", description: "Etiqueta emergente del elemento" },
+      { name: "icon", type: "string", description: "Ícono del botón de acción secundario" },
+      { name: "goto", type: "string", description: "Destino de navegación" },
+    ],
+    example: `fabitem "Descargar Reporte" icon=download goto=@DownloadReport`,
+  },
+  {
+    label: "wavyprogress",
+    kind: "keyword",
+    detail: 'wavyprogress label="..." value=65 [variant=linear|circular]',
+    insertText: `wavyprogress label="Sincronizando..." value=70 variant=linear`,
+    documentation: "Indicador de progreso orgánico sinusoidal Material 3 Expressive (Wavy Progress) con onda armónica continua o roseta circular animada.",
+    parameters: [
+      { name: "value", type: "number", description: "Porcentaje de avance (0 a 100)" },
+      { name: "label", type: "string", description: "Etiqueta descriptiva sobre el indicador" },
+      { name: "variant", type: "string", description: "Variante geométrica", values: ["linear", "circular"] },
+      { name: "amplitude", type: "number", description: "Amplitud de la onda sinusoidal" },
+    ],
+    example: `wavyprogress label="Compilando diseño..." value=85 variant=linear`,
+  },
 
   // Screens & Declarations
   {
