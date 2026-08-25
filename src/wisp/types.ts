@@ -3,7 +3,7 @@
  * Designed for Material 3 Expressive prototyping and extensible to other design systems.
  */
 
-export type ScreenType = "screen" | "dialog" | "form" | "wizard" | "sheet" | "modal" | "snackbar" | "toast" | "component" | "drawer" | "sidesheet";
+export type ScreenType = "screen" | "dialog" | "form" | "wizard" | "sheet" | "modal" | "snackbar" | "toast" | "component" | "drawer" | "sidesheet" | "bottomsheet";
 
 export interface NodePosition {
   line: number;

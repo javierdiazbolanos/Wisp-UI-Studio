@@ -18,6 +18,8 @@ import { UnsavedChangesModal } from "./components/UnsavedChangesModal";
 import { M3ThemeStudioModal } from "./components/M3ThemeStudioModal";
 import { WispLogo } from "./components/WispLogo";
 import { ScreenNavigatorDropdown } from "./components/ScreenNavigatorDropdown";
+import { CreateScreenModal } from "./components/CreateScreenModal";
+import { ScreenType } from "./wisp/types";
 import { WISP_TEMPLATES, WispTemplate, BASIC_HOME_TEMPLATE } from "./data/templates";
 import { DynamicIcon } from "./components/DynamicIcon";
 import { motion, AnimatePresence } from "motion/react";
@@ -88,6 +90,17 @@ export default function App() {
   const [navigationHistory, setNavigationHistory] = useState<string[]>([]);
   const [activeToast, setActiveToast] = useState<ActiveToastData | null>(null);
 
+  // Screen / Dialog / Container creation dialog state
+  const [createModalState, setCreateModalState] = useState<{
+    isOpen: boolean;
+    targetScreenName: string;
+    fromScreenName: string;
+  }>({
+    isOpen: false,
+    targetScreenName: "",
+    fromScreenName: "Home",
+  });
+
   // Auto-dismiss active snackbar after its duration at app level
   useEffect(() => {
     if (activeToast) {
@@ -119,6 +132,46 @@ export default function App() {
     wispDocument.screens.find((s) => s.type !== "snackbar" && s.type !== "toast") ||
     wispDocument.screens[0];
 
+  const handleOpenCreateModal = (screenName: string, fromScreenName?: string) => {
+    const cleanName = screenName.replace(/^@/, "").trim();
+    if (!cleanName) return;
+    setCreateModalState({
+      isOpen: true,
+      targetScreenName: cleanName,
+      fromScreenName: fromScreenName || activeScreenName || "Home",
+    });
+  };
+
+  const handleApplyCreateScreen = (
+    screenName: string,
+    screenType: ScreenType,
+    snippet: string
+  ) => {
+    const cleanName = screenName.replace(/^@/, "").trim();
+    if (!cleanName) return;
+
+    // Append snippet to code
+    setWispCode((prev) => prev.trimEnd() + snippet);
+
+    // If it's a full screen, wizard, or form, switch active preview to it
+    if (screenType === "screen" || screenType === "wizard" || screenType === "form") {
+      setActiveScreenName(cleanName);
+      setActiveWizardStep(1);
+    }
+
+    setActiveToast({
+      id: `created_${cleanName}_${Date.now()}`,
+      message: `¡Vista @${cleanName} (${screenType}) agregada al código!`,
+      icon: "sparkles",
+      type: "success",
+      duration: 4000,
+    });
+  };
+
+  const handleCreateScreen = (screenName: string, fromScreenName?: string) => {
+    handleOpenCreateModal(screenName, fromScreenName);
+  };
+
   const handleNavigate = (target: string) => {
     if (target === "back") {
       if (navigationHistory.length > 0) {
@@ -134,6 +187,15 @@ export default function App() {
       if (match) {
         const screenName = match[1];
         const stepNum = match[2] ? parseInt(match[2], 10) : 1;
+
+        // Check if target screen exists in document
+        const screenExists = wispDocument.screens.some((s) => s.name === screenName);
+        if (!screenExists) {
+          const fromScreen = activeScreenName || "Home";
+          // Open interactive creation modal directly
+          handleOpenCreateModal(screenName, fromScreen);
+          return;
+        }
 
         if (screenName !== activeScreenName) {
           setNavigationHistory((h) => [...h, activeScreenName]);
@@ -484,6 +546,7 @@ export default function App() {
                 onInsertSnippet={(snippet) => {
                   setWispCode((prev) => prev + snippet);
                 }}
+                onOpenCreateModal={() => handleOpenCreateModal("Screen1", activeScreenName)}
               />
             )}
           </div>
@@ -667,6 +730,7 @@ export default function App() {
               inspectMode={inspectMode}
               onOpenDocs={() => setIsDocsOpen(true)}
               onNewCode={handleNewProject}
+              onCreateScreen={handleCreateScreen}
               isMaximized={isEditorMaximized}
               onToggleMaximize={() => setIsEditorMaximized(!isEditorMaximized)}
               previewIsDark={isDark}
@@ -852,11 +916,37 @@ export default function App() {
                     onTriggerToast={setActiveToast}
                   />
                 ) : (
-                  <div className="text-center py-16 text-neutral-400 space-y-2">
-                    <p className="text-lg font-bold">No screens declared</p>
-                    <p className="text-xs">
-                      Write <code className="font-mono text-purple-600">@Home:screen</code> in the editor to start prototyping.
-                    </p>
+                  <div className="text-center py-16 px-4 space-y-4 my-auto">
+                    <div className="w-14 h-14 rounded-3xl bg-purple-100 dark:bg-purple-950/60 text-purple-600 dark:text-purple-300 flex items-center justify-center mx-auto shadow-inner">
+                      <Sparkles className="w-7 h-7" />
+                    </div>
+                    <div className="space-y-1">
+                      <p className="text-base font-bold text-neutral-900 dark:text-white">
+                        {activeScreenName
+                          ? `La pantalla @${activeScreenName} no existe aún`
+                          : "No se han declarado pantallas"}
+                      </p>
+                      <p className="text-xs text-neutral-500 max-w-sm mx-auto">
+                        {activeScreenName
+                          ? `El enlace o navegación apuntó a @${activeScreenName}. Puedes generarla rápidamente con un clic.`
+                          : "Escribe @Home:screen en el editor o presiona 'Nuevo' para comenzar."}
+                      </p>
+                    </div>
+                    {activeScreenName && (
+                      <button
+                        type="button"
+                        onClick={() =>
+                          handleOpenCreateModal(
+                            activeScreenName,
+                            navigationHistory[navigationHistory.length - 1] || "Home"
+                          )
+                        }
+                        className="px-4 py-2.5 bg-purple-600 hover:bg-purple-700 text-white rounded-2xl text-xs font-bold shadow-md shadow-purple-500/20 inline-flex items-center gap-2 cursor-pointer transition-all active:scale-96"
+                      >
+                        <Plus className="w-4 h-4" />
+                        <span>Crear vista @{activeScreenName}</span>
+                      </button>
+                    )}
                   </div>
                 )}
               </div>
@@ -901,7 +991,9 @@ export default function App() {
                         <button
                           type="button"
                           onClick={() => {
-                            if (activeToast.goto) {
+                            if (activeToast.onAction) {
+                              activeToast.onAction();
+                            } else if (activeToast.goto) {
                               handleNavigate(activeToast.goto);
                             }
                             setActiveToast(null);
@@ -932,6 +1024,15 @@ export default function App() {
       </div>
 
       {/* Modals */}
+      <CreateScreenModal
+        isOpen={createModalState.isOpen}
+        targetScreenName={createModalState.targetScreenName}
+        fromScreenName={createModalState.fromScreenName}
+        onClose={() => setCreateModalState((prev) => ({ ...prev, isOpen: false }))}
+        onCreate={handleApplyCreateScreen}
+        isDark={isDark}
+      />
+
       <AICopilotModal
         isOpen={isAICopilotOpen}
         onClose={() => setIsAICopilotOpen(false)}
@@ -944,6 +1045,7 @@ export default function App() {
         isOpen={isExportOpen}
         onClose={() => setIsExportOpen(false)}
         document={wispDocument}
+        colorScheme={activeColorScheme}
       />
 
       <WispDocsModal

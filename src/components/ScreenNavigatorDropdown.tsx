@@ -25,6 +25,7 @@ interface ScreenNavigatorDropdownProps {
   onSelectScreen: (screenName: string) => void;
   onJumpToLine?: (line: number) => void;
   onInsertSnippet?: (snippet: string) => void;
+  onOpenCreateModal?: () => void;
 }
 
 export const ScreenNavigatorDropdown: React.FC<ScreenNavigatorDropdownProps> = ({
@@ -33,6 +34,7 @@ export const ScreenNavigatorDropdown: React.FC<ScreenNavigatorDropdownProps> = (
   onSelectScreen,
   onJumpToLine,
   onInsertSnippet,
+  onOpenCreateModal,
 }) => {
   const [isOpen, setIsOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
@@ -303,7 +305,19 @@ export const ScreenNavigatorDropdown: React.FC<ScreenNavigatorDropdownProps> = (
             <div className="mt-2 pt-2 border-t border-neutral-100 dark:border-neutral-800 flex items-center justify-between text-[11px] text-neutral-500 px-1">
               <span className="text-[10px]">WDL v1.0 M3</span>
               <div className="flex items-center gap-1.5">
-                {onInsertSnippet && (
+                {onOpenCreateModal ? (
+                  <button
+                    type="button"
+                    onClick={() => {
+                      onOpenCreateModal();
+                      setIsOpen(false);
+                    }}
+                    className="flex items-center gap-1 px-2 py-0.5 rounded-lg bg-purple-50 hover:bg-purple-100 dark:bg-purple-950 dark:hover:bg-purple-900 text-purple-700 dark:text-purple-300 font-semibold cursor-pointer transition-all"
+                  >
+                    <Plus className="w-3 h-3" />
+                    <span>+ Screen</span>
+                  </button>
+                ) : onInsertSnippet ? (
                   <button
                     type="button"
                     onClick={() => {
@@ -315,7 +329,7 @@ export const ScreenNavigatorDropdown: React.FC<ScreenNavigatorDropdownProps> = (
                     <Plus className="w-3 h-3" />
                     <span>+ Screen</span>
                   </button>
-                )}
+                ) : null}
                 {onInsertSnippet && (
                   <button
                     type="button"

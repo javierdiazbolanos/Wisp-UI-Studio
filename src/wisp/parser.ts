@@ -89,7 +89,7 @@ export function parseWispDSL(dslText: string): WispDocument {
         if (screenMatch) {
           const screenName = screenMatch[1];
           const screenTypeRaw = (screenMatch[2] || "screen").toLowerCase();
-          const validTypes: ScreenType[] = ["screen", "dialog", "form", "wizard", "sheet", "modal", "snackbar", "toast", "component", "drawer", "sidesheet"];
+          const validTypes: ScreenType[] = ["screen", "dialog", "form", "wizard", "sheet", "modal", "snackbar", "toast", "component", "drawer", "sidesheet", "bottomsheet"];
           const screenType: ScreenType = validTypes.includes(screenTypeRaw as ScreenType)
             ? (screenTypeRaw as ScreenType)
             : "screen";

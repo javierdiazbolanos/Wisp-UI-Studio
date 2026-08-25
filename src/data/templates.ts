@@ -15,7 +15,7 @@ export const BASIC_HOME_TEMPLATE = `@theme material3
     spacer height=8
     textfield nombre label="Nombre completo" placeholder="Ingresa tu nombre" icon=user
     spacer height=12
-    button "Continuar" filled icon=arrow-right goto=@Home
+    button "Continuar" filled icon=arrow-right goto=@Screen1
 `;
 
 export const WISP_TEMPLATES: WispTemplate[] = [

@@ -40,6 +40,7 @@ export interface WispCodeEditorProps {
   onSelectSnippet?: (snippet: string) => void;
   onOpenDocs?: () => void;
   onNewCode?: () => void;
+  onCreateScreen?: (screenName: string) => void;
   isMaximized?: boolean;
   onToggleMaximize?: () => void;
   previewIsDark?: boolean;
@@ -101,6 +102,7 @@ export const WispCodeEditor: React.FC<WispCodeEditorProps> = ({
   onCursorLineChange,
   onOpenDocs,
   onNewCode,
+  onCreateScreen,
   isMaximized = false,
   onToggleMaximize,
   previewIsDark = false,
@@ -114,6 +116,18 @@ export const WispCodeEditor: React.FC<WispCodeEditorProps> = ({
   const [fontSize, setFontSize] = useState<number>(13); // 12, 13, 14, 16
   const [cursorPos, setCursorPos] = useState<{ line: number; column: number }>({ line: 1, column: 1 });
   const [editorViewMode, setEditorViewMode] = useState<"monaco" | "plain" | "readonly">("monaco");
+
+  // Check for missing target screens in diagnostics
+  const missingTargetScreens = useMemo(() => {
+    const missing = new Set<string>();
+    for (const d of diagnostics) {
+      const match = d.message.match(/Navigation target "@([a-zA-Z0-9_-]+)" does not exist/i);
+      if (match) {
+        missing.add(match[1]);
+      }
+    }
+    return Array.from(missing);
+  }, [diagnostics]);
 
   // Monokai Dark as default, with option to switch to Light or Material Dark
   const [monacoTheme, setMonacoTheme] = useState<MonacoTheme>(() => {
@@ -801,7 +815,7 @@ export const WispCodeEditor: React.FC<WispCodeEditorProps> = ({
               <span>Sintaxis Wisp 100% válida</span>
             </div>
           ) : (
-            <div className="flex items-center gap-3">
+            <div className="flex items-center gap-3 flex-wrap">
               {errorCount > 0 && (
                 <div className="flex items-center gap-1 text-red-400 font-medium">
                   <AlertCircle className="w-3.5 h-3.5" />
@@ -812,6 +826,22 @@ export const WispCodeEditor: React.FC<WispCodeEditorProps> = ({
                 <div className="flex items-center gap-1 text-amber-400 font-medium">
                   <AlertTriangle className="w-3.5 h-3.5" />
                   <span>{warningCount} advertencia(s)</span>
+                </div>
+              )}
+              {missingTargetScreens.length > 0 && onCreateScreen && (
+                <div className="flex items-center gap-1.5 pl-2 border-l border-neutral-700/60">
+                  {missingTargetScreens.map((screenName) => (
+                    <button
+                      key={screenName}
+                      type="button"
+                      onClick={() => onCreateScreen(screenName)}
+                      className="px-2 py-0.5 rounded-lg bg-purple-600 hover:bg-purple-700 text-white text-[10px] font-bold transition-all shadow-xs flex items-center gap-1 cursor-pointer animate-pulse hover:animate-none"
+                      title={`Crear pantalla @${screenName}`}
+                    >
+                      <Plus className="w-3 h-3" />
+                      <span>Crear @{screenName}</span>
+                    </button>
+                  ))}
                 </div>
               )}
             </div>

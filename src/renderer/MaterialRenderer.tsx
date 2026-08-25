@@ -54,6 +54,7 @@ export interface ActiveToastData {
   type?: string;
   goto?: string;
   duration?: number;
+  onAction?: () => void;
 }
 
 interface MaterialRendererProps {
@@ -5526,7 +5527,9 @@ export const MaterialRenderer: React.FC<MaterialRendererProps> = ({
                 <button
                   type="button"
                   onClick={() => {
-                    if (activeToast.goto) {
+                    if (activeToast.onAction) {
+                      activeToast.onAction();
+                    } else if (activeToast.goto) {
                       handleNavigateAction(activeToast.goto);
                     }
                     setActiveToast(null);
